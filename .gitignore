@@ -1,6 +1,8 @@
 xi-modal-input/Cargo.lock
 xi-modal-input/target
 
+ModalInputTest/*.a
+
 ### macOS ###
 # General
 .DS_Store

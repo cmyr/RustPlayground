@@ -13,6 +13,14 @@ class ViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        let handler = EventHandler { (val) in
+            print("callback with \(val)")
+        }
+        for i in 0...10 {
+            let r = handler.handleInput(val: UInt32(i))
+//            let r = xiEventHandlerHandleInput(handler, UInt32(i))
+            print("\(i): \(r)")
+        }
         // Do any additional setup after loading the view.
     }
 
@@ -21,7 +29,5 @@ class ViewController: NSViewController {
         // Update the view, if already loaded.
         }
     }
-
-
 }
 

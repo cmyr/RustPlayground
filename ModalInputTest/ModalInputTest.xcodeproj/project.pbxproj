@@ -3,15 +3,18 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		600D761322405AC400CC9D90 /* libximodal.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 609A225F22404CF900A3F007 /* libximodal.a */; };
+		604B0F6022405C88007038E6 /* XiEventHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 604B0F5F22405C88007038E6 /* XiEventHandler.swift */; };
 		606644EB223FFED7006215A0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606644EA223FFED7006215A0 /* AppDelegate.swift */; };
 		606644ED223FFED7006215A0 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606644EC223FFED7006215A0 /* ViewController.swift */; };
 		606644EF223FFED8006215A0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 606644EE223FFED8006215A0 /* Assets.xcassets */; };
 		606644F2223FFED8006215A0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 606644F0223FFED8006215A0 /* Main.storyboard */; };
 		606644FE223FFED9006215A0 /* ModalInputTestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606644FD223FFED9006215A0 /* ModalInputTestTests.swift */; };
+		609A22672240504100A3F007 /* libximodal.h in Headers */ = {isa = PBXBuildFile; fileRef = 609A22662240504100A3F007 /* libximodal.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -22,9 +25,17 @@
 			remoteGlobalIDString = 606644E6223FFED7006215A0;
 			remoteInfo = ModalInputTest;
 		};
+		609A226422404D5D00A3F007 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 606644DF223FFED7006215A0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 609A225E22404CF900A3F007;
+			remoteInfo = ximodal;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		604B0F5F22405C88007038E6 /* XiEventHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XiEventHandler.swift; sourceTree = "<group>"; };
 		606644E7223FFED7006215A0 /* ModalInputTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ModalInputTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		606644EA223FFED7006215A0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		606644EC223FFED7006215A0 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -35,6 +46,9 @@
 		606644F9223FFED9006215A0 /* ModalInputTestTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ModalInputTestTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		606644FD223FFED9006215A0 /* ModalInputTestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModalInputTestTests.swift; sourceTree = "<group>"; };
 		606644FF223FFED9006215A0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		609A225F22404CF900A3F007 /* libximodal.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libximodal.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		609A22662240504100A3F007 /* libximodal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = libximodal.h; path = "../xi-modal-input/libximodal.h"; sourceTree = "<group>"; };
+		609A2269224052B000A3F007 /* ModalInputTest-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ModalInputTest-Bridging-Header.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -42,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				600D761322405AC400CC9D90 /* libximodal.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -55,12 +70,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		600D761222405AC400CC9D90 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		606644DE223FFED7006215A0 = {
 			isa = PBXGroup;
 			children = (
 				606644E9223FFED7006215A0 /* ModalInputTest */,
 				606644FC223FFED9006215A0 /* ModalInputTestTests */,
 				606644E8223FFED7006215A0 /* Products */,
+				609A2269224052B000A3F007 /* ModalInputTest-Bridging-Header.h */,
+				609A22662240504100A3F007 /* libximodal.h */,
+				600D761222405AC400CC9D90 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -69,6 +94,7 @@
 			children = (
 				606644E7223FFED7006215A0 /* ModalInputTest.app */,
 				606644F9223FFED9006215A0 /* ModalInputTestTests.xctest */,
+				609A225F22404CF900A3F007 /* libximodal.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -78,6 +104,7 @@
 			children = (
 				606644EA223FFED7006215A0 /* AppDelegate.swift */,
 				606644EC223FFED7006215A0 /* ViewController.swift */,
+				604B0F5F22405C88007038E6 /* XiEventHandler.swift */,
 				606644EE223FFED8006215A0 /* Assets.xcassets */,
 				606644F0223FFED8006215A0 /* Main.storyboard */,
 				606644F3223FFED8006215A0 /* Info.plist */,
@@ -97,6 +124,17 @@
 		};
 /* End PBXGroup section */
 
+/* Begin PBXHeadersBuildPhase section */
+		609A225B22404CF900A3F007 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				609A22672240504100A3F007 /* libximodal.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
 /* Begin PBXNativeTarget section */
 		606644E6223FFED7006215A0 /* ModalInputTest */ = {
 			isa = PBXNativeTarget;
@@ -105,10 +143,12 @@
 				606644E3223FFED7006215A0 /* Sources */,
 				606644E4223FFED7006215A0 /* Frameworks */,
 				606644E5223FFED7006215A0 /* Resources */,
+				6066450822402352006215A0 /* ShellScript */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				609A226522404D5D00A3F007 /* PBXTargetDependency */,
 			);
 			name = ModalInputTest;
 			productName = ModalInputTest;
@@ -133,6 +173,22 @@
 			productReference = 606644F9223FFED9006215A0 /* ModalInputTestTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		609A225E22404CF900A3F007 /* ximodal */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 609A226022404CF900A3F007 /* Build configuration list for PBXNativeTarget "ximodal" */;
+			buildPhases = (
+				609A225B22404CF900A3F007 /* Headers */,
+				609A226322404D0D00A3F007 /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ximodal;
+			productName = ximodal;
+			productReference = 609A225F22404CF900A3F007 /* libximodal.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -145,15 +201,19 @@
 				TargetAttributes = {
 					606644E6223FFED7006215A0 = {
 						CreatedOnToolsVersion = 10.1;
+						LastSwiftMigration = 1010;
 					};
 					606644F8223FFED9006215A0 = {
 						CreatedOnToolsVersion = 10.1;
 						TestTargetID = 606644E6223FFED7006215A0;
 					};
+					609A225E22404CF900A3F007 = {
+						CreatedOnToolsVersion = 10.1;
+					};
 				};
 			};
 			buildConfigurationList = 606644E2223FFED7006215A0 /* Build configuration list for PBXProject "ModalInputTest" */;
-			compatibilityVersion = "Xcode 9.3";
+			compatibilityVersion = "Xcode 10.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -167,6 +227,7 @@
 			targets = (
 				606644E6223FFED7006215A0 /* ModalInputTest */,
 				606644F8223FFED9006215A0 /* ModalInputTestTests */,
+				609A225E22404CF900A3F007 /* ximodal */,
 			);
 		};
 /* End PBXProject section */
@@ -190,11 +251,49 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		6066450822402352006215A0 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# When building from Xcode we want to ensure that `cargo` is in PATH.\n# as a convenience, add the default cargo install location\nexport PATH=\"$PATH:${HOME}/.cargo/bin\"\n\nif [[ $CONFIGURATION = \"Debug\" ]]; then\n    RUST_CONFIGURATION=\"debug\"\n    RUST_CONFIGURATION_FLAG=\"\"\nelse\n    RUST_CONFIGURATION=\"release\"\n    RUST_CONFIGURATION_FLAG=\"--release\"\nfi\n\ncd \"${SRCROOT}/../xi-modal-input\"\n\necho \"rust config ${RUST_CONFIGURATION}\"\n\ncargo build $RUST_CONFIGURATION_FLAG\ncp \"${SRCROOT}/../xi-modal-input/target/${RUST_CONFIGURATION}/libximodal.a\" \"${SRCROOT}/\"\n";
+		};
+		609A226322404D0D00A3F007 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n# When building from Xcode we want to ensure that `cargo` is in PATH.\n# as a convenience, add the default cargo install location\nexport PATH=\"$PATH:${HOME}/.cargo/bin\"\n\nif [[ $CONFIGURATION = \"Debug\" ]]; then\nRUST_CONFIGURATION=\"debug\"\nRUST_CONFIGURATION_FLAG=\"\"\nelse\nRUST_CONFIGURATION=\"release\"\nRUST_CONFIGURATION_FLAG=\"--release\"\nfi\n\ncd \"${SRCROOT}/../xi-modal-input\"\n\necho \"rust config ${RUST_CONFIGURATION}\"\n\ncargo build $RUST_CONFIGURATION_FLAG\ncp \"${SRCROOT}/../xi-modal-input/target/${RUST_CONFIGURATION}/libximodal.a\" \"${BUILT_PRODUCTS_DIR}/libximodal.a\"\n# cp \"${SRCROOT}/../xi-modal-input/libximodal.h\" \"${BUILT_PRODUCTS_DIR}/libximodal.h\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		606644E3223FFED7006215A0 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				604B0F6022405C88007038E6 /* XiEventHandler.swift in Sources */,
 				606644ED223FFED7006215A0 /* ViewController.swift in Sources */,
 				606644EB223FFED7006215A0 /* AppDelegate.swift in Sources */,
 			);
@@ -215,6 +314,11 @@
 			isa = PBXTargetDependency;
 			target = 606644E6223FFED7006215A0 /* ModalInputTest */;
 			targetProxy = 606644FA223FFED9006215A0 /* PBXContainerItemProxy */;
+		};
+		609A226522404D5D00A3F007 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 609A225E22404CF900A3F007 /* ximodal */;
+			targetProxy = 609A226422404D5D00A3F007 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -349,6 +453,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = ModalInputTest/ModalInputTest.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -357,8 +462,14 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = net.cmyr.ModalInputTest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "ModalInputTest-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.2;
 			};
 			name = Debug;
@@ -367,6 +478,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = ModalInputTest/ModalInputTest.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -375,8 +487,13 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = net.cmyr.ModalInputTest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "ModalInputTest-Bridging-Header.h";
 				SWIFT_VERSION = 4.2;
 			};
 			name = Release;
@@ -421,6 +538,26 @@
 			};
 			name = Release;
 		};
+		609A226122404CF900A3F007 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		609A226222404CF900A3F007 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -447,6 +584,15 @@
 			buildConfigurations = (
 				60664506223FFED9006215A0 /* Debug */,
 				60664507223FFED9006215A0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		609A226022404CF900A3F007 /* Build configuration list for PBXNativeTarget "ximodal" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				609A226122404CF900A3F007 /* Debug */,
+				609A226222404CF900A3F007 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

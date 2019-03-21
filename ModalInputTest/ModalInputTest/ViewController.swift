@@ -9,25 +9,19 @@
 import Cocoa
 
 class ViewController: NSViewController {
+    @IBOutlet weak var textField: NSTextField!
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        let handler = EventHandler { (val) in
-            print("callback with \(val)")
-        }
-        for i in 0...10 {
-            let r = handler.handleInput(val: UInt32(i))
-//            let r = xiEventHandlerHandleInput(handler, UInt32(i))
-            print("\(i): \(r)")
-        }
-        // Do any additional setup after loading the view.
     }
 
-    override var representedObject: Any? {
-        didSet {
-        // Update the view, if already loaded.
-        }
+    override func viewDidAppear() {
+        self.view.window?.makeFirstResponder(self.textField)
+    }
+
+    override func keyDown(with event: NSEvent) {
+        print("VC.keyDown \(event.getAddress())")
+        super.keyDown(with: event)
     }
 }
 

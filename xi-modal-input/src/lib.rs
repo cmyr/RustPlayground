@@ -1,12 +1,21 @@
 
 extern crate libc;
 
-use libc::{boolean_t, uint32_t};
+use libc::{c_char, uint32_t};
+use std::ffi::CStr;
 
+
+pub enum EventPayload {}
+
+pub struct KeyEvent<'a> {
+    modifiers: uint32_t,
+    characters: &'a CStr,
+    payload: *const EventPayload,
+}
 
 #[no_mangle]
-pub extern "C" fn xiEventHandlerCreate(cb: extern fn(*const XiCoreEvent)) -> *mut XiEventHandler {
-    let handler = EventHandler::new(|_ev| {});
+pub extern "C" fn xiEventHandlerCreate(cb: extern fn(*const EventPayload)) -> *mut XiEventHandler {
+    let handler = EventHandler::new(move |pl| { cb(pl) });
     let r = Box::into_raw(Box::new(XiEventHandler(handler)));
     eprintln!("event handler alloc {:?}", &r);
     r
@@ -25,13 +34,24 @@ pub extern "C" fn xiEventHandlerFree(ptr: *mut XiEventHandler) {
 }
 
 #[no_mangle]
-pub extern "C" fn xiEventHandlerHandleInput(handler: *mut XiEventHandler, event: uint32_t) -> boolean_t {
-    let event = event as u32;
+pub extern "C" fn xiEventHandlerHandleInput(handler: *mut XiEventHandler, modifiers: uint32_t, characters: *const c_char, payload: *const EventPayload) {
+    let characters = unsafe {
+        assert!(!characters.is_null());
+        CStr::from_ptr(characters)
+    };
+
     let handler = unsafe {
         assert!(!handler.is_null());
         &mut *handler
     };
-    handler.0.handle_input(event) as boolean_t
+
+    let event = KeyEvent {
+        characters,
+        modifiers,
+        payload,
+    };
+
+    handler.0.handle_input(event);
 }
 
 #[repr(C)]
@@ -40,21 +60,20 @@ pub struct XiEventHandler(EventHandler);
 #[repr(C)]
 pub struct XiCoreEvent(u32);
 
-type RawEvent = u32;
-
 struct EventHandler {
-    callback: Box<dyn Fn(XiCoreEvent)>,
+    callback: Box<dyn Fn(*const EventPayload)>,
 }
 
 impl EventHandler {
-    fn new<F: Fn(XiCoreEvent) + 'static>(callback: F) -> EventHandler {
+    fn new<F: Fn(*const EventPayload) + 'static>(callback: F) -> EventHandler {
         EventHandler {
             callback: Box::new(callback),
         }
     }
 
     /// Returns `true` if this event should be passed to IME.
-    fn handle_input(&mut self, input: RawEvent) -> bool {
-        input % 2 == 0
+    fn handle_input<'a>(&mut self, input: KeyEvent<'a>) {
+        let KeyEvent { payload, .. } = input;
+        (self.callback)(payload);
     }
 }

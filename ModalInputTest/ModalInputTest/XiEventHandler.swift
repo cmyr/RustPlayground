@@ -11,18 +11,18 @@ import Cocoa
 class EventHandler {
     let _inner: OpaquePointer
 
-    init(callback: @escaping (@convention(c) (OpaquePointer?) -> Void)) {
-        _inner = xiEventHandlerCreate(callback)
+    init(callback: @escaping (@convention(c) (OpaquePointer?) -> Void), action: @escaping (@convention(c) (UnsafePointer<Int8>?) -> Void)) {
+        _inner = xiEventHandlerCreate(callback, action)
     }
 
     func handleInput(event: NSEvent) {
         let chars = event.charactersIgnoringModifiers ?? "";
-        let charsPtr = UnsafePointer<Int8>(chars)
+//        let charsPtr = UnsafePointer<Int8>(chars)
         let modifiers = UInt32(event.modifierFlags.rawValue);
         let eventPtr: Unmanaged<NSEvent> = Unmanaged.passRetained(event);
 
         print("sending \(event.getAddress()) \(event)")
-        xiEventHandlerHandleInput(_inner, modifiers, charsPtr, OpaquePointer(eventPtr.toOpaque()))
+        xiEventHandlerHandleInput(_inner, modifiers, chars, OpaquePointer(eventPtr.toOpaque()))
     }
 
     deinit {

@@ -9,7 +9,7 @@
 import Cocoa
 
 class XiApp: NSApplication {
-    let handler = EventHandler(callback: dispatchEvent)
+    let handler = EventHandler(callback: dispatchEvent, action: handleAction)
 
     override func sendEvent(_ event: NSEvent) {
         if event.type == .keyDown {
@@ -27,5 +27,17 @@ func dispatchEvent(eventPtr: OpaquePointer?) {
         let event: NSEvent = Unmanaged<NSEvent>.fromOpaque(ptr).takeRetainedValue();
         print("dispatchEvent \(event.getAddress())")
         (NSApp as! XiApp).reallySendEvent(event)
+    }
+}
+
+func handleAction(jsonPtr: UnsafePointer<Int8>?) {
+    if let ptr = jsonPtr {
+        let string = String(cString: ptr)
+
+        let message = try! JSONSerialization.jsonObject(with: string.data(using: .utf8)!) as! [String: AnyObject]
+        let method = message["method"] as! String
+        let params = message["params"] as! [String: AnyObject]
+
+        (NSApp.delegate as! AppDelegate).handleMessage(method: method, params: params)
     }
 }

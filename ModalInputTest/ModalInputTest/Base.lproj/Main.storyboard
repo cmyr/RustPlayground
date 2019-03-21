@@ -718,9 +718,19 @@
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="oPh-0J-YxJ">
+                                <rect key="frame" x="0.0" y="211" width="212" height="17"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Insert" id="iEC-Pl-sZd">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
                         </subviews>
                     </view>
                     <connections>
+                        <outlet property="modeLabel" destination="oPh-0J-YxJ" id="iMb-ab-2xb"/>
                         <outlet property="textField" destination="OFx-d7-lLj" id="Ah1-GQ-3XR"/>
                     </connections>
                 </viewController>

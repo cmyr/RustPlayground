@@ -16,7 +16,11 @@ class EventHandler {
     }
 
     func handleInput(event: NSEvent) {
-        let chars = event.charactersIgnoringModifiers ?? "";
+        var chars = event.charactersIgnoringModifiers ?? "";
+        //FIXME: hack to send escape
+        if event.keyCode == 53 {
+            chars = "␛"
+        }
 //        let charsPtr = UnsafePointer<Int8>(chars)
         let modifiers = UInt32(event.modifierFlags.rawValue);
         let eventPtr: Unmanaged<NSEvent> = Unmanaged.passRetained(event);

@@ -178,7 +178,7 @@ mod vim {
                 Motion::Down => "down",
                 Motion::Up => "up",
                 Motion::Word => "word",
-                Motion::BackWord => "back",
+                Motion::BackWord => "word_back",
             }
         }
     }
@@ -193,6 +193,7 @@ mod vim {
     pub(crate) struct Machine {
         mode: Mode,
         state: CommandState,
+        raw: String,
     }
 
     impl Handler for Machine {
@@ -209,11 +210,12 @@ mod vim {
             Machine {
                 mode: Mode::Insert,
                 state: CommandState::Ready,
+                raw: String::new(),
             }
         }
 
         fn handle_insert<'a>(&mut self, event: KeyEvent<'a>, handler: &EventHandler) {
-            if event.characters == "Z" {
+            if event.characters == "␛" {
                 self.mode = Mode::Command;
                 handler.send_action("mode_change", Some(json!({"mode": "command"})));
             } else {
@@ -234,12 +236,14 @@ mod vim {
                 if chr == 'i' {
                     self.mode = Mode::Insert;
                     handler.send_action("mode_change", Some(json!({"mode": "insert"})));
+                    handler.send_action("parse_state", Some(json!({"state": ""})));
                     return;
                 }
             }
 
             self.state = match &self.state {
                 CommandState::Ready => {
+                    self.raw.push(chr);
                     if let Some(motion) = Motion::from_char(chr) {
                         CommandState::Done(Command { motion, ty: CommandType::Move, distance: 1 })
                     } else if let Some(cmd) = CommandType::from_char(chr) {
@@ -252,6 +256,7 @@ mod vim {
                 }
 
                 CommandState::AwaitMotion(ty, dist) => {
+                    self.raw.push(chr);
                     if let Some(motion) = Motion::from_char(chr) {
                         CommandState::Done(Command { motion, ty: *ty, distance: *dist.max(&1) })
                     } else if let Some(num) = chr.to_digit(10) {
@@ -266,10 +271,15 @@ mod vim {
 
             if let CommandState::Done(Command { motion, ty, distance }) = &self.state {
                 handler.send_action(ty.as_str(), Some(json!({"motion": motion.as_str(), "dist": distance})));
+                handler.send_action("parse_state", Some(json!({"state": &self.raw})));
                 self.state = CommandState::Ready;
+                self.raw = String::new();
             } else if let CommandState::Failed = self.state {
-                eprintln!("parse failed");
                 self.state = CommandState::Ready;
+                handler.send_action("parse_state", Some(json!({"state": &self.raw})));
+                self.raw = String::new();
+            } else {
+                handler.send_action("parse_state", Some(json!({"state": &self.raw})));
             }
         }
     }

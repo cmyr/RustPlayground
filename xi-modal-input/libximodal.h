@@ -4,7 +4,7 @@
 
 typedef struct _XiEventHandler XiEventHandler;
 typedef struct _XiEventPayload XiEventPayload;
-typedef void (*callback)(const XiEventPayload*);
+typedef void (*callback)(const XiEventPayload*, bool);
 typedef void (*action)(const char*);
 
 extern XiEventHandler* xiEventHandlerCreate(callback, action);

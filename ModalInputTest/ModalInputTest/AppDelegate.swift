@@ -10,7 +10,7 @@ import Cocoa
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
-
+    let handler = EventHandler(callback: dispatchEvent, action: handleAction)
     var mainController: ViewController?
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
@@ -47,3 +47,26 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 }
 
+func dispatchEvent(eventPtr: OpaquePointer?, toTheTrash: Int32) {
+    if let ptr = UnsafeRawPointer(eventPtr) {
+        let event: NSEvent = Unmanaged<NSEvent>.fromOpaque(ptr).takeRetainedValue();
+        if toTheTrash == 0 {
+            print("dispatchEvent \(event.getAddress())")
+            if let window = event.window as? XiWindow {
+                window.reallySendEvent(event)
+            }
+        }
+    }
+}
+
+func handleAction(jsonPtr: UnsafePointer<Int8>?) {
+    if let ptr = jsonPtr {
+        let string = String(cString: ptr)
+
+        let message = try! JSONSerialization.jsonObject(with: string.data(using: .utf8)!) as! [String: AnyObject]
+        let method = message["method"] as! String
+        let params = message["params"] as! [String: AnyObject]
+
+        (NSApp.delegate as! AppDelegate).handleMessage(method: method, params: params)
+    }
+}

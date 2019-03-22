@@ -1,10 +1,9 @@
-
 extern crate libc;
-#[macro_use] extern crate serde_json;
+#[macro_use]
+extern crate serde_json;
 
 use libc::{c_char, uint32_t};
-use std::ffi::{CString, CStr};
-
+use std::ffi::{CStr, CString};
 
 pub enum EventPayload {}
 
@@ -15,8 +14,14 @@ pub struct KeyEvent<'a> {
 }
 
 #[no_mangle]
-pub extern "C" fn xiEventHandlerCreate(event_cb: extern fn(*const EventPayload), action_cb: extern fn(*const c_char)) -> *mut XiEventHandler {
-    let handler = EventHandler::new(move |pl| { event_cb(pl) }, move |cstr| { action_cb(cstr) });
+pub extern "C" fn xiEventHandlerCreate(
+    event_cb: extern "C" fn(*const EventPayload, bool),
+    action_cb: extern "C" fn(*const c_char),
+) -> *mut XiEventHandler {
+    let handler = EventHandler::new(
+        move |event, discard| event_cb(event, discard),
+        move |json_cstr| action_cb(json_cstr),
+    );
     let machine = vim::Machine::new();
     let r = Box::into_raw(Box::new(XiEventHandler(handler, Box::new(machine))));
     eprintln!("event handler alloc {:?}", &r);
@@ -36,7 +41,12 @@ pub extern "C" fn xiEventHandlerFree(ptr: *mut XiEventHandler) {
 }
 
 #[no_mangle]
-pub extern "C" fn xiEventHandlerHandleInput(handler: *mut XiEventHandler, modifiers: uint32_t, characters: *const c_char, payload: *const EventPayload) {
+pub extern "C" fn xiEventHandlerHandleInput(
+    handler: *mut XiEventHandler,
+    modifiers: uint32_t,
+    characters: *const c_char,
+    payload: *const EventPayload,
+) {
     let cstr = unsafe {
         assert!(!characters.is_null());
         CStr::from_ptr(characters)
@@ -55,7 +65,6 @@ pub extern "C" fn xiEventHandlerHandleInput(handler: *mut XiEventHandler, modifi
         &mut *handler
     };
 
-
     let event = KeyEvent {
         characters,
         modifiers,
@@ -73,15 +82,15 @@ pub struct XiEventHandler(EventHandler, Box<dyn Handler>);
 pub struct XiCoreEvent(u32);
 
 struct EventHandler {
-    event_callback: Box<dyn Fn(*const EventPayload)>,
+    event_callback: Box<dyn Fn(*const EventPayload, bool)>,
     action_callback: Box<dyn Fn(*const c_char)>,
 }
 
 impl EventHandler {
     fn new<F1, F2>(event_callback: F1, action_callback: F2) -> EventHandler
-        where
-            F1: Fn(*const EventPayload) + 'static,
-            F2: Fn(*const c_char) + 'static,
+    where
+        F1: Fn(*const EventPayload, bool) + 'static,
+        F2: Fn(*const c_char) + 'static,
     {
         EventHandler {
             event_callback: Box::new(event_callback),
@@ -102,10 +111,14 @@ impl EventHandler {
 
     fn send_event<'a>(&self, event: KeyEvent<'a>) {
         let KeyEvent { payload, .. } = event;
-        (self.event_callback)(payload);
+        (self.event_callback)(payload, false);
+    }
+
+    fn free_event<'a>(&self, event: KeyEvent<'a>) {
+        let KeyEvent { payload, .. } = event;
+        (self.event_callback)(payload, true);
     }
 }
-
 
 trait Handler {
     fn handle_event<'a>(&mut self, event: KeyEvent<'a>, handler: &EventHandler);
@@ -200,7 +213,10 @@ mod vim {
         fn handle_event<'a>(&mut self, event: KeyEvent<'a>, handler: &EventHandler) {
             match self.mode {
                 Mode::Insert => self.handle_insert(event, handler),
-                Mode::Command => self.handle_command(event, handler),
+                Mode::Command => {
+                    self.handle_command(&event, handler);
+                    handler.free_event(event);
+                }
             }
         }
     }
@@ -218,12 +234,13 @@ mod vim {
             if event.characters == "␛" {
                 self.mode = Mode::Command;
                 handler.send_action("mode_change", Some(json!({"mode": "command"})));
+                handler.free_event(event);
             } else {
                 handler.send_event(event);
             }
         }
 
-        fn handle_command<'a>(&mut self, event: KeyEvent<'a>, handler: &EventHandler) {
+        fn handle_command<'a>(&mut self, event: &KeyEvent<'a>, handler: &EventHandler) {
             let chr = match event.characters.chars().next() {
                 Some(c) => c,
                 None => {
@@ -245,7 +262,11 @@ mod vim {
                 CommandState::Ready => {
                     self.raw.push(chr);
                     if let Some(motion) = Motion::from_char(chr) {
-                        CommandState::Done(Command { motion, ty: CommandType::Move, distance: 1 })
+                        CommandState::Done(Command {
+                            motion,
+                            ty: CommandType::Move,
+                            distance: 1,
+                        })
                     } else if let Some(cmd) = CommandType::from_char(chr) {
                         CommandState::AwaitMotion(cmd, 0)
                     } else if let Some(num) = chr.to_digit(10) {
@@ -258,7 +279,11 @@ mod vim {
                 CommandState::AwaitMotion(ty, dist) => {
                     self.raw.push(chr);
                     if let Some(motion) = Motion::from_char(chr) {
-                        CommandState::Done(Command { motion, ty: *ty, distance: *dist.max(&1) })
+                        CommandState::Done(Command {
+                            motion,
+                            ty: *ty,
+                            distance: *dist.max(&1),
+                        })
                     } else if let Some(num) = chr.to_digit(10) {
                         let new_dist = dist * 10 + num as usize;
                         CommandState::AwaitMotion(*ty, new_dist)
@@ -269,8 +294,16 @@ mod vim {
                 _ => unreachable!(),
             };
 
-            if let CommandState::Done(Command { motion, ty, distance }) = &self.state {
-                handler.send_action(ty.as_str(), Some(json!({"motion": motion.as_str(), "dist": distance})));
+            if let CommandState::Done(Command {
+                motion,
+                ty,
+                distance,
+            }) = &self.state
+            {
+                handler.send_action(
+                    ty.as_str(),
+                    Some(json!({"motion": motion.as_str(), "dist": distance})),
+                );
                 handler.send_action("parse_state", Some(json!({"state": &self.raw})));
                 self.state = CommandState::Ready;
                 self.raw = String::new();
@@ -284,4 +317,3 @@ mod vim {
         }
     }
 }
-

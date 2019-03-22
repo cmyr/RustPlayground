@@ -11,7 +11,7 @@ import Cocoa
 class EventHandler {
     let _inner: OpaquePointer
 
-    init(callback: @escaping (@convention(c) (OpaquePointer?) -> Void), action: @escaping (@convention(c) (UnsafePointer<Int8>?) -> Void)) {
+    init(callback: @escaping (@convention(c) (OpaquePointer?, Int32) -> Void), action: @escaping (@convention(c) (UnsafePointer<Int8>?) -> Void)) {
         _inner = xiEventHandlerCreate(callback, action)
     }
 
@@ -21,7 +21,7 @@ class EventHandler {
         if event.keyCode == 53 {
             chars = "␛"
         }
-//        let charsPtr = UnsafePointer<Int8>(chars)
+
         let modifiers = UInt32(event.modifierFlags.rawValue);
         let eventPtr: Unmanaged<NSEvent> = Unmanaged.passRetained(event);
 

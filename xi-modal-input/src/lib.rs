@@ -27,12 +27,7 @@ pub extern "C" fn xiEventHandlerCreate(
     timer_cb: extern "C" fn(*const EventPayload, uint32_t) -> uint32_t,
     cancel_timer_cb: extern "C" fn(uint32_t),
 ) -> *const XiEventHandler {
-    let handler = EventHandler::new(
-        move |event, discard| event_cb(event, discard),
-        move |json_cstr| action_cb(json_cstr),
-        timer_cb,
-        cancel_timer_cb,
-    );
+    let handler = EventHandler::new(event_cb, action_cb, timer_cb, cancel_timer_cb);
     let machine = vim::Machine::new();
     let r = Box::into_raw(Box::new(XiEventHandler(handler, Box::new(machine))));
     eprintln!("event handler alloc {:?}", &r);
@@ -100,28 +95,23 @@ pub extern "C" fn xiEventHandlerHandleInput(
 #[repr(C)]
 pub struct XiEventHandler(EventHandler, Box<dyn Handler>);
 
-//FIXME: the first two here can also just be extern C fns
 struct EventHandler {
-    event_callback: Box<dyn Fn(*const EventPayload, bool)>,
-    action_callback: Box<dyn Fn(*const c_char)>,
+    event_callback: extern "C" fn(*const EventPayload, bool),
+    action_callback: extern "C" fn(*const c_char),
     timer_callback: extern "C" fn(*const EventPayload, uint32_t) -> uint32_t,
     cancel_timer_callback: extern "C" fn(uint32_t),
 }
 
 impl EventHandler {
-    fn new<F1, F2>(
-        event_callback: F1,
-        action_callback: F2,
+    fn new(
+        event_callback: extern "C" fn(*const EventPayload, bool),
+        action_callback: extern "C" fn(*const c_char),
         timer_callback: extern "C" fn(*const EventPayload, uint32_t) -> uint32_t,
         cancel_timer_callback: extern "C" fn(uint32_t),
-    ) -> EventHandler
-    where
-        F1: Fn(*const EventPayload, bool) + 'static,
-        F2: Fn(*const c_char) + 'static,
-    {
+    ) -> EventHandler {
         EventHandler {
-            event_callback: Box::new(event_callback),
-            action_callback: Box::new(action_callback),
+            event_callback,
+            action_callback,
             timer_callback,
             cancel_timer_callback,
         }

@@ -64,6 +64,11 @@ class ViewController: NSViewController {
         textField.doCommand(by: #selector(NSStandardKeyBindingResponding.deleteBackward(_:)))
     }
 
+    override func flagsChanged(with event: NSEvent) {
+        super.flagsChanged(with: event)
+//        print(String(event.modifierFlags.rawValue, radix: 2, uppercase: true), event.keyCode)
+    }
+
 
     func selectorForDeleteMotion(motion: Motion) -> Selector {
         switch motion {

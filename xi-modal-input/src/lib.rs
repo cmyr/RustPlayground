@@ -5,11 +5,18 @@ extern crate serde_json;
 use libc::{c_char, uint32_t};
 use std::ffi::{CStr, CString};
 
+const KEY_TIMEOUT_MILLIS: uint32_t = 500;
+
+// a token for an event that has been scheduled with a delay.
+type PendingToken = uint32_t;
+
+type Milliseconds = uint32_t;
+
 pub enum EventPayload {}
 
-pub struct KeyEvent<'a> {
+pub struct KeyEvent {
     modifiers: uint32_t,
-    characters: &'a str,
+    characters: &'static str,
     payload: *const EventPayload,
 }
 
@@ -17,10 +24,14 @@ pub struct KeyEvent<'a> {
 pub extern "C" fn xiEventHandlerCreate(
     event_cb: extern "C" fn(*const EventPayload, bool),
     action_cb: extern "C" fn(*const c_char),
-) -> *mut XiEventHandler {
+    timer_cb: extern "C" fn(*const EventPayload, uint32_t) -> uint32_t,
+    cancel_timer_cb: extern "C" fn(uint32_t),
+) -> *const XiEventHandler {
     let handler = EventHandler::new(
         move |event, discard| event_cb(event, discard),
         move |json_cstr| action_cb(json_cstr),
+        timer_cb,
+        cancel_timer_cb,
     );
     let machine = vim::Machine::new();
     let r = Box::into_raw(Box::new(XiEventHandler(handler, Box::new(machine))));
@@ -78,16 +89,21 @@ pub extern "C" fn xiEventHandlerHandleInput(
 #[repr(C)]
 pub struct XiEventHandler(EventHandler, Box<dyn Handler>);
 
-#[repr(C)]
-pub struct XiCoreEvent(u32);
-
+//FIXME: the first two here can also just be extern C fns
 struct EventHandler {
     event_callback: Box<dyn Fn(*const EventPayload, bool)>,
     action_callback: Box<dyn Fn(*const c_char)>,
+    timer_callback: extern "C" fn(*const EventPayload, uint32_t) -> uint32_t,
+    cancel_timer_callback: extern "C" fn(uint32_t),
 }
 
 impl EventHandler {
-    fn new<F1, F2>(event_callback: F1, action_callback: F2) -> EventHandler
+    fn new<F1, F2>(
+        event_callback: F1,
+        action_callback: F2,
+        timer_callback: extern "C" fn(*const EventPayload, uint32_t) -> uint32_t,
+        cancel_timer_callback: extern "C" fn(uint32_t),
+    ) -> EventHandler
     where
         F1: Fn(*const EventPayload, bool) + 'static,
         F2: Fn(*const c_char) + 'static,
@@ -95,6 +111,8 @@ impl EventHandler {
         EventHandler {
             event_callback: Box::new(event_callback),
             action_callback: Box::new(action_callback),
+            timer_callback,
+            cancel_timer_callback,
         }
     }
 
@@ -109,23 +127,32 @@ impl EventHandler {
         (self.action_callback)(action_cstr.as_ptr());
     }
 
-    fn send_event<'a>(&self, event: KeyEvent<'a>) {
+    fn send_event(&self, event: KeyEvent) {
         let KeyEvent { payload, .. } = event;
         (self.event_callback)(payload, false);
     }
 
-    fn free_event<'a>(&self, event: KeyEvent<'a>) {
+    fn free_event(&self, event: KeyEvent) {
         let KeyEvent { payload, .. } = event;
         (self.event_callback)(payload, true);
+    }
+
+    fn schedule_event(&self, event: KeyEvent, delay: Milliseconds) -> PendingToken {
+        let KeyEvent { payload, .. } = event;
+        (self.timer_callback)(payload, delay)
+    }
+
+    fn cancel_timer(&self, token: PendingToken) {
+        (self.cancel_timer_callback)(token);
     }
 }
 
 trait Handler {
-    fn handle_event<'a>(&mut self, event: KeyEvent<'a>, handler: &EventHandler);
+    fn handle_event(&mut self, event: KeyEvent, handler: &EventHandler);
 }
 
 mod vim {
-    use super::{EventHandler, Handler, KeyEvent};
+    use super::*;
 
     enum Mode {
         Insert,
@@ -207,10 +234,11 @@ mod vim {
         mode: Mode,
         state: CommandState,
         raw: String,
+        timeout_token: Option<PendingToken>,
     }
 
     impl Handler for Machine {
-        fn handle_event<'a>(&mut self, event: KeyEvent<'a>, handler: &EventHandler) {
+        fn handle_event(&mut self, event: KeyEvent, handler: &EventHandler) {
             match self.mode {
                 Mode::Insert => self.handle_insert(event, handler),
                 Mode::Command => {
@@ -227,20 +255,34 @@ mod vim {
                 mode: Mode::Insert,
                 state: CommandState::Ready,
                 raw: String::new(),
+                timeout_token: None,
             }
         }
 
-        fn handle_insert<'a>(&mut self, event: KeyEvent<'a>, handler: &EventHandler) {
-            if event.characters == "␛" {
+        fn handle_insert(&mut self, event: KeyEvent, handler: &EventHandler) {
+            let timeout_token = self.timeout_token.take();
+            let mut to_command_mode = |event| {
                 self.mode = Mode::Command;
                 handler.send_action("mode_change", Some(json!({"mode": "command"})));
                 handler.free_event(event);
+            };
+
+            if event.characters == "␛" {
+                to_command_mode(event);
+            } else if event.characters == "j" {
+                if let Some(token) = timeout_token {
+                    handler.cancel_timer(token);
+                    to_command_mode(event);
+                } else {
+                    let token = handler.schedule_event(event, KEY_TIMEOUT_MILLIS);
+                    self.timeout_token = Some(token);
+                }
             } else {
                 handler.send_event(event);
             }
         }
 
-        fn handle_command<'a>(&mut self, event: &KeyEvent<'a>, handler: &EventHandler) {
+        fn handle_command(&mut self, event: &KeyEvent, handler: &EventHandler) {
             let chr = match event.characters.chars().next() {
                 Some(c) => c,
                 None => {

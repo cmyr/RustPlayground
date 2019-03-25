@@ -10,8 +10,10 @@ import Cocoa
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
-    let handler = EventHandler(callback: dispatchEvent, action: handleAction)
+    let handler = EventHandler(callback: dispatchEvent, action: handleAction, timer: handleTimer, cancelTimer: cancelTimer)
     var mainController: ViewController?
+    var scheduledEvents = [UInt32: NSEvent]()
+    var nextWorkItemId: UInt32 = 0
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         // Insert code here to initialize your application
@@ -45,16 +47,48 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             print("unhandled method \(method)")
         }
     }
-}
 
-func dispatchEvent(eventPtr: OpaquePointer?, toTheTrash: Int32) {
-    if let ptr = UnsafeRawPointer(eventPtr) {
-        let event: NSEvent = Unmanaged<NSEvent>.fromOpaque(ptr).takeRetainedValue();
-        if toTheTrash == 0 {
-            print("dispatchEvent \(event.getAddress())")
+    func sendEvent(_ event: NSEvent) {
+        // first send any currently delayed events
+        self.scheduledEvents.keys.forEach { self.sendScheduledEvent(withIdentifier: $0) }
+        if let window = event.window as? XiWindow {
+            window.reallySendEvent(event)
+        }
+    }
+
+    func scheduleEvent(_ event: NSEvent, afterDelay delayMillis: UInt32) -> UInt32 {
+        let nextId = self.nextWorkItemId;
+        self.nextWorkItemId += 1;
+
+        let workItem = DispatchWorkItem {
+            self.sendScheduledEvent(withIdentifier: nextId)
+        }
+
+        self.scheduledEvents[nextId] = event
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(Int(delayMillis)), execute: workItem)
+        return nextId
+    }
+
+    func sendScheduledEvent(withIdentifier ident: UInt32) {
+        if let event = self.scheduledEvents[ident] {
             if let window = event.window as? XiWindow {
+                print("sending delayed event \(ident)")
                 window.reallySendEvent(event)
             }
+        }
+        self.scheduledEvents.removeValue(forKey: ident)
+    }
+
+    func cancelEvent(withIdentifier ident: UInt32) {
+        self.scheduledEvents.removeValue(forKey: ident)
+    }
+}
+
+func dispatchEvent(eventPtr: OpaquePointer?, toTheTrash: Bool) {
+    if let ptr = UnsafeRawPointer(eventPtr) {
+        let event: NSEvent = Unmanaged<NSEvent>.fromOpaque(ptr).takeRetainedValue();
+        if !toTheTrash {
+            (NSApp.delegate as! AppDelegate).sendEvent(event)
         }
     }
 }
@@ -69,4 +103,13 @@ func handleAction(jsonPtr: UnsafePointer<Int8>?) {
 
         (NSApp.delegate as! AppDelegate).handleMessage(method: method, params: params)
     }
+}
+
+func handleTimer(eventPtr: OpaquePointer?, delay: UInt32) -> UInt32 {
+    let event: NSEvent = Unmanaged<NSEvent>.fromOpaque(UnsafeRawPointer(eventPtr)!).takeRetainedValue();
+    return (NSApp.delegate as! AppDelegate).scheduleEvent(event, afterDelay: delay)
+}
+
+func cancelTimer(token: UInt32) {
+    (NSApp.delegate as! AppDelegate).cancelEvent(withIdentifier: token)
 }

@@ -11,8 +11,12 @@ import Cocoa
 class EventHandler {
     let _inner: OpaquePointer
 
-    init(callback: @escaping (@convention(c) (OpaquePointer?, Int32) -> Void), action: @escaping (@convention(c) (UnsafePointer<Int8>?) -> Void)) {
-        _inner = xiEventHandlerCreate(callback, action)
+    init(callback: @escaping (@convention(c) (OpaquePointer?, Bool) -> Void),
+         action: @escaping (@convention(c) (UnsafePointer<Int8>?) -> Void),
+         timer: @escaping (@convention(c) (OpaquePointer?, UInt32) -> UInt32),
+         cancelTimer: @escaping (@convention(c) (UInt32) -> Void)
+         ) {
+        _inner = xiEventHandlerCreate(callback, action, timer, cancelTimer)
     }
 
     func handleInput(event: NSEvent) {

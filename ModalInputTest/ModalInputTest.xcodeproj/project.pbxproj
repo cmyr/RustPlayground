@@ -204,10 +204,11 @@
 				TargetAttributes = {
 					606644E6223FFED7006215A0 = {
 						CreatedOnToolsVersion = 10.1;
-						LastSwiftMigration = 1010;
+						LastSwiftMigration = 1020;
 					};
 					606644F8223FFED9006215A0 = {
 						CreatedOnToolsVersion = 10.1;
+						LastSwiftMigration = 1020;
 						TestTargetID = 606644E6223FFED7006215A0;
 					};
 					609A225E22404CF900A3F007 = {
@@ -474,7 +475,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "ModalInputTest-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -498,7 +499,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = net.cmyr.ModalInputTest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "ModalInputTest-Bridging-Header.h";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
@@ -517,7 +518,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = net.cmyr.ModalInputTestTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ModalInputTest.app/Contents/MacOS/ModalInputTest";
 			};
 			name = Debug;
@@ -537,7 +538,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = net.cmyr.ModalInputTestTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ModalInputTest.app/Contents/MacOS/ModalInputTest";
 			};
 			name = Release;

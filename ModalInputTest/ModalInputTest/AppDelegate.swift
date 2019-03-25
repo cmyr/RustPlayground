@@ -74,6 +74,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             if let window = event.window as? XiWindow {
                 print("sending delayed event \(ident)")
                 window.reallySendEvent(event)
+                self.handler.clearPending(ident)
             }
         }
         self.scheduledEvents.removeValue(forKey: ident)

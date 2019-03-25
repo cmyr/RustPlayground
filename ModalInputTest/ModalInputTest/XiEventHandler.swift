@@ -33,6 +33,10 @@ class EventHandler {
         xiEventHandlerHandleInput(_inner, modifiers, chars, OpaquePointer(eventPtr.toOpaque()))
     }
 
+    func clearPending(_ identifier: UInt32) {
+        xiEventHandlerClearPending(_inner, identifier)
+    }
+
     deinit {
         xiEventHandlerFree(_inner)
     }

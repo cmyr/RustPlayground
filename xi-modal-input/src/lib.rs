@@ -52,6 +52,17 @@ pub extern "C" fn xiEventHandlerFree(ptr: *mut XiEventHandler) {
 }
 
 #[no_mangle]
+pub extern "C" fn xiEventHandlerClearPending(handler: *mut XiEventHandler, token: uint32_t) {
+    let handler = unsafe {
+        assert!(!handler.is_null());
+        &mut *handler
+    };
+
+    let XiEventHandler(_, machine) = handler;
+    machine.clear_pending(token);
+}
+
+#[no_mangle]
 pub extern "C" fn xiEventHandlerHandleInput(
     handler: *mut XiEventHandler,
     modifiers: uint32_t,
@@ -149,6 +160,8 @@ impl EventHandler {
 
 trait Handler {
     fn handle_event(&mut self, event: KeyEvent, handler: &EventHandler);
+    /// Informs the handler that the given delayed event has fired.
+    fn clear_pending(&mut self, token: PendingToken);
 }
 
 mod vim {
@@ -246,6 +259,10 @@ mod vim {
                     handler.free_event(event);
                 }
             }
+        }
+
+        fn clear_pending(&mut self, _token: PendingToken) {
+            self.timeout_token = None;
         }
     }
 

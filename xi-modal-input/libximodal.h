@@ -17,3 +17,4 @@ typedef void (*cancel_timer_callback)(xi_timer_token);
 extern XiEventHandler* xiEventHandlerCreate(event_callback, action_callback, timer_callback, cancel_timer_callback);
 extern void xiEventHandlerFree(XiEventHandler*);
 extern void xiEventHandlerHandleInput(const XiEventHandler*, uint32_t, const char*, XiEventPayload*);
+extern void xiEventHandlerClearPending(const XiEventHandler*, uint32_t);

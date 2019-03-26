@@ -21,7 +21,7 @@ class ViewController: NSViewController {
     }
 
     enum Motion: String {
-        case left, right, up, down, word, word_back
+        case left, right, up, down, word, word_back, end_of_line, start_of_line
     }
 
     var parseState: String = "" {
@@ -84,6 +84,10 @@ class ViewController: NSViewController {
             return #selector(NSStandardKeyBindingResponding.moveDownAndModifySelection(_:))
         case .up:
             return #selector(NSStandardKeyBindingResponding.moveUpAndModifySelection(_:))
+        case .start_of_line:
+            return #selector(NSStandardKeyBindingResponding.moveToBeginningOfLineAndModifySelection(_:))
+        case .end_of_line:
+            return #selector(NSStandardKeyBindingResponding.moveToEndOfLineAndModifySelection(_:))
         }
     }
 
@@ -101,6 +105,10 @@ class ViewController: NSViewController {
             return #selector(NSStandardKeyBindingResponding.moveDown(_:))
         case .up:
             return #selector(NSStandardKeyBindingResponding.moveUp(_:))
+        case .start_of_line:
+            return #selector(NSStandardKeyBindingResponding.moveToBeginningOfLine(_:))
+        case .end_of_line:
+            return #selector(NSStandardKeyBindingResponding.moveToEndOfLine(_:))
         }
     }
 }

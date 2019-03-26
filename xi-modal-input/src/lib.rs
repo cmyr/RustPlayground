@@ -199,6 +199,8 @@ mod vim {
         Down,
         Word,
         BackWord,
+        StartOfLine,
+        EndOfLine,
     }
 
     impl Motion {
@@ -210,6 +212,8 @@ mod vim {
                 'k' => Some(Motion::Up),
                 'w' => Some(Motion::Word),
                 'b' => Some(Motion::BackWord),
+                '0' => Some(Motion::StartOfLine),
+                '$' => Some(Motion::EndOfLine),
                 _ => None,
             }
         }
@@ -222,6 +226,8 @@ mod vim {
                 Motion::Up => "up",
                 Motion::Word => "word",
                 Motion::BackWord => "word_back",
+                Motion::StartOfLine => "start_of_line",
+                Motion::EndOfLine => "end_of_line",
             }
         }
     }
@@ -299,8 +305,12 @@ mod vim {
             };
 
             if let CommandState::Ready = self.state {
-                if chr == 'i' {
+                if ['i', 'a', 'A'].contains(&chr) {
                     self.mode = Mode::Insert;
+                    if chr != 'i' {
+                        let motion = if chr == 'a' { "right" } else { "end_of_line" };
+                        handler.send_action("move", Some(json!({"motion": motion, "dist": 1})));
+                    }
                     handler.send_action("mode_change", Some(json!({"mode": "insert"})));
                     handler.send_action("parse_state", Some(json!({"state": ""})));
                     return;

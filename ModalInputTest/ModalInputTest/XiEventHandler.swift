@@ -21,9 +21,25 @@ class EventHandler {
 
     func handleInput(event: NSEvent) {
         var chars = event.charactersIgnoringModifiers ?? "";
-        //FIXME: hack to send escape
-        if event.keyCode == 53 {
-            chars = "␛"
+
+        switch event.keyCode {
+        case 53:
+            chars = "Escape"
+        case 51:
+            chars = "Backspace"
+        case 117:
+            chars = "Delete"
+        case 76:
+            chars = "Enter"
+        case 123:
+            chars = "LeftArrow"
+        case 124:
+            chars = "RightArrow"
+        case 125:
+            chars = "DownArrow"
+        case 126:
+            chars = "UpArrow"
+        default: break
         }
 
         let modifiers = UInt32(event.modifierFlags.rawValue);

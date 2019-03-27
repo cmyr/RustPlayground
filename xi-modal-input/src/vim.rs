@@ -14,9 +14,9 @@ enum CommandType {
 }
 
 impl CommandType {
-    fn from_char(chr: char) -> Option<CommandType> {
+    fn from_char(chr: &str) -> Option<CommandType> {
         match chr {
-            'd' => Some(CommandType::Delete),
+            "d" => Some(CommandType::Delete),
             _ => None,
         }
     }
@@ -49,16 +49,16 @@ enum Motion {
 }
 
 impl Motion {
-    fn from_char(chr: char) -> Option<Motion> {
+    fn from_char(chr: &str) -> Option<Motion> {
         match chr {
-            'h' => Some(Motion::Left),
-            'l' => Some(Motion::Right),
-            'j' => Some(Motion::Down),
-            'k' => Some(Motion::Up),
-            'w' => Some(Motion::Word),
-            'b' => Some(Motion::BackWord),
-            '0' => Some(Motion::StartOfLine),
-            '$' => Some(Motion::EndOfLine),
+            "h" => Some(Motion::Left),
+            "l" => Some(Motion::Right),
+            "j" => Some(Motion::Down),
+            "k" => Some(Motion::Up),
+            "w" => Some(Motion::Word),
+            "b" => Some(Motion::BackWord),
+            "0" => Some(Motion::StartOfLine),
+            "$" => Some(Motion::EndOfLine),
             _ => None,
         }
     }
@@ -125,7 +125,7 @@ impl Machine {
             handler.free_event(event);
         };
 
-        if event.characters == "␛" {
+        if event.characters == "Escape" {
             to_command_mode(event);
         } else if event.characters == "j" {
             if let Some(token) = timeout_token {
@@ -141,19 +141,20 @@ impl Machine {
     }
 
     fn handle_command(&mut self, event: &KeyEvent, handler: &EventHandler) {
-        let chr = match event.characters.chars().next() {
-            Some(c) => c,
-            None => {
-                eprintln!("no chars for event");
-                return;
-            }
-        };
+        //let chr = match event.characters.chars().next() {
+        //Some(c) => c,
+        //None => {
+        //eprintln!("no chars for event");
+        //return;
+        //}
+        //};
+        let chr = event.characters;
 
         if let CommandState::Ready = self.state {
-            if ['i', 'a', 'A'].contains(&chr) {
+            if ["i", "a", "A"].contains(&chr) {
                 self.mode = Mode::Insert;
-                if chr != 'i' {
-                    let motion = if chr == 'a' { "right" } else { "end_of_line" };
+                if chr != "i" {
+                    let motion = if chr == "a" { "right" } else { "end_of_line" };
                     handler.send_action("move", Some(json!({"motion": motion, "dist": 1})));
                 }
                 handler.send_action("mode_change", Some(json!({"mode": "insert"})));
@@ -164,7 +165,7 @@ impl Machine {
 
         self.state = match &self.state {
             CommandState::Ready => {
-                self.raw.push(chr);
+                self.raw.push_str(chr);
                 if let Some(motion) = Motion::from_char(chr) {
                     CommandState::Done(Command {
                         motion,
@@ -173,23 +174,23 @@ impl Machine {
                     })
                 } else if let Some(cmd) = CommandType::from_char(chr) {
                     CommandState::AwaitMotion(cmd, 0)
-                } else if let Some(num) = chr.to_digit(10) {
-                    CommandState::AwaitMotion(CommandType::Move, num as usize)
+                } else if let Ok(num) = chr.parse() {
+                    CommandState::AwaitMotion(CommandType::Move, num)
                 } else {
                     CommandState::Failed
                 }
             }
 
             CommandState::AwaitMotion(ty, dist) => {
-                self.raw.push(chr);
+                self.raw.push_str(chr);
                 if let Some(motion) = Motion::from_char(chr) {
                     CommandState::Done(Command {
                         motion,
                         ty: *ty,
                         distance: *dist.max(&1),
                     })
-                } else if let Some(num) = chr.to_digit(10) {
-                    let new_dist = dist * 10 + num as usize;
+                } else if let Ok(num) = chr.parse::<usize>() {
+                    let new_dist = num + (dist * 10);
                     CommandState::AwaitMotion(*ty, new_dist)
                 } else {
                     CommandState::Failed

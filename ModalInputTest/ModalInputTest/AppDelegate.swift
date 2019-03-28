@@ -42,7 +42,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             let motion = ViewController.Motion(rawValue: newMotion)!
             let dist = params["dist"] as! Int
             mainController?.doDelete(motion: motion, dist: dist)
-
+        case "selector":
+            let selector = params["sel"] as! String
+            NSApp.sendAction(NSSelectorFromString(selector), to: nil, from: nil)
         default:
             print("unhandled method \(method)")
         }

@@ -1,4 +1,4 @@
-use super::{EventHandler, Handler, KeyEvent, PendingToken};
+use crate::input_handler::{EventHandler, Handler, KeyEvent, PendingToken};
 
 const KEY_TIMEOUT_MILLIS: u32 = 500;
 

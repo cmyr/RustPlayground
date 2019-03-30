@@ -718,18 +718,18 @@
                                 </textFieldCell>
                             </textField>
                             <scrollView fixedFrame="YES" borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Xyr-D7-DHN">
-                                <rect key="frame" x="0.0" y="0.0" width="480" height="225"/>
+                                <rect key="frame" x="0.0" y="112" width="480" height="113"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <clipView key="contentView" ambiguous="YES" drawsBackground="NO" copiesOnScroll="NO" id="9yW-ft-5cX">
-                                    <rect key="frame" x="0.0" y="0.0" width="480" height="225"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="480" height="113"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textView ambiguous="YES" editable="NO" importsGraphics="NO" richText="NO" verticallyResizable="YES" smartInsertDelete="YES" id="iz0-rm-dDA">
-                                            <rect key="frame" x="0.0" y="0.0" width="480" height="225"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="480" height="113"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                            <size key="minSize" width="480" height="225"/>
+                                            <size key="minSize" width="480" height="113"/>
                                             <size key="maxSize" width="480" height="10000000"/>
                                             <color key="insertionPointColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                         </textView>
@@ -740,7 +740,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                                 <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="dDD-uU-Pa5">
-                                    <rect key="frame" x="464" y="0.0" width="16" height="225"/>
+                                    <rect key="frame" x="464" y="0.0" width="16" height="113"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                             </scrollView>
@@ -753,6 +753,10 @@
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xjA-QF-hok" customClass="EditView" customModule="ModalInputTest" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="0.0" width="480" height="112"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            </customView>
                         </subviews>
                         <constraints>
                             <constraint firstItem="oPh-0J-YxJ" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="55Y-df-jro"/>
@@ -761,6 +765,7 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="editView" destination="xjA-QF-hok" id="Oox-E7-w0T"/>
                         <outlet property="modeLabel" destination="oPh-0J-YxJ" id="iMb-ab-2xb"/>
                         <outlet property="stateLabel" destination="dvf-d7-7un" id="UWn-eo-82r"/>
                         <outlet property="textField" destination="iz0-rm-dDA" id="ntp-mt-5zY"/>

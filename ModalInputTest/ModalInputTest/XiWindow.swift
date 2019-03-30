@@ -18,6 +18,7 @@ class XiWindow: NSWindow {
     }
 
     func reallySendEvent(_ event: NSEvent) {
+        self.makeFirstResponder(self.contentViewController)
         super.sendEvent(event)
     }
 }

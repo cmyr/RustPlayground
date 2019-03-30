@@ -58,6 +58,50 @@ class EventHandler {
     }
 }
 
+
+class XiCore {
+    let _inner: OpaquePointer
+
+    init(rpcCallback: @escaping (@convention(c) (UnsafePointer<Int8>?) -> Void),
+         updateCallback: @escaping (@convention(c) (UInt32) -> Void)
+        ) {
+        _inner = xiCoreCreate(rpcCallback, updateCallback)
+    }
+
+    func insertText(_ text: String) {
+        xiCoreSendMessage(_inner, "insert \(text)")
+    }
+
+    func doCommand(_ command: String) {
+        xiCoreSendMessage(_inner, command)
+    }
+
+    func getLine(_ lineNumber: UInt32) -> RawLine? {
+        let line = xiCoreGetLine(_inner, lineNumber);
+        if let line =  line {
+            let string =  String(cString: line.pointee.text, encoding: .utf8)!
+            let cursor: Int? = line.pointee.cursor < 0 ? nil : Int(line.pointee.cursor)
+            return RawLine(text: string, cursor: cursor)
+        } else {
+            return nil
+        }
+    }
+
+    deinit {
+        xiCoreFree(_inner)
+    }
+}
+
+class RawLine {
+    let text: String
+    let cursor: Int?
+
+    init(text: String, cursor: Int?) {
+        self.text = text
+        self.cursor = cursor
+    }
+}
+
 extension NSEvent {
     func getAddress() -> String {
         return Unmanaged.passUnretained(self).toOpaque().debugDescription

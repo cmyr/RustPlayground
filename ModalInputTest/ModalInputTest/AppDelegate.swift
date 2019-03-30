@@ -11,7 +11,13 @@ import Cocoa
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
     let handler = EventHandler(callback: dispatchEvent, action: handleAction, timer: handleTimer, cancelTimer: cancelTimer)
-    var mainController: ViewController?
+    let core = XiCore(rpcCallback: handleRpc, updateCallback: handleUpdate)
+
+    var mainController: ViewController? {
+        didSet {
+            mainController?.core = core
+        }
+    }
     var scheduledEvents = [UInt32: NSEvent]()
     var nextWorkItemId: UInt32 = 0
 
@@ -75,6 +81,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if let event = self.scheduledEvents[ident] {
             if let window = event.window as? XiWindow {
                 print("sending delayed event \(ident)")
+                
                 window.reallySendEvent(event)
                 self.handler.clearPending(ident)
             }
@@ -84,6 +91,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func cancelEvent(withIdentifier ident: UInt32) {
         self.scheduledEvents.removeValue(forKey: ident)
+    }
+
+    func coreDidUpate(_ totalLines: UInt32) {
+        mainController?.coreViewDidChange(core: core, newLines: totalLines)
+//        print("core updated, lines: \(totalLines)")
+
     }
 }
 
@@ -115,4 +128,12 @@ func handleTimer(eventPtr: OpaquePointer?, delay: UInt32) -> UInt32 {
 
 func cancelTimer(token: UInt32) {
     (NSApp.delegate as! AppDelegate).cancelEvent(withIdentifier: token)
+}
+
+func handleUpdate(newLines: UInt32) {
+    (NSApp.delegate as! AppDelegate).coreDidUpate(newLines)
+}
+
+func handleRpc(jsonPtr: UnsafePointer<Int8>?) {
+
 }

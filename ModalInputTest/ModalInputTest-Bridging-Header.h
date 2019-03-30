@@ -3,3 +3,5 @@
 //
 
 #include "libximodal.h"
+#include "xicore.h"
+

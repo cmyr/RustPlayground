@@ -15,6 +15,7 @@
 		606644F2223FFED8006215A0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 606644F0223FFED8006215A0 /* Main.storyboard */; };
 		606644FE223FFED9006215A0 /* ModalInputTestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606644FD223FFED9006215A0 /* ModalInputTestTests.swift */; };
 		609A22672240504100A3F007 /* libximodal.h in Headers */ = {isa = PBXBuildFile; fileRef = 609A22662240504100A3F007 /* libximodal.h */; };
+		60BF2285225012DD002C0352 /* EditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60BF2284225012DD002C0352 /* EditView.swift */; };
 		60CC174F224591840075FDE5 /* XiWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60CC174E224591840075FDE5 /* XiWindow.swift */; };
 /* End PBXBuildFile section */
 
@@ -36,6 +37,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		603608D2224EC693002CEAC6 /* xicore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = xicore.h; path = "../xi-modal-input/xicore.h"; sourceTree = "<group>"; };
 		604B0F5F22405C88007038E6 /* XiEventHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XiEventHandler.swift; sourceTree = "<group>"; };
 		606644E7223FFED7006215A0 /* ModalInputTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ModalInputTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		606644EA223FFED7006215A0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -50,6 +52,7 @@
 		609A225F22404CF900A3F007 /* libximodal.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libximodal.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		609A22662240504100A3F007 /* libximodal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = libximodal.h; path = "../xi-modal-input/libximodal.h"; sourceTree = "<group>"; };
 		609A2269224052B000A3F007 /* ModalInputTest-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ModalInputTest-Bridging-Header.h"; sourceTree = "<group>"; };
+		60BF2284225012DD002C0352 /* EditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditView.swift; sourceTree = "<group>"; };
 		60CC174E224591840075FDE5 /* XiWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XiWindow.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -87,6 +90,7 @@
 				606644E8223FFED7006215A0 /* Products */,
 				609A2269224052B000A3F007 /* ModalInputTest-Bridging-Header.h */,
 				609A22662240504100A3F007 /* libximodal.h */,
+				603608D2224EC693002CEAC6 /* xicore.h */,
 				600D761222405AC400CC9D90 /* Frameworks */,
 			);
 			sourceTree = "<group>";
@@ -106,6 +110,7 @@
 			children = (
 				606644EA223FFED7006215A0 /* AppDelegate.swift */,
 				606644EC223FFED7006215A0 /* ViewController.swift */,
+				60BF2284225012DD002C0352 /* EditView.swift */,
 				60CC174E224591840075FDE5 /* XiWindow.swift */,
 				604B0F5F22405C88007038E6 /* XiEventHandler.swift */,
 				606644EE223FFED8006215A0 /* Assets.xcassets */,
@@ -298,6 +303,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				604B0F6022405C88007038E6 /* XiEventHandler.swift in Sources */,
+				60BF2285225012DD002C0352 /* EditView.swift in Sources */,
 				606644ED223FFED7006215A0 /* ViewController.swift in Sources */,
 				606644EB223FFED7006215A0 /* AppDelegate.swift in Sources */,
 				60CC174F224591840075FDE5 /* XiWindow.swift in Sources */,

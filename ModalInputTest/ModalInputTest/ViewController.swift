@@ -13,8 +13,11 @@ class ViewController: NSViewController {
     @IBOutlet weak var modeLabel: NSTextField!
     @IBOutlet weak var stateLabel: NSTextField!
     @IBOutlet var textField: NSTextView!
+    @IBOutlet weak var editView: EditView!
 
     var contents = String();
+
+    var core: XiCore!
 
     enum Mode: String {
         case command, insert
@@ -23,6 +26,8 @@ class ViewController: NSViewController {
     enum Motion: String {
         case left, right, up, down, word, word_back, end_of_line, start_of_line
     }
+
+    var totalLines: Int = 0;
 
     var parseState: String = "" {
         didSet {
@@ -44,7 +49,13 @@ class ViewController: NSViewController {
     override func viewDidAppear() {
         self.mode = .insert
         self.textField.isEditable = true
-        print("is selectable", self.textField.isSelectable)
+        self.editView.lineSource = self
+
+    }
+
+    func coreViewDidChange(core: XiCore, newLines: UInt32) {
+        self.totalLines = Int(newLines)
+        self.editView.needsDisplay = true
     }
 
     func doMove(motion: Motion, dist: Int) {
@@ -62,6 +73,27 @@ class ViewController: NSViewController {
         }
 
         textField.doCommand(by: #selector(NSStandardKeyBindingResponding.deleteBackward(_:)))
+    }
+
+
+
+    override func doCommand(by selector: Selector) {
+        let selString = NSStringFromSelector(selector)
+        (NSApp.delegate as! AppDelegate).core.doCommand(selString)
+        if textField.responds(to: selector) {
+            textField.doCommand(by: selector)
+        }
+    }
+
+    override func insertText(_ insertString: Any) {
+        self.textField.insertText(insertString)
+        (NSApp.delegate as! AppDelegate).core.insertText(insertString as! String)
+        super.insertText(insertString)
+    }
+
+
+    override func keyDown(with event: NSEvent) {
+        self.interpretKeyEvents([event])
     }
 
     override func flagsChanged(with event: NSEvent) {
@@ -110,5 +142,11 @@ class ViewController: NSViewController {
         case .end_of_line:
             return #selector(NSStandardKeyBindingResponding.moveToEndOfLine(_:))
         }
+    }
+}
+
+extension ViewController: LineSource {
+    func getLine(line: UInt32) -> RawLine? {
+        return core?.getLine(line)
     }
 }

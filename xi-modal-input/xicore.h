@@ -1,4 +1,5 @@
-
+#ifndef XI_CORE_H
+#define XI_CORE_H
 typedef struct _XiCore XiCore;
 
 typedef struct _XiLine {
@@ -16,3 +17,4 @@ extern void xiCoreFree(XiCore*);
 extern void xiCoreSendMessage(XiCore*, json);
 extern XiLine* xiCoreGetLine(XiCore*, uint32_t);
 
+#endif

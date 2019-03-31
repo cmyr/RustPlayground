@@ -3,6 +3,9 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#ifndef XI_MODAL_H
+#define XI_MODAL_H
+
 typedef struct _XiEventHandler XiEventHandler;
 typedef struct _XiEventPayload XiEventPayload;
 
@@ -18,3 +21,5 @@ extern XiEventHandler* xiEventHandlerCreate(event_callback, action_callback, tim
 extern void xiEventHandlerFree(XiEventHandler*);
 extern void xiEventHandlerHandleInput(const XiEventHandler*, uint32_t, const char*, XiEventPayload*);
 extern void xiEventHandlerClearPending(const XiEventHandler*, uint32_t);
+
+#endif

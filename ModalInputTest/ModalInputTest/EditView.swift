@@ -33,14 +33,13 @@ class EditView: NSView {
 
         for lineNumber in 0..<lines.totalLines {
             let line = lines.getLine(line: UInt32(lineNumber))!
-            print("line \(lineNumber):", line.text)
             let attrString = NSMutableAttributedString(string: line.text, attributes: [.font: defaultFont, .foregroundColor: NSColor.black])
             let yPos = yOff + linespace * CGFloat(lineNumber)
             if let selection = line.selection {
 
                 let selStart = CGFloat(selection.startIndex)
                 let selEnd = CGFloat(selection.endIndex)
-                print("selection \(selStart)..\(selEnd)")
+                print("line \(lineNumber) selection: \(selStart)..\(selEnd)")
                 let rect = CGRect(x: xOff + selStart * charWidth, y: yPos, width: charWidth * (selEnd - selStart), height: linespace)
                 NSColor.selectedTextColor.setFill()
                 rect.fill()

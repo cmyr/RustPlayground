@@ -117,15 +117,22 @@ impl Machine {
         let chr = event.characters;
 
         if let CommandState::Ready = self.state {
-            if ["i", "a", "A"].contains(&chr) {
+            if ["i", "a", "A", "o", "O"].contains(&chr) {
                 self.mode = Mode::Insert;
-                if chr != "i" {
+                if chr == "a" || chr == "A" {
                     let motion = match chr {
                         "a" => Movement::Right,
                         "A" => Movement::RightOfLine,
                         _ => unreachable!(),
                     };
                     ctx.do_core_event(ViewEvent::Move(motion).into(), 1);
+                } else if chr == "o" {
+                    ctx.do_core_event(ViewEvent::Move(Movement::RightOfLine).into(), 1);
+                    ctx.do_core_event(BufferEvent::InsertNewline.into(), 1);
+                } else if chr == "O" {
+                    ctx.do_core_event(ViewEvent::Move(Movement::LeftOfLine).into(), 1);
+                    ctx.do_core_event(BufferEvent::InsertNewline.into(), 1);
+                    ctx.do_core_event(ViewEvent::Move(Movement::Up).into(), 1);
                 }
                 ctx.send_client_rpc("mode_change", json!({"mode": "insert"}));
                 ctx.send_client_rpc("parse_state", json!({"state": ""}));

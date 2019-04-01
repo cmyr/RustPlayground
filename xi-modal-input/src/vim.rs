@@ -1,6 +1,23 @@
-use crate::input_handler::{EventHandler, Handler, KeyEvent, PendingToken};
+use crate::input_handler::{EventCtx, Handler, KeyEvent, PendingToken};
+use xi_core_lib::edit_types::{ViewEvent, BufferEvent};
+use xi_core_lib::movement::Movement;
+
 
 const KEY_TIMEOUT_MILLIS: u32 = 500;
+
+fn movement_from_str(s: &str) -> Option<Movement> {
+    match s {
+        "h" => Some(Movement::Left),
+        "l" => Some(Movement::Right),
+        "j" => Some(Movement::Down),
+        "k" => Some(Movement::Up),
+        "w" => Some(Movement::RightWord),
+        "b" => Some(Movement::LeftWord),
+        "0" => Some(Movement::LeftOfLine),
+        "$" => Some(Movement::RightOfLine),
+        _ => None,
+    }
+}
 
 enum Mode {
     Insert,
@@ -20,61 +37,13 @@ impl CommandType {
             _ => None,
         }
     }
-
-    fn as_str(&self) -> &'static str {
-        match self {
-            CommandType::Move => "move",
-            CommandType::Delete => "delete",
-        }
-    }
 }
 
 #[derive(Debug, Clone, Copy)]
 struct Command {
     ty: CommandType,
-    motion: Motion,
+    motion: Movement,
     distance: usize,
-}
-
-#[derive(Debug, Clone, Copy)]
-enum Motion {
-    Left,
-    Right,
-    Up,
-    Down,
-    Word,
-    BackWord,
-    StartOfLine,
-    EndOfLine,
-}
-
-impl Motion {
-    fn from_char(chr: &str) -> Option<Motion> {
-        match chr {
-            "h" => Some(Motion::Left),
-            "l" => Some(Motion::Right),
-            "j" => Some(Motion::Down),
-            "k" => Some(Motion::Up),
-            "w" => Some(Motion::Word),
-            "b" => Some(Motion::BackWord),
-            "0" => Some(Motion::StartOfLine),
-            "$" => Some(Motion::EndOfLine),
-            _ => None,
-        }
-    }
-
-    fn as_str(&self) -> &'static str {
-        match self {
-            Motion::Left => "left",
-            Motion::Right => "right",
-            Motion::Down => "down",
-            Motion::Up => "up",
-            Motion::Word => "word",
-            Motion::BackWord => "word_back",
-            Motion::StartOfLine => "start_of_line",
-            Motion::EndOfLine => "end_of_line",
-        }
-    }
 }
 
 enum CommandState {
@@ -92,12 +61,16 @@ pub(crate) struct Machine {
 }
 
 impl Handler for Machine {
-    fn handle_event(&mut self, event: KeyEvent, handler: &EventHandler) {
+    fn handle_event(&mut self, event: KeyEvent, mut ctx: EventCtx) -> bool {
         match self.mode {
-            Mode::Insert => self.handle_insert(event, handler),
+            Mode::Insert => {
+                self.handle_insert(event, &ctx);
+                false
+            }
             Mode::Command => {
-                self.handle_command(&event, handler);
-                handler.free_event(event);
+                let r = self.handle_command(&event, &mut ctx);
+                ctx.free_event(event);
+                r
             }
         }
     }
@@ -117,56 +90,54 @@ impl Machine {
         }
     }
 
-    fn handle_insert(&mut self, event: KeyEvent, handler: &EventHandler) {
+    fn handle_insert(&mut self, event: KeyEvent, ctx: &EventCtx) {
         let timeout_token = self.timeout_token.take();
         let mut to_command_mode = |event| {
             self.mode = Mode::Command;
-            handler.send_action("mode_change", Some(json!({"mode": "command"})));
-            handler.free_event(event);
+            ctx.send_client_rpc("mode_change", json!({"mode": "command"}));
+            ctx.free_event(event);
         };
 
         if event.characters == "Escape" {
             to_command_mode(event);
         } else if event.characters == "j" {
             if let Some(token) = timeout_token {
-                handler.cancel_timer(token);
+                ctx.cancel_timer(token);
                 to_command_mode(event);
             } else {
-                let token = handler.schedule_event(event, KEY_TIMEOUT_MILLIS);
+                let token = ctx.schedule_event(event, KEY_TIMEOUT_MILLIS);
                 self.timeout_token = Some(token);
             }
         } else {
-            handler.send_event(event);
+            ctx.send_event(event);
         }
     }
 
-    fn handle_command(&mut self, event: &KeyEvent, handler: &EventHandler) {
-        //let chr = match event.characters.chars().next() {
-        //Some(c) => c,
-        //None => {
-        //eprintln!("no chars for event");
-        //return;
-        //}
-        //};
+    /// returns `true` if an event has happened, and we should rerender.
+    fn handle_command(&mut self, event: &KeyEvent, ctx: &mut EventCtx) -> bool {
         let chr = event.characters;
 
         if let CommandState::Ready = self.state {
             if ["i", "a", "A"].contains(&chr) {
                 self.mode = Mode::Insert;
                 if chr != "i" {
-                    let motion = if chr == "a" { "right" } else { "end_of_line" };
-                    handler.send_action("move", Some(json!({"motion": motion, "dist": 1})));
+                    let motion = match chr {
+                        "a" => Movement::Right,
+                        "A" => Movement::RightOfLine,
+                        _ => unreachable!(),
+                    };
+                    ctx.do_core_event(ViewEvent::Move(motion).into(), 1);
                 }
-                handler.send_action("mode_change", Some(json!({"mode": "insert"})));
-                handler.send_action("parse_state", Some(json!({"state": ""})));
-                return;
+                ctx.send_client_rpc("mode_change", json!({"mode": "insert"}));
+                ctx.send_client_rpc("parse_state", json!({"state": ""}));
+                return true;
             }
         }
 
         self.state = match &self.state {
             CommandState::Ready => {
                 self.raw.push_str(chr);
-                if let Some(motion) = Motion::from_char(chr) {
+                if let Some(motion) = movement_from_str(chr) {
                     CommandState::Done(Command {
                         motion,
                         ty: CommandType::Move,
@@ -183,7 +154,7 @@ impl Machine {
 
             CommandState::AwaitMotion(ty, dist) => {
                 self.raw.push_str(chr);
-                if let Some(motion) = Motion::from_char(chr) {
+                if let Some(motion) = movement_from_str(chr) {
                     CommandState::Done(Command {
                         motion,
                         ty: *ty,
@@ -205,19 +176,22 @@ impl Machine {
             distance,
         }) = &self.state
         {
-            handler.send_action(
-                ty.as_str(),
-                Some(json!({"motion": motion.as_str(), "dist": distance})),
-            );
-            handler.send_action("parse_state", Some(json!({"state": &self.raw})));
+            ctx.do_core_event(ViewEvent::ModifySelection(*motion).into(), *distance);
+            if let CommandType::Delete = ty {
+                ctx.do_core_event( BufferEvent::Backspace.into(), 1);
+            }
+            ctx.send_client_rpc("parse_state", json!({"state": &self.raw}));
             self.state = CommandState::Ready;
             self.raw = String::new();
+            true
         } else if let CommandState::Failed = self.state {
             self.state = CommandState::Ready;
-            handler.send_action("parse_state", Some(json!({"state": &self.raw})));
+            ctx.send_client_rpc("parse_state", json!({"state": &self.raw}));
             self.raw = String::new();
+            false
         } else {
-            handler.send_action("parse_state", Some(json!({"state": &self.raw})));
+            ctx.send_client_rpc("parse_state", json!({"state": &self.raw}));
+            false
         }
     }
 }

@@ -10,7 +10,6 @@ import Cocoa
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
-    let handler = EventHandler(callback: dispatchEvent, action: handleAction, timer: handleTimer, cancelTimer: cancelTimer)
     let core = XiCore(rpcCallback: handleRpc, updateCallback: handleUpdate)
 
     var mainController: ViewController? {
@@ -22,6 +21,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var nextWorkItemId: UInt32 = 0
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
+        core.registerEventHandler(callback: dispatchEvent, action: handleAction, timer: handleTimer, cancelTimer: cancelTimer)
         // Insert code here to initialize your application
     }
 
@@ -37,17 +37,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         case "parse_state":
             let newState = params["state"] as! String
             mainController?.parseState = newState;
-
-        case "move":
-            let newMotion = params["motion"] as! String
-            let motion = ViewController.Motion(rawValue: newMotion)!
-            let dist = params["dist"] as! Int
-            mainController?.doMove(motion: motion, dist: dist)
-        case "delete":
-            let newMotion = params["motion"] as! String
-            let motion = ViewController.Motion(rawValue: newMotion)!
-            let dist = params["dist"] as! Int
-            mainController?.doDelete(motion: motion, dist: dist)
         case "selector":
             let selector = params["sel"] as! String
             NSApp.sendAction(NSSelectorFromString(selector), to: nil, from: nil)
@@ -81,9 +70,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if let event = self.scheduledEvents[ident] {
             if let window = event.window as? XiWindow {
                 print("sending delayed event \(ident)")
-                
                 window.reallySendEvent(event)
-                self.handler.clearPending(ident)
+                self.core.clearPending(ident)
             }
         }
         self.scheduledEvents.removeValue(forKey: ident)
@@ -95,8 +83,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func coreDidUpate(_ totalLines: UInt32) {
         mainController?.coreViewDidChange(core: core, newLines: totalLines)
-//        print("core updated, lines: \(totalLines)")
-
     }
 }
 

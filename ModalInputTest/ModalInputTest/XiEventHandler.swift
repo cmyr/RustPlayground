@@ -8,15 +8,21 @@
 
 import Cocoa
 
-class EventHandler {
+class XiCore {
     let _inner: OpaquePointer
 
-    init(callback: @escaping (@convention(c) (OpaquePointer?, Bool) -> Void),
+    init(rpcCallback: @escaping (@convention(c) (UnsafePointer<Int8>?) -> Void),
+         updateCallback: @escaping (@convention(c) (UInt32) -> Void)
+        ) {
+        _inner = xiCoreCreate(rpcCallback, updateCallback)
+    }
+
+    func registerEventHandler(callback: @escaping (@convention(c) (OpaquePointer?, Bool) -> Void),
          action: @escaping (@convention(c) (UnsafePointer<Int8>?) -> Void),
          timer: @escaping (@convention(c) (OpaquePointer?, UInt32) -> UInt32),
          cancelTimer: @escaping (@convention(c) (UInt32) -> Void)
-         ) {
-        _inner = xiEventHandlerCreate(callback, action, timer, cancelTimer)
+        ) {
+        xiCoreRegisterEventHandler(_inner, callback, action, timer, cancelTimer)
     }
 
     func handleInput(event: NSEvent) {
@@ -46,26 +52,11 @@ class EventHandler {
         let eventPtr: Unmanaged<NSEvent> = Unmanaged.passRetained(event);
 
         print("sending \(event.getAddress()) \(event)")
-        xiEventHandlerHandleInput(_inner, modifiers, chars, OpaquePointer(eventPtr.toOpaque()))
+        xiCoreHandleInput(_inner, modifiers, chars, OpaquePointer(eventPtr.toOpaque()))
     }
 
     func clearPending(_ identifier: UInt32) {
-        xiEventHandlerClearPending(_inner, identifier)
-    }
-
-    deinit {
-        xiEventHandlerFree(_inner)
-    }
-}
-
-
-class XiCore {
-    let _inner: OpaquePointer
-
-    init(rpcCallback: @escaping (@convention(c) (UnsafePointer<Int8>?) -> Void),
-         updateCallback: @escaping (@convention(c) (UInt32) -> Void)
-        ) {
-        _inner = xiCoreCreate(rpcCallback, updateCallback)
+        xiCoreClearPending(_inner, identifier)
     }
 
     func insertText(_ text: String) {

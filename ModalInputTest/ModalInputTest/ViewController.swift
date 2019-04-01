@@ -12,7 +12,6 @@ class ViewController: NSViewController {
 
     @IBOutlet weak var modeLabel: NSTextField!
     @IBOutlet weak var stateLabel: NSTextField!
-    @IBOutlet var textField: NSTextView!
     @IBOutlet weak var editView: EditView!
 
     var contents = String();
@@ -48,7 +47,6 @@ class ViewController: NSViewController {
 
     override func viewDidAppear() {
         self.mode = .insert
-        self.textField.isEditable = true
         self.editView.lineSource = self
 
     }
@@ -58,35 +56,12 @@ class ViewController: NSViewController {
         self.editView.needsDisplay = true
     }
 
-    func doMove(motion: Motion, dist: Int) {
-        let selector = selectorForMoveMotion(motion: motion)
-        for _ in 0..<dist {
-            textField.doCommand(by: selector)
-        }
-    }
-
-    func doDelete(motion: Motion, dist: Int) {
-
-        let selector = selectorForDeleteMotion(motion: motion)
-        for _ in 0..<dist {
-            textField.doCommand(by: selector)
-        }
-
-        textField.doCommand(by: #selector(NSStandardKeyBindingResponding.deleteBackward(_:)))
-    }
-
-
-
     override func doCommand(by selector: Selector) {
         let selString = NSStringFromSelector(selector)
         (NSApp.delegate as! AppDelegate).core.doCommand(selString)
-        if textField.responds(to: selector) {
-            textField.doCommand(by: selector)
-        }
     }
 
     override func insertText(_ insertString: Any) {
-        self.textField.insertText(insertString)
         (NSApp.delegate as! AppDelegate).core.insertText(insertString as! String)
         super.insertText(insertString)
     }

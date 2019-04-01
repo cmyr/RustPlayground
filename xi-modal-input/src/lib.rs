@@ -15,13 +15,17 @@ use xi_core_lib::view::NoView;
 use xi_core_lib::{edit_ops, movement, rpc::EditNotification, BufferConfig};
 use xi_rope::{Interval, LinesMetric, Rope, RopeDelta};
 
+use input_handler::{EventPayload, EventCtx, Handler, KeyEvent, Plumber};
+
 pub struct XiCore {
     rpc_callback: extern "C" fn(*const c_char),
     update_callback: extern "C" fn(uint32_t),
     state: OneView,
+    plumber: Option<Plumber>,
+    handler: Option<Box<dyn Handler>>,
 }
 
-struct OneView {
+pub struct OneView {
     selection: Selection,
     text: Rope,
     config: BufferConfig,
@@ -42,10 +46,89 @@ pub extern "C" fn xiCoreCreate(
         rpc_callback,
         update_callback,
         state: OneView::new(),
+        plumber: None,
+        handler: None,
     }));
     eprintln!("xiCore alloc {:?}", &r);
     r
 }
+
+#[no_mangle]
+pub extern "C" fn xiCoreRegisterEventHandler(
+    ptr: *mut XiCore,
+    event_cb: extern "C" fn(*const EventPayload, bool),
+    action_cb: extern "C" fn(*const c_char),
+    timer_cb: extern "C" fn(*const EventPayload, uint32_t) -> uint32_t,
+    cancel_timer_cb: extern "C" fn(uint32_t),
+) {
+
+    let core = unsafe {
+        assert!(!ptr.is_null(), "null pointer in xiCoreRegisterEventHandler");
+        &mut *ptr
+    };
+
+    let machine = crate::vim::Machine::new();
+    let plumber = Plumber::new(event_cb, action_cb, timer_cb, cancel_timer_cb);
+    core.plumber = Some(plumber);
+    core.handler = Some(Box::new(machine));
+}
+
+#[no_mangle]
+pub extern "C" fn xiCoreHandleInput(
+    ptr: *mut XiCore,
+    modifiers: uint32_t,
+    characters: *const c_char,
+    payload: *const EventPayload,
+) {
+    let core = unsafe {
+        assert!(!ptr.is_null());
+        &mut *ptr
+    };
+
+    let cstr = unsafe {
+        assert!(!characters.is_null());
+        CStr::from_ptr(characters)
+    };
+
+    let characters = match cstr.to_str() {
+        Ok(s) => s,
+        Err(e) => {
+            eprintln!("invalid cstr: {}, {:?}", e, cstr.to_bytes());
+            ""
+        }
+    };
+
+    let event = KeyEvent {
+        characters,
+        modifiers,
+        payload,
+    };
+
+    let ctx = EventCtx {
+        plumber: core.plumber.as_ref().unwrap(),
+        state: &mut core.state,
+    };
+
+    let needs_render = core.handler.as_mut().unwrap().handle_event(event, ctx);
+    if needs_render {
+        core.send_update();
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn xiCoreClearPending(ptr: *mut XiCore, token: uint32_t) {
+    let core = unsafe {
+        assert!(!ptr.is_null());
+        &mut *ptr
+    };
+
+    if core.handler.is_none() {
+        eprintln!("unexpected None in xiCoreClearPending");
+    }
+
+    core.handler.as_mut().map(|h| h.clear_pending(token));
+}
+
 
 #[no_mangle]
 pub extern "C" fn xiCoreGetLine(ptr: *mut XiCore, idx: uint32_t) -> *const XiLine {
@@ -129,19 +212,32 @@ impl OneView {
         let start = self.text.offset_of_line(idx);
         let end = self.text.offset_of_line(idx + 1);
         let line = self.text.slice_to_cow(start..end);
-        let caret = self
+        let maybe_caret = self
             .selection
             .regions_in_range(start, end)
-            .first()
-            .map(|r| r.end)
-            .filter(|caret| caret <= &end)
-            .map(|c| (c - start) as i32)
-            .unwrap_or(-1);
+            .first();
+
+        let caret = match maybe_caret {
+            Some(region) => {
+                let c = region.end;
+                if (c > start && c < end)
+                || (!region.is_upstream() && c == start)
+                || (region.is_upstream() && c == end)
+                || (c == end && c == self.text.len()
+                    && self.text.line_of_offset(c) == idx)
+                {
+                    (c - start) as i32
+                } else {
+                    -1
+                }
+            }
+            None => -1,
+        };
+
         Some((line, caret))
     }
 
     fn handle_event(&mut self, event: EventDomain) -> Option<Interval> {
-        //let OneView { view, editor, config, .. } = self;
         match event {
             EventDomain::View(event) => self.handle_view_event(event),
             EventDomain::Buffer(event) => self.handle_edit(event),
@@ -243,9 +339,11 @@ impl XiCore {
 
         let domain: EventDomain = event.into();
         self.state.handle_event(domain);
+        self.send_update();
+    }
 
+    fn send_update(&self) {
         let n_lines = self.state.count_lines();
-        eprintln!("'{}'", self.state.text);
         (self.update_callback)(n_lines as u32)
     }
 }

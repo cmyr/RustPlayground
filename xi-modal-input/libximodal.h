@@ -3,10 +3,11 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#include "xicore.h"
+
 #ifndef XI_MODAL_H
 #define XI_MODAL_H
 
-typedef struct _XiEventHandler XiEventHandler;
 typedef struct _XiEventPayload XiEventPayload;
 
 typedef uint32_t xi_millis;
@@ -17,9 +18,11 @@ typedef void (*action_callback)(const char*);
 typedef xi_timer_token (*timer_callback)(const XiEventPayload*, xi_millis);
 typedef void (*cancel_timer_callback)(xi_timer_token);
 
-extern XiEventHandler* xiEventHandlerCreate(event_callback, action_callback, timer_callback, cancel_timer_callback);
-extern void xiEventHandlerFree(XiEventHandler*);
-extern void xiEventHandlerHandleInput(const XiEventHandler*, uint32_t, const char*, XiEventPayload*);
-extern void xiEventHandlerClearPending(const XiEventHandler*, uint32_t);
+extern void
+xiCoreRegisterEventHandler(XiCore*, event_callback, action_callback, timer_callback, cancel_timer_callback);
+extern void
+xiCoreHandleInput(const XiCore*, uint32_t, const char*, XiEventPayload*);
+extern void
+xiCoreClearPending(const XiCore*, uint32_t);
 
 #endif

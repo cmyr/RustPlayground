@@ -72,7 +72,13 @@ class XiCore {
         if let line =  line {
             let string =  String(cString: line.pointee.text, encoding: .utf8)!
             let cursor: Int? = line.pointee.cursor < 0 ? nil : Int(line.pointee.cursor)
-            return RawLine(text: string, cursor: cursor)
+            let selection: Range<Int>?
+            if line.pointee.selection.0 == line.pointee.selection.1 {
+                selection = nil
+            } else {
+                selection = Int(line.pointee.selection.0)..<Int(line.pointee.selection.1)
+            }
+            return RawLine(text: string, cursor: cursor, selection: selection)
         } else {
             return nil
         }
@@ -86,10 +92,12 @@ class XiCore {
 class RawLine {
     let text: String
     let cursor: Int?
+    let selection: Range<Int>?
 
-    init(text: String, cursor: Int?) {
+    init(text: String, cursor: Int?, selection: Range<Int>?) {
         self.text = text
         self.cursor = cursor
+        self.selection = selection
     }
 }
 

@@ -5,6 +5,7 @@ typedef struct _XiCore XiCore;
 typedef struct _XiLine {
     char *text;
     int32_t cursor;
+    int32_t selection[2];
 } XiLine;
 
 typedef const char* json;

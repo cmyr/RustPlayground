@@ -1,7 +1,6 @@
 use crate::input_handler::{EventCtx, Handler, KeyEvent, PendingToken};
-use xi_core_lib::edit_types::{ViewEvent, BufferEvent};
+use xi_core_lib::edit_types::{BufferEvent, ViewEvent};
 use xi_core_lib::movement::Movement;
-
 
 const KEY_TIMEOUT_MILLIS: u32 = 500;
 
@@ -176,9 +175,11 @@ impl Machine {
             distance,
         }) = &self.state
         {
-            ctx.do_core_event(ViewEvent::ModifySelection(*motion).into(), *distance);
             if let CommandType::Delete = ty {
-                ctx.do_core_event( BufferEvent::Backspace.into(), 1);
+                ctx.do_core_event(ViewEvent::ModifySelection(*motion).into(), *distance);
+                ctx.do_core_event(BufferEvent::Backspace.into(), 1);
+            } else {
+                ctx.do_core_event(ViewEvent::Move(*motion).into(), *distance);
             }
             ctx.send_client_rpc("parse_state", json!({"state": &self.raw}));
             self.state = CommandState::Ready;

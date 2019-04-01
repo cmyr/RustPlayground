@@ -18,81 +18,6 @@ pub struct KeyEvent {
     pub payload: *const EventPayload,
 }
 
-#[no_mangle]
-pub extern "C" fn xiEventHandlerCreate(
-    event_cb: extern "C" fn(*const EventPayload, bool),
-    action_cb: extern "C" fn(*const c_char),
-    timer_cb: extern "C" fn(*const EventPayload, uint32_t) -> uint32_t,
-    cancel_timer_cb: extern "C" fn(uint32_t),
-) -> *const XiEventHandler {
-    let handler = Plumber::new(event_cb, action_cb, timer_cb, cancel_timer_cb);
-    let machine = crate::vim::Machine::new();
-    let r = Box::into_raw(Box::new(XiEventHandler(handler, Box::new(machine))));
-    eprintln!("event handler alloc {:?}", &r);
-    r
-}
-
-#[no_mangle]
-pub extern "C" fn xiEventHandlerFree(ptr: *mut XiEventHandler) {
-    eprintln!("event handler free {:?}", ptr);
-    if ptr.is_null() {
-        return;
-    }
-
-    unsafe {
-        Box::from_raw(ptr);
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn xiEventHandlerClearPending(handler: *mut XiEventHandler, token: uint32_t) {
-    let handler = unsafe {
-        assert!(!handler.is_null());
-        &mut *handler
-    };
-
-    let XiEventHandler(_, machine) = handler;
-    machine.clear_pending(token);
-}
-
-//#[no_mangle]
-//pub extern "C" fn xiEventHandlerHandleInput(
-    //handler: *mut XiEventHandler,
-    //modifiers: uint32_t,
-    //characters: *const c_char,
-    //payload: *const EventPayload,
-//) {
-    //let cstr = unsafe {
-        //assert!(!characters.is_null());
-        //CStr::from_ptr(characters)
-    //};
-
-    //let characters = match cstr.to_str() {
-        //Ok(s) => s,
-        //Err(e) => {
-            //eprintln!("invalid cstr: {}, {:?}", e, cstr.to_bytes());
-            //""
-        //}
-    //};
-
-    //let handler = unsafe {
-        //assert!(!handler.is_null());
-        //&mut *handler
-    //};
-
-    //let event = KeyEvent {
-        //characters,
-        //modifiers,
-        //payload,
-    //};
-
-    ////let XiEventHandler(handler, machine) = handler;
-    ////machine.handle_event(event, handler);
-//}
-
-#[repr(C)]
-pub struct XiEventHandler(Plumber, Box<dyn Handler>);
-
 pub struct Plumber {
     event_callback: extern "C" fn(*const EventPayload, bool),
     action_callback: extern "C" fn(*const c_char),
@@ -115,7 +40,6 @@ impl Plumber {
         }
     }
 }
-
 
 pub struct EventCtx<'a> {
     pub plumber: &'a Plumber,
@@ -143,7 +67,8 @@ impl<'a> EventCtx<'a> {
     }
 
     pub(crate) fn send_client_rpc<V>(&self, method: &str, params: V)
-        where V: Into<Option<serde_json::Value>>,
+    where
+        V: Into<Option<serde_json::Value>>,
     {
         let params = params.into().unwrap_or(serde_json::Map::new().into());
         let json = json!({
@@ -156,12 +81,12 @@ impl<'a> EventCtx<'a> {
     }
 
     pub(crate) fn do_core_event(&mut self, action: EventDomain, repeat: usize) {
+        eprintln!("doing {:?} x {}", &action, repeat);
         for _ in 0..repeat {
             self.state.handle_event(action.clone());
         }
     }
 }
-
 
 pub trait Handler {
     /// Returns `true` if we should update after this event

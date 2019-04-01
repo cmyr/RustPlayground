@@ -36,6 +36,15 @@ class EditView: NSView {
             print("line \(lineNumber):", line.text)
             let attrString = NSMutableAttributedString(string: line.text, attributes: [.font: defaultFont, .foregroundColor: NSColor.black])
             let yPos = yOff + linespace * CGFloat(lineNumber)
+            if let selection = line.selection {
+
+                let selStart = CGFloat(selection.startIndex)
+                let selEnd = CGFloat(selection.endIndex)
+                print("selection \(selStart)..\(selEnd)")
+                let rect = CGRect(x: xOff + selStart * charWidth, y: yPos, width: charWidth * (selEnd - selStart), height: linespace)
+                NSColor.selectedTextColor.setFill()
+                rect.fill()
+            }
             if let cursor = line.cursor {
                 print("cursor \(cursor)")
                 let cursorPos = CGFloat(cursor)

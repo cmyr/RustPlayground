@@ -15,7 +15,7 @@ use xi_core_lib::view::NoView;
 use xi_core_lib::{edit_ops, movement, rpc::EditNotification, BufferConfig};
 use xi_rope::{Interval, LinesMetric, Rope, RopeDelta};
 
-use input_handler::{EventPayload, EventCtx, Handler, KeyEvent, Plumber};
+use input_handler::{EventCtx, EventPayload, Handler, KeyEvent, Plumber};
 
 pub struct XiCore {
     rpc_callback: extern "C" fn(*const c_char),
@@ -35,6 +35,7 @@ pub struct OneView {
 pub struct XiLine {
     text: *const c_char,
     cursor: int32_t,
+    selection: [int32_t; 2],
 }
 
 #[no_mangle]
@@ -61,7 +62,6 @@ pub extern "C" fn xiCoreRegisterEventHandler(
     timer_cb: extern "C" fn(*const EventPayload, uint32_t) -> uint32_t,
     cancel_timer_cb: extern "C" fn(uint32_t),
 ) {
-
     let core = unsafe {
         assert!(!ptr.is_null(), "null pointer in xiCoreRegisterEventHandler");
         &mut *ptr
@@ -129,21 +129,19 @@ pub extern "C" fn xiCoreClearPending(ptr: *mut XiCore, token: uint32_t) {
     core.handler.as_mut().map(|h| h.clear_pending(token));
 }
 
-
 #[no_mangle]
 pub extern "C" fn xiCoreGetLine(ptr: *mut XiCore, idx: uint32_t) -> *const XiLine {
-    eprintln!("core: {:p}, idx: {}\n", ptr, idx);
     let core = unsafe {
         assert!(!ptr.is_null(), "null pointer in xiCoreGetLine");
         &mut *ptr
     };
 
-    let (line, cursor) = core.state.get_line(idx as usize).unwrap();
-    eprintln!("core line {}: {}", idx, line);
+    let (line, cursor, sel) = core.state.get_line(idx as usize).unwrap();
     let cstring = CString::new(line.as_ref()).expect("bad string, very sad");
     Box::into_raw(Box::new(XiLine {
         text: cstring.into_raw(),
         cursor,
+        selection: [sel.0, sel.1],
     }))
 }
 
@@ -205,26 +203,22 @@ impl OneView {
         }
     }
 
-    fn get_line(&self, idx: usize) -> Option<(Cow<str>, i32)> {
+    fn get_line(&self, idx: usize) -> Option<(Cow<str>, i32, (i32, i32))> {
         if idx > self.text.count::<LinesMetric>(self.text.len()) {
             return None;
         }
         let start = self.text.offset_of_line(idx);
         let end = self.text.offset_of_line(idx + 1);
         let line = self.text.slice_to_cow(start..end);
-        let maybe_caret = self
-            .selection
-            .regions_in_range(start, end)
-            .first();
+        let region = self.selection.regions_in_range(start, end).first();
 
-        let caret = match maybe_caret {
+        let caret = match region {
             Some(region) => {
                 let c = region.end;
                 if (c > start && c < end)
-                || (!region.is_upstream() && c == start)
-                || (region.is_upstream() && c == end)
-                || (c == end && c == self.text.len()
-                    && self.text.line_of_offset(c) == idx)
+                    || (!region.is_upstream() && c == start)
+                    || (region.is_upstream() && c == end)
+                    || (c == end && c == self.text.len() && self.text.line_of_offset(c) == idx)
                 {
                     (c - start) as i32
                 } else {
@@ -234,7 +228,12 @@ impl OneView {
             None => -1,
         };
 
-        Some((line, caret))
+        let line_sel = region
+            .map(|r| (r.min().saturating_sub(start), r.max() - start))
+            .unwrap_or((0, 0));
+        let sel_start = clamp(line_sel.0, start, end);
+        let sel_end = clamp(line_sel.1, start, end);
+        Some((line, caret, (sel_start as i32, sel_end as i32)))
     }
 
     fn handle_event(&mut self, event: EventDomain) -> Option<Interval> {
@@ -435,3 +434,14 @@ fn event_from_str(string: &str) -> Option<EditNotification> {
 // in fact, maybe we can just own selections and not a whole view thingie?
 //
 //
+
+/// utility function to clamp a value within the given range
+fn clamp(x: usize, min: usize, max: usize) -> usize {
+    if x < min {
+        min
+    } else if x < max {
+        x
+    } else {
+        max
+    }
+}

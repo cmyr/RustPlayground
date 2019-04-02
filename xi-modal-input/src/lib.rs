@@ -231,8 +231,8 @@ impl OneView {
         let line_sel = region
             .map(|r| (r.min().saturating_sub(start), r.max() - start))
             .unwrap_or((0, 0));
-        let sel_start = clamp(line_sel.0, start, end);
-        let sel_end = clamp(line_sel.1, start, end);
+        let sel_start = line_sel.0;
+        let sel_end = line_sel.1.min(line.len());
         Some((line, caret, (sel_start as i32, sel_end as i32)))
     }
 

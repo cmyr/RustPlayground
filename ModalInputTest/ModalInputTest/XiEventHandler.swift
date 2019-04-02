@@ -10,6 +10,10 @@ import Cocoa
 
 class XiCore {
     let _inner: OpaquePointer
+    private var _hasInputHandler = false
+    var hasInputHandler: Bool {
+        return _hasInputHandler
+    }
 
     init(rpcCallback: @escaping (@convention(c) (UnsafePointer<Int8>?) -> Void),
          updateCallback: @escaping (@convention(c) (UInt32) -> Void)
@@ -22,6 +26,10 @@ class XiCore {
          timer: @escaping (@convention(c) (OpaquePointer?, UInt32) -> UInt32),
          cancelTimer: @escaping (@convention(c) (UInt32) -> Void)
         ) {
+        guard !hasInputHandler else {
+            fatalError("inputhandler can only be set up once")
+        }
+        _hasInputHandler = true
         xiCoreRegisterEventHandler(_inner, callback, action, timer, cancelTimer)
     }
 

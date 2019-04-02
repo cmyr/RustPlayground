@@ -21,8 +21,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var nextWorkItemId: UInt32 = 0
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        core.registerEventHandler(callback: dispatchEvent, action: handleAction, timer: handleTimer, cancelTimer: cancelTimer)
-        // Insert code here to initialize your application
+        // uncomment me for vim mode
+//        core.registerEventHandler(callback: dispatchEvent, action: handleAction, timer: handleTimer, cancelTimer: cancelTimer)
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {

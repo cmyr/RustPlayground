@@ -41,14 +41,14 @@ class EditView: NSView {
                 let selEnd = CGFloat(selection.endIndex)
                 print("line \(lineNumber) selection: \(selStart)..\(selEnd)")
                 let rect = CGRect(x: xOff + selStart * charWidth, y: yPos, width: charWidth * (selEnd - selStart), height: linespace)
-                NSColor.selectedTextColor.setFill()
+                NSColor.selectedTextBackgroundColor.setFill()
                 rect.fill()
             }
             if let cursor = line.cursor {
                 print("cursor \(cursor)")
                 let cursorPos = CGFloat(cursor)
-                let rect = NSRect(x: xOff + cursorPos * charWidth, y: yPos, width: charWidth, height: linespace)
-                NSColor.lightGray.setFill()
+                let rect = NSRect(x: xOff + cursorPos * charWidth, y: yPos + (linespace - 2), width: charWidth, height: 2)
+                NSColor.black.setFill()
                 rect.fill()
             }
 

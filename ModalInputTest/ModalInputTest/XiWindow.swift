@@ -10,8 +10,9 @@ import Cocoa
 
 class XiWindow: NSWindow {
     override func sendEvent(_ event: NSEvent) {
-        if event.type == .keyDown {
-            (NSApp.delegate as! AppDelegate).core.handleInput(event: event)
+        let core = (NSApp.delegate as! AppDelegate).core
+        if event.type == .keyDown && core.hasInputHandler {
+            core.handleInput(event: event)
         } else {
             super.sendEvent(event)
         }

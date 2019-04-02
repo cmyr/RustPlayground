@@ -10,7 +10,7 @@ import Cocoa
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
-    let core = XiCore(rpcCallback: handleRpc, updateCallback: handleUpdate)
+    let core = XiCoreProxy(rpcCallback: handleRpc, updateCallback: handleUpdate)
 
     var mainController: ViewController? {
         didSet {
@@ -81,8 +81,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         self.scheduledEvents.removeValue(forKey: ident)
     }
 
-    func coreDidUpate(_ totalLines: UInt32) {
-        mainController?.coreViewDidChange(core: core, newLines: totalLines)
+    func coreDidUpate(_ invalRange: Range<Int>) {
+        mainController?.coreViewDidChange(core: core, newLines: UInt32(invalRange.count))
     }
 }
 
@@ -116,8 +116,8 @@ func cancelTimer(token: UInt32) {
     (NSApp.delegate as! AppDelegate).cancelEvent(withIdentifier: token)
 }
 
-func handleUpdate(newLines: UInt32) {
-    (NSApp.delegate as! AppDelegate).coreDidUpate(newLines)
+func handleUpdate(start: Int, end: Int) {
+    (NSApp.delegate as! AppDelegate).coreDidUpate(start..<end)
 }
 
 func handleRpc(jsonPtr: UnsafePointer<Int8>?) {

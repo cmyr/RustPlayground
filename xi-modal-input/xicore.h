@@ -11,9 +11,9 @@ typedef struct _XiLine {
 typedef const char* json;
 
 typedef void (*rpc_callback)(json);
-typedef void (*update_callback)(uint32_t);
+typedef void (*invalidate_callback)(size_t start, size_t end);
 
-extern XiCore* xiCoreCreate(rpc_callback, update_callback);
+extern XiCore* xiCoreCreate(rpc_callback, invalidate_callback);
 extern void xiCoreFree(XiCore*);
 extern void xiCoreSendMessage(XiCore*, json);
 extern XiLine* xiCoreGetLine(XiCore*, uint32_t);

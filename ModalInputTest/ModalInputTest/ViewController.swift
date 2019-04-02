@@ -16,7 +16,7 @@ class ViewController: NSViewController {
 
     var contents = String();
 
-    var core: XiCore!
+    var core: XiCoreProxy!
 
     enum Mode: String {
         case command, insert
@@ -51,7 +51,7 @@ class ViewController: NSViewController {
 
     }
 
-    func coreViewDidChange(core: XiCore, newLines: UInt32) {
+    func coreViewDidChange(core: XiCoreProxy, newLines: UInt32) {
         self.totalLines = Int(newLines)
         self.editView.needsDisplay = true
     }

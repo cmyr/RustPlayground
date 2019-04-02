@@ -5,7 +5,7 @@ extern crate serde_json;
 mod input_handler;
 mod vim;
 
-use libc::{c_char, int32_t, uint32_t};
+use libc::{c_char, int32_t, uint32_t, size_t};
 use std::borrow::Cow;
 use std::ffi::{CStr, CString};
 
@@ -19,7 +19,7 @@ use input_handler::{EventCtx, EventPayload, Handler, KeyEvent, Plumber};
 
 pub struct XiCore {
     rpc_callback: extern "C" fn(*const c_char),
-    update_callback: extern "C" fn(uint32_t),
+    invalidate_callback: extern "C" fn(size_t, size_t),
     state: OneView,
     plumber: Option<Plumber>,
     handler: Option<Box<dyn Handler>>,
@@ -41,11 +41,11 @@ pub struct XiLine {
 #[no_mangle]
 pub extern "C" fn xiCoreCreate(
     rpc_callback: extern "C" fn(*const c_char),
-    update_callback: extern "C" fn(uint32_t),
+    invalidate_callback: extern "C" fn(size_t, size_t),
 ) -> *const XiCore {
     let r = Box::into_raw(Box::new(XiCore {
         rpc_callback,
-        update_callback,
+        invalidate_callback,
         state: OneView::new(),
         plumber: None,
         handler: None,
@@ -343,7 +343,7 @@ impl XiCore {
 
     fn send_update(&self) {
         let n_lines = self.state.count_lines();
-        (self.update_callback)(n_lines as u32)
+        (self.invalidate_callback)(0, n_lines)
     }
 }
 
@@ -434,14 +434,3 @@ fn event_from_str(string: &str) -> Option<EditNotification> {
 // in fact, maybe we can just own selections and not a whole view thingie?
 //
 //
-
-/// utility function to clamp a value within the given range
-fn clamp(x: usize, min: usize, max: usize) -> usize {
-    if x < min {
-        min
-    } else if x < max {
-        x
-    } else {
-        max
-    }
-}

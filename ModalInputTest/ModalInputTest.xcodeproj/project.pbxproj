@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		600D761322405AC400CC9D90 /* libximodal.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 609A225F22404CF900A3F007 /* libximodal.a */; };
-		604B0F6022405C88007038E6 /* XiEventHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 604B0F5F22405C88007038E6 /* XiEventHandler.swift */; };
+		604B0F6022405C88007038E6 /* XiCoreProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 604B0F5F22405C88007038E6 /* XiCoreProxy.swift */; };
 		606644EB223FFED7006215A0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606644EA223FFED7006215A0 /* AppDelegate.swift */; };
 		606644ED223FFED7006215A0 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606644EC223FFED7006215A0 /* ViewController.swift */; };
 		606644EF223FFED8006215A0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 606644EE223FFED8006215A0 /* Assets.xcassets */; };
@@ -38,7 +38,7 @@
 
 /* Begin PBXFileReference section */
 		603608D2224EC693002CEAC6 /* xicore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = xicore.h; path = "../xi-modal-input/xicore.h"; sourceTree = "<group>"; };
-		604B0F5F22405C88007038E6 /* XiEventHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XiEventHandler.swift; sourceTree = "<group>"; };
+		604B0F5F22405C88007038E6 /* XiCoreProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XiCoreProxy.swift; sourceTree = "<group>"; };
 		606644E7223FFED7006215A0 /* ModalInputTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ModalInputTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		606644EA223FFED7006215A0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		606644EC223FFED7006215A0 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -112,7 +112,7 @@
 				606644EC223FFED7006215A0 /* ViewController.swift */,
 				60BF2284225012DD002C0352 /* EditView.swift */,
 				60CC174E224591840075FDE5 /* XiWindow.swift */,
-				604B0F5F22405C88007038E6 /* XiEventHandler.swift */,
+				604B0F5F22405C88007038E6 /* XiCoreProxy.swift */,
 				606644EE223FFED8006215A0 /* Assets.xcassets */,
 				606644F0223FFED8006215A0 /* Main.storyboard */,
 				606644F3223FFED8006215A0 /* Info.plist */,
@@ -302,7 +302,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				604B0F6022405C88007038E6 /* XiEventHandler.swift in Sources */,
+				604B0F6022405C88007038E6 /* XiCoreProxy.swift in Sources */,
 				60BF2285225012DD002C0352 /* EditView.swift in Sources */,
 				606644ED223FFED7006215A0 /* ViewController.swift in Sources */,
 				606644EB223FFED7006215A0 /* AppDelegate.swift in Sources */,

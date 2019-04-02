@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class XiCore {
+class XiCoreProxy {
     let _inner: OpaquePointer
     private var _hasInputHandler = false
     var hasInputHandler: Bool {
@@ -16,7 +16,7 @@ class XiCore {
     }
 
     init(rpcCallback: @escaping (@convention(c) (UnsafePointer<Int8>?) -> Void),
-         updateCallback: @escaping (@convention(c) (UInt32) -> Void)
+         updateCallback: @escaping (@convention(c) (Int, Int) -> Void)
         ) {
         _inner = xiCoreCreate(rpcCallback, updateCallback)
     }

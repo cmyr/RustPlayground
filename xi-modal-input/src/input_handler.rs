@@ -1,5 +1,5 @@
 use libc::{c_char, uint32_t};
-use std::ffi::{CStr, CString};
+use std::ffi::CString;
 
 use xi_core_lib::edit_types::EventDomain;
 
@@ -26,7 +26,7 @@ pub struct Plumber {
 }
 
 impl Plumber {
-    pub(crate) fn new(
+    pub fn new(
         event_callback: extern "C" fn(*const EventPayload, bool),
         action_callback: extern "C" fn(*const c_char),
         timer_callback: extern "C" fn(*const EventPayload, uint32_t) -> uint32_t,

@@ -5,9 +5,8 @@ extern crate serde_json;
 mod input_handler;
 mod vim;
 
-use libc::{c_char, int32_t, uint32_t, size_t};
 use std::borrow::Cow;
-use std::ffi::{CStr, CString};
+use libc::{c_char, size_t};
 
 use xi_core_lib::edit_types::{BufferEvent, EventDomain, ViewEvent};
 use xi_core_lib::selection::{InsertDrift, SelRegion, Selection};
@@ -15,14 +14,15 @@ use xi_core_lib::view::NoView;
 use xi_core_lib::{edit_ops, movement, rpc::EditNotification, BufferConfig};
 use xi_rope::{Interval, LinesMetric, Rope, RopeDelta};
 
-use input_handler::{EventCtx, EventPayload, Handler, KeyEvent, Plumber};
+pub use input_handler::{EventCtx, EventPayload, Handler, KeyEvent, Plumber};
+pub use vim::Machine as Vim;
 
 pub struct XiCore {
-    rpc_callback: extern "C" fn(*const c_char),
-    invalidate_callback: extern "C" fn(size_t, size_t),
-    state: OneView,
-    plumber: Option<Plumber>,
-    handler: Option<Box<dyn Handler>>,
+    pub rpc_callback: extern "C" fn(*const c_char),
+    pub invalidate_callback: extern "C" fn(size_t, size_t),
+    pub state: OneView,
+    pub plumber: Option<Plumber>,
+    pub handler: Option<Box<dyn Handler>>,
 }
 
 pub struct OneView {
@@ -31,157 +31,8 @@ pub struct OneView {
     config: BufferConfig,
 }
 
-#[repr(C)]
-pub struct XiLine {
-    text: *const c_char,
-    cursor: int32_t,
-    selection: [int32_t; 2],
-}
-
-#[no_mangle]
-pub extern "C" fn xiCoreCreate(
-    rpc_callback: extern "C" fn(*const c_char),
-    invalidate_callback: extern "C" fn(size_t, size_t),
-) -> *const XiCore {
-    let r = Box::into_raw(Box::new(XiCore {
-        rpc_callback,
-        invalidate_callback,
-        state: OneView::new(),
-        plumber: None,
-        handler: None,
-    }));
-    eprintln!("xiCore alloc {:?}", &r);
-    r
-}
-
-#[no_mangle]
-pub extern "C" fn xiCoreRegisterEventHandler(
-    ptr: *mut XiCore,
-    event_cb: extern "C" fn(*const EventPayload, bool),
-    action_cb: extern "C" fn(*const c_char),
-    timer_cb: extern "C" fn(*const EventPayload, uint32_t) -> uint32_t,
-    cancel_timer_cb: extern "C" fn(uint32_t),
-) {
-    let core = unsafe {
-        assert!(!ptr.is_null(), "null pointer in xiCoreRegisterEventHandler");
-        &mut *ptr
-    };
-
-    let machine = crate::vim::Machine::new();
-    let plumber = Plumber::new(event_cb, action_cb, timer_cb, cancel_timer_cb);
-    core.plumber = Some(plumber);
-    core.handler = Some(Box::new(machine));
-}
-
-#[no_mangle]
-pub extern "C" fn xiCoreHandleInput(
-    ptr: *mut XiCore,
-    modifiers: uint32_t,
-    characters: *const c_char,
-    payload: *const EventPayload,
-) {
-    let core = unsafe {
-        assert!(!ptr.is_null());
-        &mut *ptr
-    };
-
-    let cstr = unsafe {
-        assert!(!characters.is_null());
-        CStr::from_ptr(characters)
-    };
-
-    let characters = match cstr.to_str() {
-        Ok(s) => s,
-        Err(e) => {
-            eprintln!("invalid cstr: {}, {:?}", e, cstr.to_bytes());
-            ""
-        }
-    };
-
-    let event = KeyEvent {
-        characters,
-        modifiers,
-        payload,
-    };
-
-    let ctx = EventCtx {
-        plumber: core.plumber.as_ref().unwrap(),
-        state: &mut core.state,
-    };
-
-    let needs_render = core.handler.as_mut().unwrap().handle_event(event, ctx);
-    if needs_render {
-        core.send_update();
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn xiCoreClearPending(ptr: *mut XiCore, token: uint32_t) {
-    let core = unsafe {
-        assert!(!ptr.is_null());
-        &mut *ptr
-    };
-
-    if core.handler.is_none() {
-        eprintln!("unexpected None in xiCoreClearPending");
-    }
-
-    core.handler.as_mut().map(|h| h.clear_pending(token));
-}
-
-#[no_mangle]
-pub extern "C" fn xiCoreGetLine(ptr: *mut XiCore, idx: uint32_t) -> *const XiLine {
-    let core = unsafe {
-        assert!(!ptr.is_null(), "null pointer in xiCoreGetLine");
-        &mut *ptr
-    };
-
-    let (line, cursor, sel) = core.state.get_line(idx as usize).unwrap();
-    let cstring = CString::new(line.as_ref()).expect("bad string, very sad");
-    Box::into_raw(Box::new(XiLine {
-        text: cstring.into_raw(),
-        cursor,
-        selection: [sel.0, sel.1],
-    }))
-}
-
-#[no_mangle]
-pub extern "C" fn xiCoreFree(ptr: *mut XiCore) {
-    eprintln!("xiCore free {:?}", &ptr);
-    if ptr.is_null() {
-        return;
-    }
-
-    unsafe {
-        Box::from_raw(ptr);
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn xiCoreSendMessage(ptr: *mut XiCore, msg: *const c_char) {
-    let core = unsafe {
-        assert!(!ptr.is_null(), "null pointer in xiCoreSendMessage");
-        &mut *ptr
-    };
-
-    let cstr = unsafe {
-        assert!(!ptr.is_null(), "null msg pointer in xiCoreSendMessage");
-        CStr::from_ptr(msg)
-    };
-
-    let msg = match cstr.to_str() {
-        Ok(s) => s,
-        Err(e) => {
-            eprintln!("invalid cstr: {}, {:?}", e, cstr.to_bytes());
-            return;
-        }
-    };
-
-    core.handle_message(msg);
-}
-
 impl OneView {
-    fn new() -> Self {
+    pub fn new() -> Self {
         OneView {
             selection: SelRegion::caret(0).into(),
             text: Rope::from(""),
@@ -203,7 +54,7 @@ impl OneView {
         }
     }
 
-    fn get_line(&self, idx: usize) -> Option<(Cow<str>, i32, (i32, i32))> {
+    pub fn get_line(&self, idx: usize) -> Option<(Cow<str>, i32, (i32, i32))> {
         if idx > self.text.count::<LinesMetric>(self.text.len()) {
             return None;
         }
@@ -318,7 +169,7 @@ impl OneView {
 }
 
 impl XiCore {
-    fn handle_message(&mut self, msg: &str) {
+    pub fn handle_message(&mut self, msg: &str) {
         use xi_core_lib::rpc::*;
         use EditNotification as E;
 
@@ -341,7 +192,7 @@ impl XiCore {
         self.send_update();
     }
 
-    fn send_update(&self) {
+    pub fn send_update(&self) {
         let n_lines = self.state.count_lines();
         (self.invalidate_callback)(0, n_lines)
     }

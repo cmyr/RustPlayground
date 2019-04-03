@@ -1,0 +1,18 @@
+[package]
+name = "xi-ffi"
+version = "0.1.0"
+authors = ["Colin Rofls <colin@cmyr.net>"]
+edition = "2018"
+
+[dependencies.xi-modal-input]
+path = "../xi-modal-input"
+version = "0.1"
+
+[dependencies.libc]
+version = "0.2.17"
+default-features = false
+
+[lib]
+name = "ximodal"
+path = "src/lib.rs"
+crate-type = ["staticlib"]

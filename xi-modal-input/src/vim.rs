@@ -52,7 +52,7 @@ enum CommandState {
     Failed,
 }
 
-pub(crate) struct Machine {
+pub struct Machine {
     mode: Mode,
     state: CommandState,
     raw: String,
@@ -80,7 +80,7 @@ impl Handler for Machine {
 }
 
 impl Machine {
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         Machine {
             mode: Mode::Insert,
             state: CommandState::Ready,

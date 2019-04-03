@@ -17,7 +17,3 @@ path = "/Users/rofls/dev/projects/xi-mac/xi-editor/rust/core-lib"
 [dependencies.xi-rope]
 path = "/Users/rofls/dev/projects/xi-mac/xi-editor/rust/rope"
 
-[lib]
-name = "ximodal"
-path = "src/lib.rs"
-crate-type = ["staticlib"]

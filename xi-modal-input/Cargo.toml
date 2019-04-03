@@ -19,3 +19,5 @@ path = "/Users/rofls/dev/projects/xi-mac/xi-editor/rust/core-lib"
 [dependencies.xi-rope]
 path = "/Users/rofls/dev/projects/xi-mac/xi-editor/rust/rope"
 
+[dependencies.xi-unicode]
+path = "/Users/rofls/dev/projects/xi-mac/xi-editor/rust/unicode"

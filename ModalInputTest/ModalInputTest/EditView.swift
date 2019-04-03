@@ -15,7 +15,6 @@ protocol LineSource {
 
 class EditView: NSView {
 
-    let defaultFont = NSFont(name: "Menlo", size: 14.0)!
     var lineSource: LineSource?
 
     override var isFlipped: Bool {
@@ -26,28 +25,30 @@ class EditView: NSView {
         guard let lines = lineSource, lines.totalLines > 0 else { return }
         NSColor.white.setFill()
         dirtyRect.fill()
-        let linespace = defaultFont.linespace
+
+        let font = DefaultFont.shared
+        let linespace = font.linespace
         let xOff: CGFloat = 2.0
-        let yOff = defaultFont.topPadding
-        let charWidth = defaultFont.characterWidth()
+        let yOff = font.topPadding
+        let charWidth = font.characterWidth()
+
 
         for lineNumber in 0..<lines.totalLines {
             let line = lines.getLine(line: UInt32(lineNumber))!
-            let attrString = NSMutableAttributedString(string: line.text, attributes: [.font: defaultFont, .foregroundColor: NSColor.black])
+            let attrString = NSMutableAttributedString(string: line.text, attributes: [.font: font, .foregroundColor: NSColor.black])
             let yPos = yOff + linespace * CGFloat(lineNumber)
             if let selection = line.selection {
 
-                let selStart = CGFloat(selection.startIndex)
-                let selEnd = CGFloat(selection.endIndex)
-                print("line \(lineNumber) selection: \(selStart)..\(selEnd)")
-                let rect = CGRect(x: xOff + selStart * charWidth, y: yPos, width: charWidth * (selEnd - selStart), height: linespace)
+                let selStart = font.isFixedPitch ? CGFloat(selection.startIndex) * charWidth : getVisualOffset(attrString, selection.startIndex)
+                let selEnd = font.isFixedPitch ?  CGFloat(selection.endIndex) * charWidth : getVisualOffset(attrString, selection.endIndex)
+                let rect = CGRect(x: xOff + selStart, y: yPos, width: selEnd - selStart, height: linespace)
                 NSColor.selectedTextBackgroundColor.setFill()
                 rect.fill()
             }
             if let cursor = line.cursor {
-                print("cursor \(cursor)")
-                let cursorPos = CGFloat(cursor)
-                let rect = NSRect(x: xOff + cursorPos * charWidth, y: yPos + (linespace - 2), width: charWidth, height: 2)
+                let cursorPos = font.isFixedPitch ? CGFloat(cursor) * charWidth : getVisualOffset(attrString, cursor)
+
+                let rect = NSRect(x: xOff + cursorPos, y: yPos + (linespace - 1), width: charWidth, height: 1)
                 NSColor.black.setFill()
                 rect.fill()
             }
@@ -56,7 +57,12 @@ class EditView: NSView {
 
         }
     }
-    
+
+    func getVisualOffset(_ line: NSAttributedString, _ cursorPos: Int) -> CGFloat {
+        let ctLine = CTLineCreateWithAttributedString(line)
+        let pos = CTLineGetOffsetForStringIndex(ctLine, cursorPos, nil)
+        return pos
+    }
 }
 
 extension NSFont {
@@ -73,14 +79,12 @@ extension NSFont {
     }
 
     func characterWidth() -> CGFloat {
-        if self.isFixedPitch {
             let characters = [UniChar(0x20)]
             var glyphs = [CGGlyph(0)]
             if CTFontGetGlyphsForCharacters(self, characters, &glyphs, 1) {
                 let advance = CTFontGetAdvancesForGlyphs(self, .horizontal, glyphs, nil, 1)
                 return CGFloat(advance)
             }
-        }
-        return 0
+        fatalError("font characterWidth() failed")
     }
 }

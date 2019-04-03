@@ -10,13 +10,18 @@ mod vim;
 
 use libc::{c_char, size_t};
 use std::borrow::Cow;
+use std::collections::HashMap;
+use std::ffi::CString;
 
 use xi_core_lib::edit_types::{BufferEvent, EventDomain, SpecialEvent, ViewEvent};
 use xi_core_lib::rpc::{EditNotification, Rect};
 use xi_core_lib::selection::{InsertDrift, SelRegion, Selection};
 use xi_core_lib::view::NoView;
-use xi_core_lib::{edit_ops, movement, BufferConfig};
-use xi_rope::{LinesMetric, Rope, RopeDelta};
+use xi_core_lib::{edit_ops, linewrap::LineBreakCursor, movement, BufferConfig};
+use xi_rope::breaks2::{BreakBuilder, Breaks};
+use xi_rope::{Cursor, LinesMetric, Rope, RopeDelta};
+
+//use xi_unicode::LineBreakLeafIter;
 
 pub use input_handler::{EventCtx, EventPayload, Handler, KeyEvent, Plumber};
 use rpc::Rpc;
@@ -34,14 +39,26 @@ pub struct OneView {
     selection: Selection,
     text: Rope,
     config: BufferConfig,
+    breaks: Breaks,
     frame: Rect,
+    width_cache: WidthCache,
+    width_measure_fn: extern "C" fn(*const c_char) -> size_t,
+}
+
+type Width = usize;
+
+#[derive(Debug, Default, Clone)]
+pub struct WidthCache {
+    /// maps cache key to index within widths
+    m: HashMap<String, Width>,
 }
 
 impl OneView {
-    pub fn new() -> Self {
+    pub fn new(width_measure_fn: extern "C" fn(*const c_char) -> size_t) -> Self {
         OneView {
             selection: SelRegion::caret(0).into(),
             text: Rope::from(""),
+            width_cache: WidthCache::default(),
             config: BufferConfig {
                 line_ending: "\n".to_string(),
                 tab_size: 4,
@@ -58,6 +75,8 @@ impl OneView {
                 save_with_newline: false,
             },
             frame: Rect::zero(),
+            breaks: Breaks::default(),
+            width_measure_fn,
         }
     }
 
@@ -143,7 +162,9 @@ impl OneView {
             let newtext = delta.apply(&self.text);
             let newsel = self.selection.apply_delta(&delta, true, InsertDrift::Default);
             self.text = newtext;
+            self.update_breaks(&delta);
             self.selection = newsel;
+            eprintln!("max_width: {}", self.breaks.max_width());
         }
     }
 
@@ -172,6 +193,44 @@ impl OneView {
     fn viewport_change(&mut self, new_frame: Rect) {
         self.frame = new_frame;
         eprintln!("viewport changed to {:?}", new_frame);
+    }
+
+    fn update_breaks(&mut self, delta: &RopeDelta) {
+        let (iv, new_len) = delta.summary();
+
+        let mut builder = BreakBuilder::new();
+        let mut cursor = Cursor::new(&self.text, iv.start());
+        cursor.at_or_prev::<LinesMetric>();
+
+        let mut start = cursor.pos();
+        let mut break_cursor = LineBreakCursor::new(&self.text, start);
+        let mut cur_width = 0;
+        //eprintln!("updating for iv {:?}, new_len {} old_len {}", iv, new_len, self.text.len());
+        loop {
+            let (next, is_hard) = break_cursor.next();
+            let this_word = self.text.slice_to_cow(start..next);
+            let width = self.measure_width(&this_word);
+            cur_width += width;
+            //eprintln!("word '{}', width {} next {}", this_word, width, next);
+
+            if is_hard || next >= self.text.len() {
+                builder.add_break(next - start, cur_width);
+                cur_width = 0;
+                if start >= iv.start() + new_len {
+                    break;
+                }
+            }
+            start = next;
+        }
+
+        let new_breaks = builder.build();
+        let end = start + new_breaks.len();
+        self.breaks.edit(start..end, new_breaks);
+    }
+
+    fn measure_width(&self, line: &str) -> usize {
+        let cstr = CString::new(line).unwrap();
+        (self.width_measure_fn)(cstr.as_ptr())
     }
 
     fn count_lines(&self) -> usize {

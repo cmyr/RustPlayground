@@ -15,11 +15,12 @@ pub struct XiLine {
 pub extern "C" fn xiCoreCreate(
     rpc_callback: extern "C" fn(*const c_char),
     invalidate_callback: extern "C" fn(size_t, size_t),
+    width_measure_fn: extern "C" fn(*const c_char) -> size_t,
 ) -> *const XiCore {
     let r = Box::into_raw(Box::new(XiCore {
         rpc_callback,
         invalidate_callback,
-        state: OneView::new(),
+        state: OneView::new(width_measure_fn),
         plumber: None,
         handler: None,
     }));

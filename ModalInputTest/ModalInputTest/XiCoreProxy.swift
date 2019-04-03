@@ -16,9 +16,10 @@ class XiCoreProxy {
     }
 
     init(rpcCallback: @escaping (@convention(c) (UnsafePointer<Int8>?) -> Void),
-         updateCallback: @escaping (@convention(c) (Int, Int) -> Void)
+         updateCallback: @escaping (@convention(c) (Int, Int) -> Void),
+         widthMeasure: @escaping (@convention(c) (UnsafePointer<Int8>?) -> Int)
         ) {
-        _inner = xiCoreCreate(rpcCallback, updateCallback)
+        _inner = xiCoreCreate(rpcCallback, updateCallback, widthMeasure)
     }
 
     func registerEventHandler(callback: @escaping (@convention(c) (OpaquePointer?, Bool) -> Void),

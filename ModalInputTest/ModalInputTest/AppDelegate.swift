@@ -10,7 +10,7 @@ import Cocoa
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
-    let core = XiCoreProxy(rpcCallback: handleRpc, updateCallback: handleUpdate)
+    let core = XiCoreProxy(rpcCallback: handleRpc, updateCallback: handleUpdate, widthMeasure: measureWidth)
 
     var mainController: ViewController? {
         didSet {
@@ -122,4 +122,20 @@ func handleUpdate(start: Int, end: Int) {
 
 func handleRpc(jsonPtr: UnsafePointer<Int8>?) {
 
+}
+
+class DefaultFont {
+    static let shared = NSFont(name: "Input Sans", size: 14.0)!
+}
+
+func measureWidth(strPtr: UnsafePointer<Int8>?) -> Int {
+    guard let strPtr = strPtr else {
+        fatalError("measureWidth passed null pointer")
+    }
+
+    let string = String(cString: strPtr)
+    let attrString = NSAttributedString(string: string, attributes: [.font: DefaultFont.shared])
+
+    let ctLine = CTLineCreateWithAttributedString(attrString)
+    return Int(CTLineGetTypographicBounds(ctLine, nil, nil, nil))
 }

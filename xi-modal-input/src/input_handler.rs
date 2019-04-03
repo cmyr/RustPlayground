@@ -32,12 +32,7 @@ impl Plumber {
         timer_callback: extern "C" fn(*const EventPayload, uint32_t) -> uint32_t,
         cancel_timer_callback: extern "C" fn(uint32_t),
     ) -> Plumber {
-        Plumber {
-            event_callback,
-            action_callback,
-            timer_callback,
-            cancel_timer_callback,
-        }
+        Plumber { event_callback, action_callback, timer_callback, cancel_timer_callback }
     }
 }
 

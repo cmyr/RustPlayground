@@ -4,24 +4,23 @@ extern crate serde_json;
 #[macro_use]
 extern crate serde_derive;
 
-
 mod input_handler;
-mod vim;
 mod rpc;
+mod vim;
 
-use std::borrow::Cow;
 use libc::{c_char, size_t};
+use std::borrow::Cow;
 
 use xi_core_lib::edit_types::{BufferEvent, EventDomain, SpecialEvent, ViewEvent};
+use xi_core_lib::rpc::{EditNotification, Rect};
 use xi_core_lib::selection::{InsertDrift, SelRegion, Selection};
 use xi_core_lib::view::NoView;
 use xi_core_lib::{edit_ops, movement, BufferConfig};
-use xi_core_lib::rpc::{EditNotification, Rect};
 use xi_rope::{LinesMetric, Rope, RopeDelta};
 
 pub use input_handler::{EventCtx, EventPayload, Handler, KeyEvent, Plumber};
-pub use vim::Machine as Vim;
 use rpc::Rpc;
+pub use vim::Machine as Vim;
 
 pub struct XiCore {
     pub rpc_callback: extern "C" fn(*const c_char),
@@ -87,9 +86,8 @@ impl OneView {
             None => -1,
         };
 
-        let line_sel = region
-            .map(|r| (r.min().saturating_sub(start), r.max() - start))
-            .unwrap_or((0, 0));
+        let line_sel =
+            region.map(|r| (r.min().saturating_sub(start), r.max() - start)).unwrap_or((0, 0));
         let sel_start = line_sel.0;
         let sel_end = line_sel.1.min(line.len());
         Some((line, caret, (sel_start as i32, sel_end as i32)))
@@ -143,9 +141,7 @@ impl OneView {
         if let Some(delta) = self.edit_for_event(event) {
             eprintln!("handling edit {:?}", &delta);
             let newtext = delta.apply(&self.text);
-            let newsel = self
-                .selection
-                .apply_delta(&delta, true, InsertDrift::Default);
+            let newsel = self.selection.apply_delta(&delta, true, InsertDrift::Default);
             self.text = newtext;
             self.selection = newsel;
         }

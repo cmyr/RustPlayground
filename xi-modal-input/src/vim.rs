@@ -144,11 +144,7 @@ impl Machine {
             CommandState::Ready => {
                 self.raw.push_str(chr);
                 if let Some(motion) = movement_from_str(chr) {
-                    CommandState::Done(Command {
-                        motion,
-                        ty: CommandType::Move,
-                        distance: 1,
-                    })
+                    CommandState::Done(Command { motion, ty: CommandType::Move, distance: 1 })
                 } else if let Some(cmd) = CommandType::from_char(chr) {
                     CommandState::AwaitMotion(cmd, 0)
                 } else if let Ok(num) = chr.parse() {
@@ -161,11 +157,7 @@ impl Machine {
             CommandState::AwaitMotion(ty, dist) => {
                 self.raw.push_str(chr);
                 if let Some(motion) = movement_from_str(chr) {
-                    CommandState::Done(Command {
-                        motion,
-                        ty: *ty,
-                        distance: *dist.max(&1),
-                    })
+                    CommandState::Done(Command { motion, ty: *ty, distance: *dist.max(&1) })
                 } else if let Ok(num) = chr.parse::<usize>() {
                     let new_dist = num + (dist * 10);
                     CommandState::AwaitMotion(*ty, new_dist)
@@ -176,12 +168,7 @@ impl Machine {
             _ => unreachable!(),
         };
 
-        if let CommandState::Done(Command {
-            motion,
-            ty,
-            distance,
-        }) = &self.state
-        {
+        if let CommandState::Done(Command { motion, ty, distance }) = &self.state {
             if let CommandType::Delete = ty {
                 ctx.do_core_event(ViewEvent::ModifySelection(*motion).into(), *distance);
                 ctx.do_core_event(BufferEvent::Backspace.into(), 1);

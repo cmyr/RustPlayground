@@ -1,6 +1,5 @@
-
-use serde_json::Value;
 use serde::de::DeserializeOwned;
+use serde_json::Value;
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct Rpc<'a> {

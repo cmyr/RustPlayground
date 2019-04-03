@@ -1,8 +1,8 @@
 use std::ffi::{CStr, CString};
 
-use libc::{c_char, int32_t, uint32_t, size_t};
+use libc::{c_char, int32_t, size_t, uint32_t};
 extern crate xi_modal_input;
-use xi_modal_input::{XiCore, EventCtx, KeyEvent, EventPayload, Plumber, OneView, Vim};
+use xi_modal_input::{EventCtx, EventPayload, KeyEvent, OneView, Plumber, Vim, XiCore};
 
 #[repr(C)]
 pub struct XiLine {
@@ -71,16 +71,9 @@ pub extern "C" fn xiCoreHandleInput(
         }
     };
 
-    let event = KeyEvent {
-        characters,
-        modifiers,
-        payload,
-    };
+    let event = KeyEvent { characters, modifiers, payload };
 
-    let ctx = EventCtx {
-        plumber: core.plumber.as_ref().unwrap(),
-        state: &mut core.state,
-    };
+    let ctx = EventCtx { plumber: core.plumber.as_ref().unwrap(), state: &mut core.state };
 
     let needs_render = core.handler.as_mut().unwrap().handle_event(event, ctx);
     if needs_render {
@@ -111,11 +104,7 @@ pub extern "C" fn xiCoreGetLine(ptr: *mut XiCore, idx: uint32_t) -> *const XiLin
 
     let (line, cursor, sel) = core.state.get_line(idx as usize).unwrap();
     let cstring = CString::new(line.as_ref()).expect("bad string, very sad");
-    Box::into_raw(Box::new(XiLine {
-        text: cstring.into_raw(),
-        cursor,
-        selection: [sel.0, sel.1],
-    }))
+    Box::into_raw(Box::new(XiLine { text: cstring.into_raw(), cursor, selection: [sel.0, sel.1] }))
 }
 
 #[no_mangle]

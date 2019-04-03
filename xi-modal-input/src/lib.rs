@@ -7,20 +7,21 @@ extern crate serde_derive;
 
 mod input_handler;
 mod vim;
+mod rpc;
 
 use std::borrow::Cow;
 use libc::{c_char, size_t};
 
-use serde_json::Value;
-
-use xi_core_lib::edit_types::{BufferEvent, EventDomain, ViewEvent};
+use xi_core_lib::edit_types::{BufferEvent, EventDomain, SpecialEvent, ViewEvent};
 use xi_core_lib::selection::{InsertDrift, SelRegion, Selection};
 use xi_core_lib::view::NoView;
-use xi_core_lib::{edit_ops, movement, rpc::EditNotification, BufferConfig};
-use xi_rope::{Interval, LinesMetric, Rope, RopeDelta};
+use xi_core_lib::{edit_ops, movement, BufferConfig};
+use xi_core_lib::rpc::{EditNotification, Rect};
+use xi_rope::{LinesMetric, Rope, RopeDelta};
 
 pub use input_handler::{EventCtx, EventPayload, Handler, KeyEvent, Plumber};
 pub use vim::Machine as Vim;
+use rpc::Rpc;
 
 pub struct XiCore {
     pub rpc_callback: extern "C" fn(*const c_char),
@@ -34,12 +35,7 @@ pub struct OneView {
     selection: Selection,
     text: Rope,
     config: BufferConfig,
-}
-
-#[derive(Debug, Clone, Deserialize)]
-struct Rpc<'a> {
-    method: &'a str,
-    params: Value,
+    frame: Rect,
 }
 
 impl OneView {
@@ -62,6 +58,7 @@ impl OneView {
                 surrounding_pairs: vec![],
                 save_with_newline: false,
             },
+            frame: Rect::zero(),
         }
     }
 
@@ -98,19 +95,21 @@ impl OneView {
         Some((line, caret, (sel_start as i32, sel_end as i32)))
     }
 
-    fn handle_event(&mut self, event: EventDomain) -> Option<Interval> {
+    fn handle_event(&mut self, event: EventDomain) {
         match event {
             EventDomain::View(event) => self.handle_view_event(event),
             EventDomain::Buffer(event) => self.handle_edit(event),
-            EventDomain::Special(_other) => None,
+            EventDomain::Special(other) => match other {
+                SpecialEvent::ViewportChange(rect) => self.viewport_change(rect),
+                _other => eprintln!("unhandled special event {:?}", _other),
+            },
         }
     }
 
-    fn handle_view_event(&mut self, event: ViewEvent) -> Option<Interval> {
-        let new_selection = self.selection_for_event(event)?;
-        let change = self.selection.interval().union(new_selection.interval());
-        self.selection = new_selection;
-        Some(change)
+    fn handle_view_event(&mut self, event: ViewEvent) {
+        if let Some(new_selection) = self.selection_for_event(event) {
+            self.selection = new_selection;
+        }
     }
 
     fn selection_for_event(&mut self, event: ViewEvent) -> Option<Selection> {
@@ -140,16 +139,16 @@ impl OneView {
         }
     }
 
-    fn handle_edit(&mut self, event: BufferEvent) -> Option<Interval> {
-        let delta = self.edit_for_event(event)?;
-        eprintln!("handling edit {:?}", &delta);
-        let newtext = delta.apply(&self.text);
-        let newsel = self
-            .selection
-            .apply_delta(&delta, true, InsertDrift::Default);
-        self.text = newtext;
-        self.selection = newsel;
-        None
+    fn handle_edit(&mut self, event: BufferEvent) {
+        if let Some(delta) = self.edit_for_event(event) {
+            eprintln!("handling edit {:?}", &delta);
+            let newtext = delta.apply(&self.text);
+            let newsel = self
+                .selection
+                .apply_delta(&delta, true, InsertDrift::Default);
+            self.text = newtext;
+            self.selection = newsel;
+        }
     }
 
     fn edit_for_event(&mut self, event: BufferEvent) -> Option<RopeDelta> {
@@ -174,6 +173,11 @@ impl OneView {
         }
     }
 
+    fn viewport_change(&mut self, new_frame: Rect) {
+        self.frame = new_frame;
+        eprintln!("viewport changed to {:?}", new_frame);
+    }
+
     fn count_lines(&self) -> usize {
         self.text.count::<LinesMetric>(self.text.len()) + 1
     }
@@ -194,6 +198,7 @@ impl XiCore {
         eprintln!("core handle_msg {:?}", msg.method);
         let event = match msg.method {
             "insert" => E::Insert { chars: msg.params["chars"].as_str().unwrap().to_owned() },
+            "viewport_change" => E::ViewportChange(msg.get_params()),
             other => match event_from_str(other) {
                 Some(event) => event,
                 None => {

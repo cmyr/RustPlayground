@@ -58,11 +58,11 @@ class ViewController: NSViewController {
 
     override func doCommand(by selector: Selector) {
         let selString = NSStringFromSelector(selector)
-        (NSApp.delegate as! AppDelegate).core.doCommand(selString)
+        core.doCommand(selString)
     }
 
     override func insertText(_ insertString: Any) {
-        (NSApp.delegate as! AppDelegate).core.insertText(insertString as! String)
+        core.insertText(insertString as! String)
         super.insertText(insertString)
     }
 
@@ -71,10 +71,7 @@ class ViewController: NSViewController {
     }
 
     @objc func frameDidChangeNotification(_ notification: Notification) {
-//        updateEditViewHeight()
-//        willScroll(to: scrollView.contentView.bounds.origin)
-//        updateViewportSize()
-//        statusBar.checkItemsFitFor(windowWidth: self.view.frame.width)
+        core.frameChanged(newFrame: view.frame)
     }
 }
 

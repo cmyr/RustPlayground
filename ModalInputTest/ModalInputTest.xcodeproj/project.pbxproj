@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		600D761322405AC400CC9D90 /* libximodal.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 609A225F22404CF900A3F007 /* libximodal.a */; };
 		604B0F6022405C88007038E6 /* XiCoreProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 604B0F5F22405C88007038E6 /* XiCoreProxy.swift */; };
 		606644EB223FFED7006215A0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606644EA223FFED7006215A0 /* AppDelegate.swift */; };
 		606644ED223FFED7006215A0 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606644EC223FFED7006215A0 /* ViewController.swift */; };
@@ -16,6 +15,7 @@
 		606644FE223FFED9006215A0 /* ModalInputTestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606644FD223FFED9006215A0 /* ModalInputTestTests.swift */; };
 		609A22672240504100A3F007 /* libximodal.h in Headers */ = {isa = PBXBuildFile; fileRef = 609A22662240504100A3F007 /* libximodal.h */; };
 		60BF2285225012DD002C0352 /* EditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60BF2284225012DD002C0352 /* EditView.swift */; };
+		60BF2286225511BD002C0352 /* libximodal.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 609A225F22404CF900A3F007 /* libximodal.a */; };
 		60CC174F224591840075FDE5 /* XiWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60CC174E224591840075FDE5 /* XiWindow.swift */; };
 /* End PBXBuildFile section */
 
@@ -61,7 +61,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				600D761322405AC400CC9D90 /* libximodal.a in Frameworks */,
+				60BF2286225511BD002C0352 /* libximodal.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -151,7 +151,6 @@
 				606644E3223FFED7006215A0 /* Sources */,
 				606644E4223FFED7006215A0 /* Frameworks */,
 				606644E5223FFED7006215A0 /* Resources */,
-				6066450822402352006215A0 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -261,23 +260,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		6066450822402352006215A0 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# When building from Xcode we want to ensure that `cargo` is in PATH.\n# as a convenience, add the default cargo install location\nexport PATH=\"$PATH:${HOME}/.cargo/bin\"\n\nset -e\n\nif [[ $CONFIGURATION = \"Debug\" ]]; then\n    RUST_CONFIGURATION=\"debug\"\n    RUST_CONFIGURATION_FLAG=\"\"\nelse\n    RUST_CONFIGURATION=\"release\"\n    RUST_CONFIGURATION_FLAG=\"--release\"\nfi\n\ncd \"${SRCROOT}/../xi-ffi\"\n\necho \"rust config ${RUST_CONFIGURATION}\"\nif [[ ${ACTION:-build} = \"build\" ]]; then\n    cargo build $RUST_CONFIGURATION_FLAG\n    cp \"${SRCROOT}/../xi-ffi/target/${RUST_CONFIGURATION}/libximodal.a\" \"${SRCROOT}/\"\nelif [[ $ACTION = \"clean\" ]]; then\n    cargo clean\n    rm \"${SRCROOT}/libximodal.a\"\nfi\n\nset +e\n";
-		};
 		609A226322404D0D00A3F007 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -293,7 +275,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n# When building from Xcode we want to ensure that `cargo` is in PATH.\n# as a convenience, add the default cargo install location\nexport PATH=\"$PATH:${HOME}/.cargo/bin\"\n\nif [[ $CONFIGURATION = \"Debug\" ]]; then\nRUST_CONFIGURATION=\"debug\"\nRUST_CONFIGURATION_FLAG=\"\"\nelse\nRUST_CONFIGURATION=\"release\"\nRUST_CONFIGURATION_FLAG=\"--release\"\nfi\n\ncd \"${SRCROOT}/../xi-modal-input\"\n\necho \"rust config ${RUST_CONFIGURATION}\"\n\ncargo build $RUST_CONFIGURATION_FLAG\ncp \"${SRCROOT}/../xi-modal-input/target/${RUST_CONFIGURATION}/libximodal.a\" \"${BUILT_PRODUCTS_DIR}/libximodal.a\"\n# cp \"${SRCROOT}/../xi-modal-input/libximodal.h\" \"${BUILT_PRODUCTS_DIR}/libximodal.h\"\n";
+			shellScript = "# When building from Xcode we want to ensure that `cargo` is in PATH.\n# as a convenience, add the default cargo install location\nexport PATH=\"$PATH:${HOME}/.cargo/bin\"\n\nset -e\n\nif [[ $CONFIGURATION = \"Debug\" ]]; then\n    RUST_CONFIGURATION=\"debug\"\n    RUST_CONFIGURATION_FLAG=\"\"\nelse\n    RUST_CONFIGURATION=\"release\"\n    RUST_CONFIGURATION_FLAG=\"--release\"\nfi\n\ncd \"${SRCROOT}/../xi-ffi\"\n\necho \"rust config ${RUST_CONFIGURATION}, action ${ACTION}\"\n\nif [[ ${ACTION:-build} = \"build\" ]]; then\n    cargo build $RUST_CONFIGURATION_FLAG\n    echo \"cargo built, copying to ${BUILT_PRODUCTS_DIR}\"\n    cp \"${SRCROOT}/../xi-ffi/target/${RUST_CONFIGURATION}/libximodal.a\" \"${BUILT_PRODUCTS_DIR}/libximodal.a\"\nelif [[ $ACTION = \"clean\" ]]; then\n    echo \"cleaing\"\n    cargo clean\nfi\n\nset +e\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

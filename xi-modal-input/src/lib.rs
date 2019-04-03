@@ -1,12 +1,17 @@
 extern crate libc;
 #[macro_use]
 extern crate serde_json;
+#[macro_use]
+extern crate serde_derive;
+
 
 mod input_handler;
 mod vim;
 
 use std::borrow::Cow;
 use libc::{c_char, size_t};
+
+use serde_json::Value;
 
 use xi_core_lib::edit_types::{BufferEvent, EventDomain, ViewEvent};
 use xi_core_lib::selection::{InsertDrift, SelRegion, Selection};
@@ -29,6 +34,12 @@ pub struct OneView {
     selection: Selection,
     text: Rope,
     config: BufferConfig,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+struct Rpc<'a> {
+    method: &'a str,
+    params: Value,
 }
 
 impl OneView {
@@ -172,16 +183,21 @@ impl XiCore {
     pub fn handle_message(&mut self, msg: &str) {
         use xi_core_lib::rpc::*;
         use EditNotification as E;
+        let msg: Rpc = match serde_json::from_str(msg) {
+            Ok(rpc) => rpc,
+            Err(e) => {
+                eprintln!("invalid json '{}': {}", msg, e);
+                return;
+            }
+        };
 
-        eprintln!("core handle_msg {:?}", msg);
-        let event = match msg {
-            m if m.starts_with("insert ") => E::Insert {
-                chars: msg["insert ".len()..].into(),
-            },
-            _else => match event_from_str(_else) {
+        eprintln!("core handle_msg {:?}", msg.method);
+        let event = match msg.method {
+            "insert" => E::Insert { chars: msg.params["chars"].as_str().unwrap().to_owned() },
+            other => match event_from_str(other) {
                 Some(event) => event,
                 None => {
-                    eprintln!("no event for '{}'", _else);
+                    eprintln!("no event for '{}'", other);
                     return;
                 }
             },
@@ -285,3 +301,16 @@ fn event_from_str(string: &str) -> Option<EditNotification> {
 // in fact, maybe we can just own selections and not a whole view thingie?
 //
 //
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn deserialize_smoke_test() {
+        let rpc_json = json!({"method": "hello", "params": {"foo": "bar"}});
+        let rpc_str = serde_json::to_string(&rpc_json).unwrap();
+        let rpc: Rpc = serde_json::from_str(&rpc_str).unwrap();
+        assert_eq!(rpc.method, "hello");
+        assert_eq!(rpc.params.as_object().unwrap().get("foo").unwrap().as_str(), Some("bar"));
+    }
+}

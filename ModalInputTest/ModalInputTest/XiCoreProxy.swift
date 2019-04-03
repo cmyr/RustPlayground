@@ -68,11 +68,11 @@ class XiCoreProxy {
     }
 
     func insertText(_ text: String) {
-        xiCoreSendMessage(_inner, "insert \(text)")
+        sendRpc(method: "insert", params: ["chars": text])
     }
 
     func doCommand(_ command: String) {
-        xiCoreSendMessage(_inner, command)
+        sendRpc(method: command, params: [])
     }
 
     func getLine(_ lineNumber: UInt32) -> RawLine? {
@@ -89,6 +89,21 @@ class XiCoreProxy {
             return RawLine(text: string, cursor: cursor, selection: selection)
         } else {
             return nil
+        }
+    }
+
+    func sendRpc(method: String, params: Any) {
+        let req: [String: Any] = ["method": method, "params": params]
+        sendJson(req)
+    }
+
+    private func sendJson(_ json: Any) {
+        do {
+            let data = try JSONSerialization.data(withJSONObject: json, options: [])
+            let string = String(data: data, encoding: .utf8)
+            xiCoreSendMessage(_inner, string)
+        } catch _ {
+            print("error serializing to json")
         }
     }
 

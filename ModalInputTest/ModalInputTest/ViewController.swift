@@ -22,10 +22,6 @@ class ViewController: NSViewController {
         case command, insert
     }
 
-    enum Motion: String {
-        case left, right, up, down, word, word_back, end_of_line, start_of_line
-    }
-
     var totalLines: Int = 0;
 
     var parseState: String = "" {
@@ -42,6 +38,10 @@ class ViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(frameDidChangeNotification),
+                                               name: NSView.frameDidChangeNotification,
+                                               object: view)
         (NSApp.delegate as! AppDelegate).mainController = self
     }
 
@@ -66,57 +66,15 @@ class ViewController: NSViewController {
         super.insertText(insertString)
     }
 
-
     override func keyDown(with event: NSEvent) {
         self.interpretKeyEvents([event])
     }
 
-    override func flagsChanged(with event: NSEvent) {
-        super.flagsChanged(with: event)
-//        print(String(event.modifierFlags.rawValue, radix: 2, uppercase: true), event.keyCode)
-    }
-
-
-    func selectorForDeleteMotion(motion: Motion) -> Selector {
-        switch motion {
-        case .left:
-            return #selector(NSStandardKeyBindingResponding.moveBackwardAndModifySelection(_:))
-        case .right:
-            return #selector(NSStandardKeyBindingResponding.moveForwardAndModifySelection(_:))
-        case .word:
-            return #selector(NSStandardKeyBindingResponding.moveWordForwardAndModifySelection(_:))
-        case .word_back:
-            return #selector(NSStandardKeyBindingResponding.moveWordBackwardAndModifySelection(_:))
-        case .down:
-            return #selector(NSStandardKeyBindingResponding.moveDownAndModifySelection(_:))
-        case .up:
-            return #selector(NSStandardKeyBindingResponding.moveUpAndModifySelection(_:))
-        case .start_of_line:
-            return #selector(NSStandardKeyBindingResponding.moveToBeginningOfLineAndModifySelection(_:))
-        case .end_of_line:
-            return #selector(NSStandardKeyBindingResponding.moveToEndOfLineAndModifySelection(_:))
-        }
-    }
-
-    func selectorForMoveMotion(motion: Motion) -> Selector {
-        switch motion {
-        case .left:
-            return #selector(NSStandardKeyBindingResponding.moveBackward(_:))
-        case .right:
-            return #selector(NSStandardKeyBindingResponding.moveForward(_:))
-        case .word:
-            return #selector(NSStandardKeyBindingResponding.moveWordForward(_:))
-        case .word_back:
-            return #selector(NSStandardKeyBindingResponding.moveWordBackward(_:))
-        case .down:
-            return #selector(NSStandardKeyBindingResponding.moveDown(_:))
-        case .up:
-            return #selector(NSStandardKeyBindingResponding.moveUp(_:))
-        case .start_of_line:
-            return #selector(NSStandardKeyBindingResponding.moveToBeginningOfLine(_:))
-        case .end_of_line:
-            return #selector(NSStandardKeyBindingResponding.moveToEndOfLine(_:))
-        }
+    @objc func frameDidChangeNotification(_ notification: Notification) {
+//        updateEditViewHeight()
+//        willScroll(to: scrollView.contentView.bounds.origin)
+//        updateViewportSize()
+//        statusBar.checkItemsFitFor(windowWidth: self.view.frame.width)
     }
 }
 

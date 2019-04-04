@@ -22,6 +22,8 @@ typedef void (*invalidate_callback)(size_t start, size_t end);
 extern XiCore* xiCoreCreate(rpc_callback, invalidate_callback, width_measure_fn);
 extern void xiCoreFree(XiCore*);
 extern void xiCoreSendMessage(XiCore*, json);
+extern void xiCStringFree(char*);
 extern XiLine* xiCoreGetLine(XiCore*, uint32_t);
+extern void xiLineFree(XiLine*);
 
 #endif

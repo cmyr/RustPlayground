@@ -96,7 +96,10 @@ class XiCoreProxy {
             } else {
                 selection = Int(line.pointee.selection.0)..<Int(line.pointee.selection.1)
             }
-            return RawLine(text: string, cursor: cursor, selection: selection)
+            let result = RawLine(text: string, cursor: cursor, selection: selection)
+            xiLineFree(line)
+            return result
+
         } else {
             return nil
         }

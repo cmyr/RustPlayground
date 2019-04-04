@@ -18,7 +18,7 @@ impl RpcCallback {
 
         let asstr = serde_json::to_string(&rpc).expect("to_string failed");
         let cstr = CString::new(asstr).expect("nul byte in string :( :(");
-        (self.0)(cstr.into_raw())
+        (self.0)(cstr.as_ptr())
     }
 }
 

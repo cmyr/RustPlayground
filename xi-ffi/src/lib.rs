@@ -115,6 +115,29 @@ pub extern "C" fn xiCoreFree(ptr: *mut XiCore) {
 }
 
 #[no_mangle]
+pub extern "C" fn xiCStringFree(ptr: *mut c_char) {
+    if ptr.is_null() {
+        return;
+    }
+
+    unsafe {
+        CString::from_raw(ptr);
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn xiLineFree(ptr: *mut XiLine) {
+    if ptr.is_null() {
+        return;
+    }
+
+    unsafe {
+        let line = Box::from_raw(ptr);
+        CString::from_raw(line.text as *mut _);
+    }
+}
+
+#[no_mangle]
 pub extern "C" fn xiCoreSendMessage(ptr: *mut XiCore, msg: *const c_char) {
     let core = unsafe {
         assert!(!ptr.is_null(), "null pointer in xiCoreSendMessage");

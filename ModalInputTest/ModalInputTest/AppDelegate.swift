@@ -8,6 +8,10 @@
 
 import Cocoa
 
+class DefaultFont {
+    static let shared = NSFont(name: "Input Sans", size: 14.0)!
+}
+
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
     let core = XiCoreProxy(rpcCallback: handleRpc, updateCallback: handleUpdate, widthMeasure: measureWidth)
@@ -134,10 +138,6 @@ func handleRpc(jsonPtr: UnsafePointer<Int8>?) {
 
         (NSApp.delegate as! AppDelegate).handleMessage(method: method, params: params)
     }
-}
-
-class DefaultFont {
-    static let shared = NSFont(name: "Input Sans", size: 14.0)!
 }
 
 func measureWidth(strPtr: UnsafePointer<Int8>?) -> XiSize {

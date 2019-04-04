@@ -28,9 +28,16 @@ use rpc::Rpc;
 pub use vim::Machine as Vim;
 
 #[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Size {
     width: usize,
     height: usize,
+}
+
+impl Size {
+    fn zero() -> Self {
+        Size { width: 0, height: 0 }
+    }
 }
 
 pub struct XiCore {
@@ -47,24 +54,18 @@ pub struct OneView {
     config: BufferConfig,
     breaks: Breaks,
     frame: Rect,
-    width_cache: WidthCache,
+    width_cache: HashMap<String, Size>,
     width_measure_fn: extern "C" fn(*const c_char) -> Size,
-}
-
-type Width = usize;
-
-#[derive(Debug, Default, Clone)]
-pub struct WidthCache {
-    /// maps cache key to index within widths
-    m: HashMap<String, Width>,
+    line_height: usize,
+    content_size: Size,
 }
 
 impl OneView {
     pub fn new(width_measure_fn: extern "C" fn(*const c_char) -> Size) -> Self {
-        OneView {
+        let mut this = OneView {
             selection: SelRegion::caret(0).into(),
             text: Rope::from(""),
-            width_cache: WidthCache::default(),
+            width_cache: HashMap::new(),
             config: BufferConfig {
                 line_ending: "\n".to_string(),
                 tab_size: 4,
@@ -82,8 +83,15 @@ impl OneView {
             },
             frame: Rect::zero(),
             breaks: Breaks::default(),
+            line_height: 0,
             width_measure_fn,
-        }
+            content_size: Size::zero(),
+        };
+
+        // hack, just grab height once
+        let size = this.measure_width("a");
+        this.line_height = size.height;
+        this
     }
 
     pub fn get_line(&self, idx: usize) -> Option<(Cow<str>, i32, (i32, i32))> {
@@ -170,7 +178,12 @@ impl OneView {
             self.text = newtext;
             self.update_breaks(&delta);
             self.selection = newsel;
-            eprintln!("max_width: {}", self.breaks.max_width());
+
+            let newsize = self.compute_content_size();
+            if newsize != self.content_size {
+                eprintln!("size changed {:?} -> {:?}", self.content_size, newsize);
+                self.content_size = newsize;
+            }
         }
     }
 
@@ -206,30 +219,34 @@ impl OneView {
         // first get breaks to be the right size
         let empty_breaks = Breaks::new_no_break(new_len);
         self.breaks.edit(iv, empty_breaks);
-        assert_eq!(self.breaks.len(), self.text.len(), "breaks are all messed up");
+
+        // ownership cheating: this is just a pointer clone
+        let text = self.text.clone();
+
+        assert_eq!(self.breaks.len(), text.len(), "breaks are all messed up");
 
         let mut builder = BreakBuilder::new();
-        let mut cursor = Cursor::new(&self.text, iv.start());
+        let mut cursor = Cursor::new(&text, iv.start());
         cursor.at_or_prev::<LinesMetric>();
 
         let start = cursor.pos();
-        let end = cursor.next::<LinesMetric>().unwrap_or(self.text.len());
+        let end = cursor.next::<LinesMetric>().unwrap_or(text.len());
         let mut last_word = start;
         let mut last_line = start;
-        let mut break_cursor = LineBreakCursor::new(&self.text, start);
+        let mut break_cursor = LineBreakCursor::new(&text, start);
         let mut cur_width = 0;
-        //eprintln!("updating for iv {:?}, new_len {} old_len {}", iv, new_len, self.text.len());
+        //eprintln!("updating for iv {:?}, new_len {} old_len {}", iv, new_len, text.len());
         loop {
             if last_word == end {
                 break;
             }
             let (next, is_hard) = break_cursor.next();
-            let this_word = self.text.slice_to_cow(last_word..next);
+            let this_word = text.slice_to_cow(last_word..next);
             let Size { width, .. } = self.measure_width(&this_word);
             cur_width += width;
             //eprintln!("word '{}', width {} next {}", this_word, width, next);
 
-            if is_hard || next >= self.text.len() {
+            if is_hard || next >= text.len() {
                 builder.add_break(next - last_line, cur_width);
                 last_line = next;
                 cur_width = 0;
@@ -247,9 +264,21 @@ impl OneView {
         //eprintln!("NEW {:?}", &self.breaks);
     }
 
-    fn measure_width(&self, line: &str) -> Size {
+    fn measure_width(&mut self, line: &str) -> Size {
+        if let Some(size) = self.width_cache.get(line) {
+            return *size;
+        }
+
         let cstr = CString::new(line).unwrap();
-        (self.width_measure_fn)(cstr.as_ptr())
+        let size = (self.width_measure_fn)(cstr.as_ptr());
+        self.width_cache.insert(line.to_owned(), size);
+        size
+    }
+
+    fn compute_content_size(&self) -> Size {
+        let height = self.count_lines() * self.line_height;
+        let width = self.breaks.max_width();
+        Size { width, height }
     }
 
     fn count_lines(&self) -> usize {

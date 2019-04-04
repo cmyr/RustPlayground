@@ -12,6 +12,7 @@ mod vim;
 
 use libc::c_char;
 use std::borrow::Cow;
+use std::cell::RefCell;
 use std::collections::HashMap;
 use std::ffi::CString;
 
@@ -20,7 +21,7 @@ use xi_core_lib::rpc::{EditNotification, Rect};
 use xi_core_lib::selection::{InsertDrift, SelRegion, Selection};
 use xi_core_lib::view::NoView;
 use xi_core_lib::{edit_ops, linewrap::LineBreakCursor, movement, BufferConfig};
-use xi_rope::breaks2::{BreakBuilder, Breaks};
+use xi_rope::breaks2::{BreakBuilder, Breaks, BreaksMetric};
 use xi_rope::{Cursor, LinesMetric, Rope, RopeDelta};
 
 use callbacks::{InvalidateCallback, RpcCallback};
@@ -42,6 +43,12 @@ impl Size {
     }
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LineCol {
+    pub line: usize,
+    pub col: usize,
+}
+
 pub struct XiCore {
     pub rpc_callback: RpcCallback,
     pub invalidate_callback: InvalidateCallback,
@@ -56,7 +63,7 @@ pub struct OneView {
     config: BufferConfig,
     breaks: Breaks,
     frame: Rect,
-    width_cache: HashMap<String, Size>,
+    width_cache: RefCell<HashMap<String, Size>>,
     width_measure_fn: extern "C" fn(*const c_char) -> Size,
     line_height: usize,
     content_size: Size,
@@ -67,7 +74,7 @@ impl OneView {
         let mut this = OneView {
             selection: SelRegion::caret(0).into(),
             text: Rope::from(""),
-            width_cache: HashMap::new(),
+            width_cache: RefCell::new(HashMap::new()),
             config: BufferConfig {
                 line_ending: "\n".to_string(),
                 tab_size: 4,
@@ -143,6 +150,7 @@ impl OneView {
 
     fn handle_view_event(&mut self, event: ViewEvent, update: &mut UpdateBuilder) {
         if let Some(new_selection) = self.selection_for_event(event) {
+            self.compute_scroll_point(&new_selection, update);
             self.selection = new_selection;
         }
         //TODO: more careful inval
@@ -183,6 +191,7 @@ impl OneView {
             let newsel = self.selection.apply_delta(&delta, true, InsertDrift::Default);
             self.text = newtext;
             self.update_breaks(&delta);
+            self.compute_scroll_point(&newsel, update);
             self.selection = newsel;
 
             let newsize = self.compute_content_size();
@@ -222,6 +231,21 @@ impl OneView {
     fn viewport_change(&mut self, new_frame: Rect) {
         self.frame = new_frame;
         eprintln!("viewport changed to {:?}", new_frame);
+    }
+
+    fn compute_scroll_point(&self, sel: &Selection, update: &mut UpdateBuilder) {
+        if let Some(caret) = &sel.last().map(|r| r.end) {
+            let line = self.breaks.count::<BreaksMetric>(*caret);
+            let line_off = self.breaks.count_base_units::<BreaksMetric>(line);
+            let linecol;
+            if *caret == line_off && *caret != 0 {
+                linecol = LineCol { line: line - 1, col: line_off };
+            } else {
+                let col = caret - line_off;
+                linecol = LineCol { line, col };
+            }
+            update.scroll_to(linecol);
+        }
     }
 
     fn update_breaks(&mut self, delta: &RopeDelta) {
@@ -274,14 +298,16 @@ impl OneView {
         //eprintln!("NEW {:?}", &self.breaks);
     }
 
-    fn measure_width(&mut self, line: &str) -> Size {
-        if let Some(size) = self.width_cache.get(line) {
+    fn measure_width(&self, line: &str) -> Size {
+        //HACK: we want this method to take &self so we're using a refcell
+        let mut width_cache = self.width_cache.borrow_mut();
+        if let Some(size) = width_cache.get(line) {
             return *size;
         }
 
         let cstr = CString::new(line).unwrap();
         let size = (self.width_measure_fn)(cstr.as_ptr());
-        self.width_cache.insert(line.to_owned(), size);
+        width_cache.insert(line.to_owned(), size);
         size
     }
 
@@ -343,6 +369,10 @@ impl XiCore {
         }
         if let Some(range) = update.lines.take() {
             self.invalidate_callback.call(range);
+        }
+
+        if let Some(scroll) = update.scroll.take() {
+            self.rpc_callback.call("scroll_to", scroll)
         }
     }
 }

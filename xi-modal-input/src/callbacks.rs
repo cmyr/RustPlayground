@@ -4,13 +4,12 @@ use std::ffi::CString;
 use std::ops::Range;
 
 use libc::{c_char, size_t};
-use serde_json::Value;
+use serde::Serialize;
 
 pub struct RpcCallback(extern "C" fn(*const c_char));
 
 impl RpcCallback {
-    pub fn call<V: Into<Option<Value>>>(&self, method: &str, params: V) {
-        let params = params.into().unwrap_or(json!({}));
+    pub fn call<V: Serialize>(&self, method: &str, params: V) {
         let rpc = json!({
             "method": method,
             "params": params,

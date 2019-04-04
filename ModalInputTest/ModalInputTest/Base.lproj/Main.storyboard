@@ -709,7 +709,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="491" height="257"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xq3-8F-meh">
+                            <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" translatesAutoresizingMaskIntoConstraints="NO" id="xq3-8F-meh">
                                 <rect key="frame" x="0.0" y="0.0" width="491" height="257"/>
                                 <clipView key="contentView" id="bSB-id-xlU">
                                     <rect key="frame" x="1" y="1" width="489" height="255"/>

@@ -2,13 +2,14 @@
 
 use std::ops::Range;
 
-use crate::Size;
+use crate::{LineCol, Size};
 
 /// Represents state changes that ocurred while handling a user event.
 #[derive(Debug, Clone, Default)]
 pub(crate) struct Update {
     pub(crate) lines: Option<Range<usize>>,
     pub(crate) size: Option<Size>,
+    pub(crate) scroll: Option<LineCol>,
 }
 
 /// A type for collecting changes that occur while handling an event.
@@ -32,6 +33,10 @@ impl UpdateBuilder {
     /// indicate that content size has changed
     pub(crate) fn content_size(&mut self, new_size: Size) {
         self.inner.size = Some(new_size);
+    }
+
+    pub(crate) fn scroll_to(&mut self, point: LineCol) {
+        self.inner.scroll = Some(point);
     }
 
     pub(crate) fn build(self) -> Update {

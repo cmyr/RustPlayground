@@ -64,6 +64,19 @@ class ViewController: NSViewController {
         }
     }
 
+    func scrollTo(_ line: Int, col: Int) {
+
+        let y = CGFloat(line) * DefaultFont.shared.linespace + 2
+        let lineText = core.getLine(UInt32(line))!
+        let toMeasure = lineText.text.utf8.prefix(col)
+        let x = measureStringWidth(String(toMeasure)!).width
+
+        let rect = CGRect(origin: CGPoint(x: x, y: y),
+                          size: CGSize(width: DefaultFont.shared.characterWidth(), height: DefaultFont.shared.linespace)).integral
+        print("scrollTo \(rect)")
+        editView.scrollToVisible(rect)
+    }
+
     @objc func frameDidChangeNotification(_ notification: Notification) {
         core.frameChanged(newFrame: view.frame)
         updateContentSize()
@@ -92,6 +105,14 @@ class ViewController: NSViewController {
 
     override func keyDown(with event: NSEvent) {
         self.interpretKeyEvents([event])
+    }
+
+    @objc func paste(_ sender: AnyObject?) {
+        print("paste")
+        NSPasteboard
+            .general
+            .string(forType: .string)
+            .flatMap({ core.insertText($0) })
     }
 }
 

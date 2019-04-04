@@ -48,6 +48,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             let width = params["width"] as! Int
             let height = params["height"] as! Int
             mainController?.contentSize = CGSize(width: width, height: height)
+        case "scroll_to":
+            let line = params["line"] as! Int
+            let col = params["col"] as! Int
+            mainController?.scrollTo(line, col: col)
         default:
             print("unhandled method \(method)")
         }
@@ -146,9 +150,15 @@ func measureWidth(strPtr: UnsafePointer<Int8>?) -> XiSize {
     }
 
     let string = String(cString: strPtr)
+    let bounds = measureStringWidth(string)
+
+    return XiSize(width: Int(bounds.width), height: Int(bounds.height))
+}
+
+func measureStringWidth(_ string: String) -> CGRect {
     let attrString = NSAttributedString(string: string, attributes: [.font: DefaultFont.shared])
 
     let ctLine = CTLineCreateWithAttributedString(attrString)
-    let bounds = CTLineGetBoundsWithOptions(ctLine, [])
-    return XiSize(width: Int(bounds.width), height: Int(bounds.height))
+    return CTLineGetBoundsWithOptions(ctLine, [])
+
 }

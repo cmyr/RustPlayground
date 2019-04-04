@@ -10,8 +10,13 @@ typedef struct _XiLine {
 
 typedef const char* json;
 
+typedef struct _XiSize {
+    size_t width;
+    size_t height;
+} XiSize;
+
 typedef void (*rpc_callback)(json);
-typedef size_t (*width_measure_fn)(const char*);
+typedef XiSize (*width_measure_fn)(const char*);
 typedef void (*invalidate_callback)(size_t start, size_t end);
 
 extern XiCore* xiCoreCreate(rpc_callback, invalidate_callback, width_measure_fn);

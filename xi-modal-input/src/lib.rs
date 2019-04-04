@@ -27,6 +27,12 @@ pub use input_handler::{EventCtx, EventPayload, Handler, KeyEvent, Plumber};
 use rpc::Rpc;
 pub use vim::Machine as Vim;
 
+#[repr(C)]
+pub struct Size {
+    width: usize,
+    height: usize,
+}
+
 pub struct XiCore {
     pub rpc_callback: extern "C" fn(*const c_char),
     pub invalidate_callback: extern "C" fn(size_t, size_t),
@@ -42,7 +48,7 @@ pub struct OneView {
     breaks: Breaks,
     frame: Rect,
     width_cache: WidthCache,
-    width_measure_fn: extern "C" fn(*const c_char) -> size_t,
+    width_measure_fn: extern "C" fn(*const c_char) -> Size,
 }
 
 type Width = usize;
@@ -54,7 +60,7 @@ pub struct WidthCache {
 }
 
 impl OneView {
-    pub fn new(width_measure_fn: extern "C" fn(*const c_char) -> size_t) -> Self {
+    pub fn new(width_measure_fn: extern "C" fn(*const c_char) -> Size) -> Self {
         OneView {
             selection: SelRegion::caret(0).into(),
             text: Rope::from(""),
@@ -197,38 +203,51 @@ impl OneView {
 
     fn update_breaks(&mut self, delta: &RopeDelta) {
         let (iv, new_len) = delta.summary();
+        // first get breaks to be the right size
+        let empty_breaks = Breaks::new_no_break(new_len);
+        self.breaks.edit(iv, empty_breaks);
+        assert_eq!(self.breaks.len(), self.text.len(), "breaks are all messed up");
 
         let mut builder = BreakBuilder::new();
         let mut cursor = Cursor::new(&self.text, iv.start());
         cursor.at_or_prev::<LinesMetric>();
 
-        let mut start = cursor.pos();
+        let start = cursor.pos();
+        let end = cursor.next::<LinesMetric>().unwrap_or(self.text.len());
+        let mut last_word = start;
+        let mut last_line = start;
         let mut break_cursor = LineBreakCursor::new(&self.text, start);
         let mut cur_width = 0;
         //eprintln!("updating for iv {:?}, new_len {} old_len {}", iv, new_len, self.text.len());
         loop {
+            if last_word == end {
+                break;
+            }
             let (next, is_hard) = break_cursor.next();
-            let this_word = self.text.slice_to_cow(start..next);
-            let width = self.measure_width(&this_word);
+            let this_word = self.text.slice_to_cow(last_word..next);
+            let Size { width, .. } = self.measure_width(&this_word);
             cur_width += width;
             //eprintln!("word '{}', width {} next {}", this_word, width, next);
 
             if is_hard || next >= self.text.len() {
-                builder.add_break(next - start, cur_width);
+                builder.add_break(next - last_line, cur_width);
+                last_line = next;
                 cur_width = 0;
-                if start >= iv.start() + new_len {
+                if last_word >= end {
                     break;
                 }
             }
-            start = next;
+            last_word = next;
         }
 
+        //eprintln!("OLD {:?}", &self.breaks);
         let new_breaks = builder.build();
-        let end = start + new_breaks.len();
+        //eprintln!("editing {}..{} {:?}", start, end, &new_breaks);
         self.breaks.edit(start..end, new_breaks);
+        //eprintln!("NEW {:?}", &self.breaks);
     }
 
-    fn measure_width(&self, line: &str) -> usize {
+    fn measure_width(&self, line: &str) -> Size {
         let cstr = CString::new(line).unwrap();
         (self.width_measure_fn)(cstr.as_ptr())
     }

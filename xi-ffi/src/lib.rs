@@ -2,7 +2,7 @@ use std::ffi::{CStr, CString};
 
 use libc::{c_char, int32_t, size_t, uint32_t};
 extern crate xi_modal_input;
-use xi_modal_input::{EventCtx, EventPayload, KeyEvent, OneView, Plumber, Vim, XiCore};
+use xi_modal_input::{EventCtx, EventPayload, KeyEvent, OneView, Plumber, Size, Vim, XiCore};
 
 #[repr(C)]
 pub struct XiLine {
@@ -15,7 +15,7 @@ pub struct XiLine {
 pub extern "C" fn xiCoreCreate(
     rpc_callback: extern "C" fn(*const c_char),
     invalidate_callback: extern "C" fn(size_t, size_t),
-    width_measure_fn: extern "C" fn(*const c_char) -> size_t,
+    width_measure_fn: extern "C" fn(*const c_char) -> Size,
 ) -> *const XiCore {
     let r = Box::into_raw(Box::new(XiCore {
         rpc_callback,

@@ -17,7 +17,7 @@ class XiCoreProxy {
 
     init(rpcCallback: @escaping (@convention(c) (UnsafePointer<Int8>?) -> Void),
          updateCallback: @escaping (@convention(c) (Int, Int) -> Void),
-         widthMeasure: @escaping (@convention(c) (UnsafePointer<Int8>?) -> Int)
+         widthMeasure: @escaping (@convention(c) (UnsafePointer<Int8>?) -> XiSize)
         ) {
         _inner = xiCoreCreate(rpcCallback, updateCallback, widthMeasure)
     }

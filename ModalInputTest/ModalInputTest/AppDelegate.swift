@@ -128,7 +128,7 @@ class DefaultFont {
     static let shared = NSFont(name: "Input Sans", size: 14.0)!
 }
 
-func measureWidth(strPtr: UnsafePointer<Int8>?) -> Int {
+func measureWidth(strPtr: UnsafePointer<Int8>?) -> XiSize {
     guard let strPtr = strPtr else {
         fatalError("measureWidth passed null pointer")
     }
@@ -137,5 +137,6 @@ func measureWidth(strPtr: UnsafePointer<Int8>?) -> Int {
     let attrString = NSAttributedString(string: string, attributes: [.font: DefaultFont.shared])
 
     let ctLine = CTLineCreateWithAttributedString(attrString)
-    return Int(CTLineGetTypographicBounds(ctLine, nil, nil, nil))
+    let bounds = CTLineGetBoundsWithOptions(ctLine, [])
+    return XiSize(width: Int(bounds.width), height: Int(bounds.height))
 }

@@ -4,11 +4,13 @@ extern crate serde_json;
 #[macro_use]
 extern crate serde_derive;
 
+mod callbacks;
 mod input_handler;
 mod rpc;
+mod update;
 mod vim;
 
-use libc::{c_char, size_t};
+use libc::c_char;
 use std::borrow::Cow;
 use std::collections::HashMap;
 use std::ffi::CString;
@@ -21,10 +23,10 @@ use xi_core_lib::{edit_ops, linewrap::LineBreakCursor, movement, BufferConfig};
 use xi_rope::breaks2::{BreakBuilder, Breaks};
 use xi_rope::{Cursor, LinesMetric, Rope, RopeDelta};
 
-//use xi_unicode::LineBreakLeafIter;
-
+use callbacks::{InvalidateCallback, RpcCallback};
 pub use input_handler::{EventCtx, EventPayload, Handler, KeyEvent, Plumber};
 use rpc::Rpc;
+use update::{Update, UpdateBuilder};
 pub use vim::Machine as Vim;
 
 #[repr(C)]
@@ -41,8 +43,8 @@ impl Size {
 }
 
 pub struct XiCore {
-    pub rpc_callback: extern "C" fn(*const c_char),
-    pub invalidate_callback: extern "C" fn(size_t, size_t),
+    pub rpc_callback: RpcCallback,
+    pub invalidate_callback: InvalidateCallback,
     pub state: OneView,
     pub plumber: Option<Plumber>,
     pub handler: Option<Box<dyn Handler>>,
@@ -126,21 +128,25 @@ impl OneView {
         Some((line, caret, (sel_start as i32, sel_end as i32)))
     }
 
-    fn handle_event(&mut self, event: EventDomain) {
+    fn handle_event(&mut self, event: EventDomain) -> Update {
+        let mut builder = UpdateBuilder::new();
         match event {
-            EventDomain::View(event) => self.handle_view_event(event),
-            EventDomain::Buffer(event) => self.handle_edit(event),
+            EventDomain::View(event) => self.handle_view_event(event, &mut builder),
+            EventDomain::Buffer(event) => self.handle_edit(event, &mut builder),
             EventDomain::Special(other) => match other {
                 SpecialEvent::ViewportChange(rect) => self.viewport_change(rect),
                 _other => eprintln!("unhandled special event {:?}", _other),
             },
         }
+        builder.build()
     }
 
-    fn handle_view_event(&mut self, event: ViewEvent) {
+    fn handle_view_event(&mut self, event: ViewEvent, update: &mut UpdateBuilder) {
         if let Some(new_selection) = self.selection_for_event(event) {
             self.selection = new_selection;
         }
+        //TODO: more careful inval
+        update.inval_lines(0..self.count_lines());
     }
 
     fn selection_for_event(&mut self, event: ViewEvent) -> Option<Selection> {
@@ -170,7 +176,7 @@ impl OneView {
         }
     }
 
-    fn handle_edit(&mut self, event: BufferEvent) {
+    fn handle_edit(&mut self, event: BufferEvent, update: &mut UpdateBuilder) {
         if let Some(delta) = self.edit_for_event(event) {
             eprintln!("handling edit {:?}", &delta);
             let newtext = delta.apply(&self.text);
@@ -181,9 +187,13 @@ impl OneView {
 
             let newsize = self.compute_content_size();
             if newsize != self.content_size {
-                eprintln!("size changed {:?} -> {:?}", self.content_size, newsize);
+                //eprintln!("size changed {:?} -> {:?}", self.content_size, newsize);
                 self.content_size = newsize;
+                update.content_size(newsize);
             }
+
+            //TODO: more careful inval
+            update.inval_lines(0..self.count_lines());
         }
     }
 
@@ -287,6 +297,16 @@ impl OneView {
 }
 
 impl XiCore {
+    pub fn new<R, I>(rpc: R, invalidate: I, state: OneView) -> Self
+    where
+        I: Into<InvalidateCallback>,
+        R: Into<RpcCallback>,
+    {
+        let invalidate_callback = invalidate.into();
+        let rpc_callback = rpc.into();
+        XiCore { invalidate_callback, rpc_callback, state, plumber: None, handler: None }
+    }
+
     pub fn handle_message(&mut self, msg: &str) {
         use xi_core_lib::rpc::*;
         use EditNotification as E;
@@ -312,13 +332,18 @@ impl XiCore {
         };
 
         let domain: EventDomain = event.into();
-        self.state.handle_event(domain);
-        self.send_update();
+        let update = self.state.handle_event(domain);
+        self.send_update(update);
     }
 
-    pub fn send_update(&self) {
-        let n_lines = self.state.count_lines();
-        (self.invalidate_callback)(0, n_lines)
+    fn send_update(&self, mut update: Update) {
+        if let Some(newsize) = update.size.take() {
+            self.rpc_callback
+                .call("content_size", json!({"width": newsize.width, "height": newsize.height}));
+        }
+        if let Some(range) = update.lines.take() {
+            self.invalidate_callback.call(range);
+        }
     }
 }
 

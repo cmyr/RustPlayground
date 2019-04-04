@@ -706,45 +706,46 @@
             <objects>
                 <viewController id="XfG-lQ-9wD" customClass="ViewController" customModule="ModalInputTest" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" wantsLayer="YES" id="m2S-Jp-Qdl">
-                        <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
-                        <autoresizingMask key="autoresizingMask"/>
+                        <rect key="frame" x="0.0" y="0.0" width="491" height="257"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="oPh-0J-YxJ">
-                                <rect key="frame" x="-2" y="233" width="39" height="17"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" title="Insert" id="iEC-Pl-sZd">
-                                    <font key="font" metaFont="system"/>
-                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dvf-d7-7un">
-                                <rect key="frame" x="206" y="233" width="212" height="17"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" id="M5O-sA-Esu">
-                                    <font key="font" metaFont="system"/>
-                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
-                            <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xjA-QF-hok" customClass="EditView" customModule="ModalInputTest" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="0.0" width="480" height="225"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                            </customView>
+                            <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xq3-8F-meh">
+                                <rect key="frame" x="0.0" y="0.0" width="491" height="257"/>
+                                <clipView key="contentView" id="bSB-id-xlU">
+                                    <rect key="frame" x="1" y="1" width="489" height="255"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <customView wantsLayer="YES" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xjA-QF-hok" customClass="EditView" customModule="ModalInputTest" customModuleProvider="target">
+                                            <rect key="frame" x="0.0" y="55" width="490" height="257"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        </customView>
+                                    </subviews>
+                                </clipView>
+                                <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="dyU-Q4-fIt">
+                                    <rect key="frame" x="1" y="240" width="489" height="16"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                                <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="jqo-de-eQp">
+                                    <rect key="frame" x="474" y="1" width="16" height="255"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                            </scrollView>
                         </subviews>
                         <constraints>
-                            <constraint firstItem="oPh-0J-YxJ" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="55Y-df-jro"/>
-                            <constraint firstItem="oPh-0J-YxJ" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="20" id="ytm-O5-Pyp"/>
+                            <constraint firstAttribute="trailing" secondItem="xq3-8F-meh" secondAttribute="trailing" id="06q-S7-PTg"/>
+                            <constraint firstItem="xq3-8F-meh" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" id="Avb-Si-O8y"/>
+                            <constraint firstAttribute="bottom" secondItem="xq3-8F-meh" secondAttribute="bottom" id="bC3-EY-7xC"/>
+                            <constraint firstItem="xq3-8F-meh" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="fgo-wo-0iq"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="editView" destination="xjA-QF-hok" id="Oox-E7-w0T"/>
-                        <outlet property="modeLabel" destination="oPh-0J-YxJ" id="iMb-ab-2xb"/>
-                        <outlet property="stateLabel" destination="dvf-d7-7un" id="UWn-eo-82r"/>
+                        <outlet property="scrollView" destination="xq3-8F-meh" id="0MT-X9-Pai"/>
                     </connections>
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="75" y="655"/>
+            <point key="canvasLocation" x="219.5" y="782.5"/>
         </scene>
     </scenes>
 </document>

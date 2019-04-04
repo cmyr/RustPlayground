@@ -10,9 +10,8 @@ import Cocoa
 
 class ViewController: NSViewController {
 
-    @IBOutlet weak var modeLabel: NSTextField!
-    @IBOutlet weak var stateLabel: NSTextField!
     @IBOutlet weak var editView: EditView!
+    @IBOutlet weak var scrollView: NSScrollView!
 
     var contents = String();
 
@@ -26,13 +25,13 @@ class ViewController: NSViewController {
 
     var parseState: String = "" {
         didSet {
-            self.stateLabel.stringValue = parseState
+//            self.stateLabel.stringValue = parseState
         }
     }
 
     var mode: Mode = .insert {
         didSet {
-            self.modeLabel.stringValue = mode.rawValue.capitalized(with: nil)
+//            self.modeLabel.stringValue = mode.rawValue.capitalized(with: nil)
         }
     }
 
@@ -41,19 +40,44 @@ class ViewController: NSViewController {
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(frameDidChangeNotification),
                                                name: NSView.frameDidChangeNotification,
-                                               object: view)
+                                               object: scrollView)
         (NSApp.delegate as! AppDelegate).mainController = self
     }
 
     override func viewDidAppear() {
         self.mode = .insert
         self.editView.lineSource = self
+        self.view.window?.makeFirstResponder(self)
 
     }
 
     func coreViewDidChange(core: XiCoreProxy, newLines: UInt32) {
         self.totalLines = Int(newLines)
         self.editView.needsDisplay = true
+    }
+
+    var contentSize: CGSize = CGSize.zero {
+        didSet {
+            if contentSize != oldValue {
+            updateContentSize()
+            }
+        }
+    }
+
+    @objc func frameDidChangeNotification(_ notification: Notification) {
+        core.frameChanged(newFrame: view.frame)
+        updateContentSize()
+    }
+
+    func updateContentSize() {
+        let cursorPadding = (DefaultFont.shared.characterWidth() * 3).rounded(.down)
+        let size = CGSize(
+            width: max(contentSize.width + cursorPadding, scrollView.contentSize.width),
+            height: max(contentSize.height, scrollView.contentSize.height)
+        )
+        if size != editView.bounds.size {
+            self.editView.frame = NSRect(origin: CGPoint.zero, size: size).integral
+        }
     }
 
     override func doCommand(by selector: Selector) {
@@ -68,10 +92,6 @@ class ViewController: NSViewController {
 
     override func keyDown(with event: NSEvent) {
         self.interpretKeyEvents([event])
-    }
-
-    @objc func frameDidChangeNotification(_ notification: Notification) {
-        core.frameChanged(newFrame: view.frame)
     }
 }
 

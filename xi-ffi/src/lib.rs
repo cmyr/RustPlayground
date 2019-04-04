@@ -17,13 +17,11 @@ pub extern "C" fn xiCoreCreate(
     invalidate_callback: extern "C" fn(size_t, size_t),
     width_measure_fn: extern "C" fn(*const c_char) -> Size,
 ) -> *const XiCore {
-    let r = Box::into_raw(Box::new(XiCore {
+    let r = Box::into_raw(Box::new(XiCore::new(
         rpc_callback,
         invalidate_callback,
-        state: OneView::new(width_measure_fn),
-        plumber: None,
-        handler: None,
-    }));
+        OneView::new(width_measure_fn),
+    )));
     eprintln!("xiCore alloc {:?}", &r);
     r
 }
@@ -75,11 +73,7 @@ pub extern "C" fn xiCoreHandleInput(
     let event = KeyEvent { characters, modifiers, payload };
 
     let ctx = EventCtx { plumber: core.plumber.as_ref().unwrap(), state: &mut core.state };
-
-    let needs_render = core.handler.as_mut().unwrap().handle_event(event, ctx);
-    if needs_render {
-        core.send_update();
-    }
+    core.handler.as_mut().unwrap().handle_event(event, ctx);
 }
 
 #[no_mangle]

@@ -40,6 +40,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         case "selector":
             let selector = params["sel"] as! String
             NSApp.sendAction(NSSelectorFromString(selector), to: nil, from: nil)
+        case "content_size":
+            let width = params["width"] as! Int
+            let height = params["height"] as! Int
+            mainController?.contentSize = CGSize(width: width, height: height)
         default:
             print("unhandled method \(method)")
         }
@@ -121,7 +125,15 @@ func handleUpdate(start: Int, end: Int) {
 }
 
 func handleRpc(jsonPtr: UnsafePointer<Int8>?) {
+    if let ptr = jsonPtr {
+        let string = String(cString: ptr)
 
+        let message = try! JSONSerialization.jsonObject(with: string.data(using: .utf8)!) as! [String: AnyObject]
+        let method = message["method"] as! String
+        let params = message["params"] as! [String: AnyObject]
+
+        (NSApp.delegate as! AppDelegate).handleMessage(method: method, params: params)
+    }
 }
 
 class DefaultFont {

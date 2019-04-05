@@ -30,6 +30,8 @@ use rpc::Rpc;
 use update::{Update, UpdateBuilder};
 pub use vim::Machine as Vim;
 
+const ENABLE_WORDWRAP: bool = false;
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LineCol {
     pub line: usize,
@@ -74,7 +76,7 @@ impl OneView {
                 auto_indent: true,
                 scroll_past_end: true,
                 wrap_width: 0,
-                word_wrap: true,
+                word_wrap: ENABLE_WORDWRAP,
                 autodetect_whitespace: false,
                 surrounding_pairs: vec![],
                 save_with_newline: false,

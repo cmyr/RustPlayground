@@ -135,6 +135,10 @@ class RawLine {
         self.cursor = cursor
         self.selection = selection
     }
+
+    static func placeholder() -> RawLine {
+        return RawLine(text: "MISSING :(", cursor: nil, selection: nil)
+    }
 }
 
 extension NSEvent {

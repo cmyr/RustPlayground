@@ -85,12 +85,12 @@ class ViewController: NSViewController {
 
         let rect = CGRect(origin: CGPoint(x: x, y: y),
                           size: CGSize(width: DefaultFont.shared.characterWidth(), height: DefaultFont.shared.linespace)).integral
-        print("scrollTo \(rect)")
+        print("scrollTo line \(line) col \(col), rect \(rect)")
         editView.scrollToVisible(rect)
     }
 
     @objc func frameDidChangeNotification(_ notification: Notification) {
-        core.frameChanged(newFrame: view.frame)
+        core.frameChanged(newFrame: scrollView.documentVisibleRect)
         updateContentSize()
     }
 

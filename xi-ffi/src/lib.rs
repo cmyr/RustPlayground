@@ -99,9 +99,13 @@ pub extern "C" fn xiCoreGetLine(ptr: *mut XiCore, idx: uint32_t) -> *const XiLin
         &mut *ptr
     };
 
-    let (line, cursor, sel) = core.state.get_line(idx as usize).unwrap();
-    let cstring = CString::new(line.as_ref()).expect("bad string, very sad");
-    Box::into_raw(Box::new(XiLine { text: cstring.into_raw(), cursor, selection: [sel.0, sel.1] }))
+    match core.state.get_line(idx as usize) {
+        Some((line, cursor, sel)) => {
+            let cstring = CString::new(line.as_ref()).expect("bad string, very sad");
+            Box::into_raw(Box::new(XiLine { text: cstring.into_raw(), cursor, selection: [sel.0, sel.1] }))
+        }
+        None => std::ptr::null(),
+    }
 }
 
 #[no_mangle]

@@ -17,9 +17,9 @@ use std::borrow::Cow;
 use xi_core_lib::edit_types::{BufferEvent, EventDomain, SpecialEvent, ViewEvent};
 use xi_core_lib::rpc::{EditNotification, Rect};
 use xi_core_lib::selection::{InsertDrift, SelRegion, Selection};
-use xi_core_lib::view::NoView;
+//use xi_core_lib::view::NoView;
 use xi_core_lib::{edit_ops, movement, BufferConfig};
-use xi_rope::breaks2::Breaks;
+use xi_rope::breaks2::{Breaks, BreaksMetric};
 use xi_rope::{Cursor, LinesMetric, Rope, RopeDelta};
 
 use callbacks::{InvalidateCallback, RpcCallback};
@@ -74,7 +74,7 @@ impl OneView {
                 auto_indent: true,
                 scroll_past_end: true,
                 wrap_width: 0,
-                word_wrap: false,
+                word_wrap: true,
                 autodetect_whitespace: false,
                 surrounding_pairs: vec![],
                 save_with_newline: false,
@@ -86,24 +86,40 @@ impl OneView {
         }
     }
 
+    fn offset_of_line(&self, line: usize) -> usize {
+        match line {
+            n if n >= self.count_lines() => self.text.len(),
+            _else => self.breaks.count_base_units::<BreaksMetric>(_else),
+        }
+    }
+
+    fn line_of_offset(&self, offset: usize) -> usize {
+        let offset = offset.min(self.text.len());
+        self.breaks.count::<BreaksMetric>(offset)
+    }
+
     pub fn get_line(&self, idx: usize) -> Option<(Cow<str>, i32, (i32, i32))> {
-        if idx > self.text.count::<LinesMetric>(self.text.len()) {
+        if idx > self.count_lines() {
             return None;
         }
-        let start = self.text.offset_of_line(idx);
-        let end = self.text.offset_of_line(idx + 1);
+        let start = self.offset_of_line(idx);
+        let end = self.offset_of_line(idx + 1);
         let line = self.text.slice_to_cow(start..end);
+
+        eprintln!("line {}, {}..{} '{} len {}'", idx, start, end, line, self.text.len());
         let region = self.selection.regions_in_range(start, end).first();
 
         let caret = match region {
             Some(region) => {
                 let c = region.end;
+                let c_line = self.line_of_offset(c);
+                eprintln!("cursor {} is_up {} c_line {}", c, region.is_upstream(), c_line);
                 if (c > start && c < end)
                     || (!region.is_upstream() && c == start)
                     || (region.is_upstream() && c == end)
-                    || (c == end && c == self.text.len() && self.text.line_of_offset(c) == idx)
+                    || (c == end && c == self.text.len() && self.line_of_offset(c) == idx)
                 {
-                    (c - start) as i32
+                    dbg!(c - start) as i32
                 } else {
                     -1
                 }
@@ -124,7 +140,7 @@ impl OneView {
             EventDomain::View(event) => self.handle_view_event(event, &mut builder),
             EventDomain::Buffer(event) => self.handle_edit(event, &mut builder),
             EventDomain::Special(other) => match other {
-                SpecialEvent::ViewportChange(rect) => self.viewport_change(rect),
+                SpecialEvent::ViewportChange(rect) => self.viewport_change(rect, &mut builder),
                 _other => eprintln!("unhandled special event {:?}", _other),
             },
         }
@@ -145,14 +161,14 @@ impl OneView {
             ViewEvent::Move(mvment) => Some(movement::selection_movement(
                 mvment,
                 &self.selection,
-                &NoView,
+                &self.breaks,
                 &self.text,
                 false,
             )),
             ViewEvent::ModifySelection(mvment) => Some(movement::selection_movement(
                 mvment,
                 &self.selection,
-                &NoView,
+                &self.breaks,
                 &self.text,
                 true,
             )),
@@ -195,14 +211,14 @@ impl OneView {
         match event {
             BufferEvent::Delete { movement, .. } => edit_ops::delete_by_movement(
                 text,
-                &NoView,
+                &self.breaks,
                 &self.selection,
                 movement,
                 false,
                 &mut kring,
             ),
             BufferEvent::Backspace => {
-                edit_ops::delete_backward(text, &NoView, &self.selection, &self.config)
+                edit_ops::delete_backward(text, &self.breaks, &self.selection, &self.config)
             }
             BufferEvent::Insert(chars) => Some(edit_ops::insert(text, &self.selection, chars)),
             BufferEvent::InsertNewline => Some(edit_ops::insert(text, &self.selection, "\n")),
@@ -211,19 +227,29 @@ impl OneView {
         }
     }
 
-    fn viewport_change(&mut self, new_frame: Rect) {
+    fn viewport_change(&mut self, new_frame: Rect, update: &mut UpdateBuilder) {
+        if self.config.word_wrap && new_frame.width != self.frame.width {
+            self.rewrap_all(new_frame.width);
+            update.inval_lines(0..self.count_lines())
+        }
         self.frame = new_frame;
         eprintln!("viewport changed to {:?}", new_frame);
     }
 
     fn compute_scroll_point(&self, sel: &Selection, update: &mut UpdateBuilder) {
-        let end = sel.last().unwrap().end;
-        let line = self.text.line_of_offset(end);
-        let line_off = self.text.offset_of_line(line);
+        let end = sel.last().expect("compute_scroll no selection?").end;
+        let line = self.line_of_offset(end);
+        let line_off = self.offset_of_line(line);
         let col = end - line_off;
 
         let linecol = LineCol { line, col };
         update.scroll_to(linecol)
+    }
+
+    fn rewrap_all(&mut self, new_width: usize) {
+        eprintln!("old breaks {:?}", &self.breaks);
+        self.breaks = lines::rewrap_region(&self.text, .., &self.width_cache, new_width);
+        eprintln!("NEW breaks {:?}", &self.breaks);
     }
 
     fn update_breaks(&mut self, delta: &RopeDelta) {
@@ -232,16 +258,19 @@ impl OneView {
         let empty_breaks = Breaks::new_no_break(new_len);
         self.breaks.edit(iv, empty_breaks);
 
-        assert_eq!(self.breaks.len(), self.text.len(), "breaks are all messed up");
+        assert_eq!(self.breaks.len(), self.text.len(), "breaks are all messed up iv {:?}", iv);
 
         let mut cursor = Cursor::new(&self.text, iv.start());
         cursor.at_or_prev::<LinesMetric>();
 
         let start = cursor.pos();
         let end = cursor.next::<LinesMetric>().unwrap_or(self.text.len());
-        let new_breaks = lines::rewrap_region(&self.text, start..end, &self.width_cache);
-        //eprintln!("editing {}..{} {:?}", start, end, &new_breaks);
+        let view_width = if self.config.word_wrap { Some(self.frame.width) } else { None };
+        let new_breaks =
+            lines::rewrap_region(&self.text, start..end, &self.width_cache, view_width);
+        eprintln!("editing {}..{} {:?}", start, end, &new_breaks);
         self.breaks.edit(start..end, new_breaks);
+        eprintln!("NEW {:?}", &self.breaks);
     }
 
     fn compute_content_size(&self) -> Size {
@@ -251,7 +280,11 @@ impl OneView {
     }
 
     fn count_lines(&self) -> usize {
-        self.text.count::<LinesMetric>(self.text.len()) + 1
+        if self.config.word_wrap {
+            self.breaks.count::<BreaksMetric>(self.breaks.len()).max(1)
+        } else {
+            self.text.count::<LinesMetric>(self.text.len()) + 1
+        }
     }
 }
 

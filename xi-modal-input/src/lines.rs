@@ -21,40 +21,34 @@ impl Size {
     }
 }
 
-pub(crate) fn rewrap_region<IV: IntervalBounds>(
+pub(crate) fn rewrap_region<IV, T>(
     text: &Rope,
     interval: IV,
     width_cache: &WidthCache,
-) -> Breaks {
+    view_width: T,
+) -> Breaks
+where
+    IV: IntervalBounds,
+    T: Into<Option<usize>>,
+{
     let interval = interval.into_interval(text.len());
+    let view_width = view_width.into();
 
     let mut builder = BreakBuilder::new();
-    let mut last_word = interval.start;
-    let mut last_line = interval.start;
-    let mut break_cursor = LineBreakCursor::new(&text, interval.start);
-    let mut cur_width = 0;
-    //eprintln!("updating for iv {:?}, new_len {} old_len {}", iv, new_len, text.len());
-    loop {
-        if last_word == interval.end {
+    let mut last_break = interval.start;
+
+    let mut breaks_iter = BreaksIter::new(text, interval.start, width_cache, view_width);
+    while let Some(Break { offset, width, hard }) = breaks_iter.next() {
+        if last_break >= interval.end {
             break;
         }
-        let (next, is_hard) = break_cursor.next();
-        let this_word = text.slice_to_cow(last_word..next);
-        let Size { width, .. } = width_cache.measure_layout_size(&this_word);
-        cur_width += width;
-        //eprintln!("word '{}', width {} next {}", this_word, width, next);
 
-        if is_hard || next >= text.len() {
-            builder.add_break(next - last_line, cur_width);
-            last_line = next;
-            cur_width = 0;
-            if last_word >= interval.end {
-                break;
-            }
-        }
-        last_word = next;
+        //if hard || offset >= text.len() {
+        builder.add_break(offset - last_break, width);
+        //}
+
+        last_break = offset;
     }
-
     builder.build()
 }
 
@@ -76,9 +70,97 @@ impl WidthCache {
             return *size;
         }
 
-        let cstr = CString::new(line).unwrap();
+        let cstr = CString::new(line).expect("measure layout bad string?");
         let size = (self.measure_fn)(cstr.as_ptr());
         cache.insert(line.to_owned(), size);
         size
+    }
+}
+
+struct BreaksIter<'a> {
+    cache: &'a WidthCache,
+    cursor: LineBreakCursor<'a>,
+    /// the size used for soft wrapping.
+    view_width: usize,
+    last: usize,
+    cur_line_width: usize,
+    done: bool,
+}
+
+#[derive(Debug, Clone, Copy)]
+struct Break {
+    offset: usize,
+    width: usize,
+    hard: bool,
+}
+
+impl<'a> BreaksIter<'a> {
+    fn new<T>(text: &'a Rope, start: usize, cache: &'a WidthCache, width: T) -> Self
+    where
+        T: Into<Option<usize>>,
+    {
+        let cursor = LineBreakCursor::new(text, start);
+        let view_width = width.into().unwrap_or(usize::max_value());
+        BreaksIter { cursor, cache, view_width, last: start, cur_line_width: 0, done: false }
+    }
+
+    /// Returns the offset of the next potential break, the width from that
+    /// to the previous break, and whether it is a hard break (newline).
+    fn next_pot_break(&mut self) -> Break {
+        let cur_pos = self.last;
+        let (next, hard) = self.cursor.next();
+
+        let word = self.cursor.get_text().slice_to_cow(cur_pos..next);
+        let width = self.cache.measure_layout_size(&word).width;
+        self.last = next;
+
+        Break { offset: next, width, hard }
+    }
+}
+
+impl<'a> Iterator for BreaksIter<'a> {
+    type Item = Break;
+
+    fn next(&mut self) -> Option<Break> {
+        let text_len = self.cursor.get_text().len();
+        let mut line_width = self.cur_line_width;
+        let mut cur_offset = self.last;
+
+        while cur_offset < text_len {
+            let Break { offset, width, hard } = self.next_pot_break();
+            if !hard {
+                if line_width == 0 && width >= self.view_width {
+                    // we don't care about soft breaks at EOF
+                    if offset == text_len {
+                        return None;
+                    }
+                    // this is a single word longer than a line; always break afterwords
+                    return Some(Break { offset, width, hard });
+                }
+                line_width += width;
+                if line_width > self.view_width {
+                    // stash this width, it's the starting width of our next line
+                    self.cur_line_width = width;
+                    return Some(Break { offset: cur_offset, width: line_width - width, hard });
+                }
+                cur_offset = offset;
+            } else if line_width > 0 && width + line_width > self.view_width {
+                // if this is a hard break but we would have broken at the previous
+                // pos otherwise, we still break at the previous pos.
+                self.cur_line_width = width;
+                return Some(Break { offset: cur_offset, width: line_width, hard });
+            } else {
+                self.cur_line_width = 0;
+                return Some(Break { offset, width: width + line_width, hard });
+            }
+        }
+
+        // only return last break if hard?
+        if !self.done && cur_offset != 0 {
+            self.done = true;
+            Some(Break { offset: cur_offset, width: line_width, hard: false })
+        } else {
+            None
+        }
     }
 }

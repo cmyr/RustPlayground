@@ -42,7 +42,11 @@ class EditView: NSView {
 
                 let selStart = font.isFixedPitch ? CGFloat(selection.startIndex) * charWidth : getVisualOffset(attrString, selection.startIndex)
                 let selEnd = font.isFixedPitch ?  CGFloat(selection.endIndex) * charWidth : getVisualOffset(attrString, selection.endIndex)
-                let rect = CGRect(x: xOff + selStart, y: yPos, width: selEnd - selStart, height: linespace)
+
+                // selections should cover the full extent of the text
+                let selY = yPos + font.descent
+
+                let rect = CGRect(x: xOff + selStart, y: selY, width: selEnd - selStart, height: linespace).integral
                 NSColor.selectedTextBackgroundColor.setFill()
                 rect.fill()
             }
@@ -57,10 +61,10 @@ class EditView: NSView {
                     } else {
                         selWidth = cursorPos - getVisualOffset(attrString, cursor - 1)
                     }
-                    rect = NSRect(x: xOff + max(cursorPos - selWidth, 0), y: yPos, width: selWidth, height: linespace)
+                    rect = NSRect(x: xOff + max(cursorPos - selWidth, 0), y: yPos, width: selWidth, height: linespace).integral
                     NSColor.lightGray.setFill()
                 } else {
-                    rect = NSRect(x: xOff + cursorPos, y: yPos + (linespace - 1), width: charWidth, height: 1)
+                    rect = NSRect(x: xOff + cursorPos, y: yPos + (linespace - 1), width: charWidth, height: font.underlineThickness).integral
                     NSColor.black.setFill()
                 }
 

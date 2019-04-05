@@ -6,7 +6,7 @@ use crate::{LineCol, Size};
 
 /// Represents state changes that ocurred while handling a user event.
 #[derive(Debug, Clone, Default)]
-pub(crate) struct Update {
+pub struct Update {
     pub(crate) lines: Option<Range<usize>>,
     pub(crate) size: Option<Size>,
     pub(crate) scroll: Option<LineCol>,
@@ -14,7 +14,7 @@ pub(crate) struct Update {
 
 /// A type for collecting changes that occur while handling an event.
 pub(crate) struct UpdateBuilder {
-    inner: Update,
+    pub(crate) inner: Update,
 }
 
 impl UpdateBuilder {

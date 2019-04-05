@@ -730,16 +730,28 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                             </scrollView>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="U2e-jw-QX2">
+                                <rect key="frame" x="-2" y="0.0" width="37" height="17"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="tGI-y0-s06">
+                                    <font key="font" usesAppearanceFont="YES"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="xq3-8F-meh" secondAttribute="trailing" id="06q-S7-PTg"/>
                             <constraint firstItem="xq3-8F-meh" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" id="Avb-Si-O8y"/>
+                            <constraint firstItem="U2e-jw-QX2" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="DjX-XH-81g"/>
+                            <constraint firstAttribute="bottom" secondItem="U2e-jw-QX2" secondAttribute="bottom" id="KDL-OS-kX9"/>
+                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="U2e-jw-QX2" secondAttribute="trailing" constant="20" symbolic="YES" id="ZLy-NX-IgP"/>
                             <constraint firstAttribute="bottom" secondItem="xq3-8F-meh" secondAttribute="bottom" id="bC3-EY-7xC"/>
                             <constraint firstItem="xq3-8F-meh" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="fgo-wo-0iq"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="editView" destination="xjA-QF-hok" id="Oox-E7-w0T"/>
+                        <outlet property="modeLabel" destination="tGI-y0-s06" id="VTk-KF-zVp"/>
                         <outlet property="scrollView" destination="xq3-8F-meh" id="0MT-X9-Pai"/>
                     </connections>
                 </viewController>

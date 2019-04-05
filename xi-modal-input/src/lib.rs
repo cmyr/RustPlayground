@@ -362,7 +362,7 @@ impl XiCore {
         self.send_update(update);
     }
 
-    fn send_update(&self, mut update: Update) {
+    pub fn send_update(&self, mut update: Update) {
         if let Some(newsize) = update.size.take() {
             self.rpc_callback
                 .call("content_size", json!({"width": newsize.width, "height": newsize.height}));

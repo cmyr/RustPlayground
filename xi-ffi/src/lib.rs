@@ -73,7 +73,9 @@ pub extern "C" fn xiCoreHandleInput(
     let event = KeyEvent { characters, modifiers, payload };
 
     let ctx = EventCtx { plumber: core.plumber.as_ref().unwrap(), state: &mut core.state };
-    core.handler.as_mut().unwrap().handle_event(event, ctx);
+    if let Some(update) = core.handler.as_mut().unwrap().handle_event(event, ctx) {
+        core.send_update(update);
+    }
 }
 
 #[no_mangle]

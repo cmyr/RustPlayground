@@ -12,6 +12,7 @@ class ViewController: NSViewController {
 
     @IBOutlet weak var editView: EditView!
     @IBOutlet weak var scrollView: NSScrollView!
+    @IBOutlet weak var modeLabel: NSTextFieldCell!
 
     var contents = String();
 
@@ -25,13 +26,21 @@ class ViewController: NSViewController {
 
     var parseState: String = "" {
         didSet {
-//            self.stateLabel.stringValue = parseState
+            if let mode = self.mode {
+                self.modeLabel.stringValue = "\(mode.rawValue.capitalized) \(parseState)"
+            }
         }
     }
 
-    var mode: Mode = .insert {
+    var mode: Mode? = nil {
         didSet {
-//            self.modeLabel.stringValue = mode.rawValue.capitalized(with: nil)
+            if let mode = mode {
+                self.modeLabel.controlView?.isHidden = false
+                self.modeLabel.stringValue = mode.rawValue.capitalized(with: nil)
+                self.editView.needsDisplay = true
+            } else {
+                self.modeLabel.controlView?.isHidden = true
+            }
         }
     }
 
@@ -42,13 +51,16 @@ class ViewController: NSViewController {
                                                name: NSView.frameDidChangeNotification,
                                                object: scrollView)
         (NSApp.delegate as! AppDelegate).mainController = self
+        if core.hasInputHandler {
+            mode = .insert
+        } else {
+            mode = nil
+        }
     }
 
     override func viewDidAppear() {
-        self.mode = .insert
         self.editView.lineSource = self
         self.view.window?.makeFirstResponder(self)
-
     }
 
     func coreViewDidChange(core: XiCoreProxy, newLines: UInt32) {

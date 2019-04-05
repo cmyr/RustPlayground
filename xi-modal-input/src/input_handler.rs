@@ -4,6 +4,7 @@ use std::ffi::CString;
 use xi_core_lib::edit_types::EventDomain;
 
 use super::OneView;
+use crate::update::{Update, UpdateBuilder};
 
 // a token for an event that has been scheduled with a delay.
 pub type PendingToken = u32;
@@ -75,17 +76,23 @@ impl<'a> EventCtx<'a> {
         (self.plumber.action_callback)(action_cstr.as_ptr());
     }
 
-    pub(crate) fn do_core_event(&mut self, action: EventDomain, repeat: usize) {
+    pub(crate) fn do_core_event(
+        &mut self,
+        action: EventDomain,
+        repeat: usize,
+        update: &mut UpdateBuilder,
+    ) {
         eprintln!("doing {:?} x {}", &action, repeat);
         for _ in 0..repeat {
-            self.state.handle_event(action.clone());
+            let this_update = self.state.handle_event(action.clone());
+            update.inner = this_update;
         }
     }
 }
 
 pub trait Handler {
     /// Returns `true` if we should update after this event
-    fn handle_event(&mut self, event: KeyEvent, ctx: EventCtx) -> bool;
+    fn handle_event(&mut self, event: KeyEvent, ctx: EventCtx) -> Option<Update>;
     /// Informs the handler that the given delayed event has fired.
     fn clear_pending(&mut self, token: PendingToken);
 }

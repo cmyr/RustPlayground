@@ -1,4 +1,5 @@
 use crate::input_handler::{EventCtx, Handler, KeyEvent, PendingToken};
+use crate::update::{Update, UpdateBuilder};
 use xi_core_lib::edit_types::{BufferEvent, ViewEvent};
 use xi_core_lib::movement::Movement;
 
@@ -60,11 +61,11 @@ pub struct Machine {
 }
 
 impl Handler for Machine {
-    fn handle_event(&mut self, event: KeyEvent, mut ctx: EventCtx) -> bool {
+    fn handle_event(&mut self, event: KeyEvent, mut ctx: EventCtx) -> Option<Update> {
         match self.mode {
             Mode::Insert => {
                 self.handle_insert(event, &ctx);
-                false
+                None
             }
             Mode::Command => {
                 let r = self.handle_command(&event, &mut ctx);
@@ -113,8 +114,10 @@ impl Machine {
     }
 
     /// returns `true` if an event has happened, and we should rerender.
-    fn handle_command(&mut self, event: &KeyEvent, ctx: &mut EventCtx) -> bool {
+    fn handle_command(&mut self, event: &KeyEvent, ctx: &mut EventCtx) -> Option<Update> {
         let chr = event.characters;
+
+        let mut update = UpdateBuilder::new();
 
         if let CommandState::Ready = self.state {
             if ["i", "a", "A", "o", "O"].contains(&chr) {
@@ -125,18 +128,22 @@ impl Machine {
                         "A" => Movement::RightOfLine,
                         _ => unreachable!(),
                     };
-                    ctx.do_core_event(ViewEvent::Move(motion).into(), 1);
+                    ctx.do_core_event(ViewEvent::Move(motion).into(), 1, &mut update);
                 } else if chr == "o" {
-                    ctx.do_core_event(ViewEvent::Move(Movement::RightOfLine).into(), 1);
-                    ctx.do_core_event(BufferEvent::InsertNewline.into(), 1);
+                    ctx.do_core_event(
+                        ViewEvent::Move(Movement::RightOfLine).into(),
+                        1,
+                        &mut update,
+                    );
+                    ctx.do_core_event(BufferEvent::InsertNewline.into(), 1, &mut update);
                 } else if chr == "O" {
-                    ctx.do_core_event(ViewEvent::Move(Movement::LeftOfLine).into(), 1);
-                    ctx.do_core_event(BufferEvent::InsertNewline.into(), 1);
-                    ctx.do_core_event(ViewEvent::Move(Movement::Up).into(), 1);
+                    ctx.do_core_event(ViewEvent::Move(Movement::LeftOfLine).into(), 1, &mut update);
+                    ctx.do_core_event(BufferEvent::InsertNewline.into(), 1, &mut update);
+                    ctx.do_core_event(ViewEvent::Move(Movement::Up).into(), 1, &mut update);
                 }
                 ctx.send_client_rpc("mode_change", json!({"mode": "insert"}));
                 ctx.send_client_rpc("parse_state", json!({"state": ""}));
-                return true;
+                return Some(update.build());
             }
         }
 
@@ -170,23 +177,27 @@ impl Machine {
 
         if let CommandState::Done(Command { motion, ty, distance }) = &self.state {
             if let CommandType::Delete = ty {
-                ctx.do_core_event(ViewEvent::ModifySelection(*motion).into(), *distance);
-                ctx.do_core_event(BufferEvent::Backspace.into(), 1);
+                ctx.do_core_event(
+                    ViewEvent::ModifySelection(*motion).into(),
+                    *distance,
+                    &mut update,
+                );
+                ctx.do_core_event(BufferEvent::Backspace.into(), 1, &mut update);
             } else {
-                ctx.do_core_event(ViewEvent::Move(*motion).into(), *distance);
+                ctx.do_core_event(ViewEvent::Move(*motion).into(), *distance, &mut update);
             }
             ctx.send_client_rpc("parse_state", json!({"state": &self.raw}));
             self.state = CommandState::Ready;
             self.raw = String::new();
-            true
+            Some(update.build())
         } else if let CommandState::Failed = self.state {
             self.state = CommandState::Ready;
             ctx.send_client_rpc("parse_state", json!({"state": &self.raw}));
             self.raw = String::new();
-            false
+            None
         } else {
             ctx.send_client_rpc("parse_state", json!({"state": &self.raw}));
-            false
+            None
         }
     }
 }

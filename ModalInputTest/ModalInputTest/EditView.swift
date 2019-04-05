@@ -11,6 +11,7 @@ import Cocoa
 protocol LineSource {
     func getLine(line: UInt32) -> RawLine?;
     var totalLines: Int { get }
+    var mode: ViewController.Mode? { get }
 }
 
 class EditView: NSView {
@@ -48,8 +49,21 @@ class EditView: NSView {
             if let cursor = line.cursor {
                 let cursorPos = font.isFixedPitch ? CGFloat(cursor) * charWidth : getVisualOffset(attrString, cursor)
 
-                let rect = NSRect(x: xOff + cursorPos, y: yPos + (linespace - 1), width: charWidth, height: 1)
-                NSColor.black.setFill()
+                let rect: NSRect
+                if lines.mode == .command {
+                    let selWidth: CGFloat;
+                    if font.isFixedPitch || cursorPos == 0 {
+                        selWidth = charWidth
+                    } else {
+                        selWidth = cursorPos - getVisualOffset(attrString, cursor - 1)
+                    }
+                    rect = NSRect(x: xOff + max(cursorPos - selWidth, 0), y: yPos, width: selWidth, height: linespace)
+                    NSColor.lightGray.setFill()
+                } else {
+                    rect = NSRect(x: xOff + cursorPos, y: yPos + (linespace - 1), width: charWidth, height: 1)
+                    NSColor.black.setFill()
+                }
+
                 rect.fill()
             }
 

@@ -9,7 +9,9 @@
 import Cocoa
 
 class DefaultFont {
-    static let shared = NSFont(name: "Input Sans", size: 14.0)!
+//    static let shared = NSFont(name: "Input Sans", size: 14.0)!
+    static let shared = NSFont(name: "Input Sans", size: 24.0)!
+//    static let shared = NSFont(name: "Zapfino", size: 36.0)!
 }
 
 @NSApplicationMain
@@ -26,7 +28,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         // uncomment me for vim mode
-//        core.registerEventHandler(callback: dispatchEvent, action: handleAction, timer: handleTimer, cancelTimer: cancelTimer)
+//        core.registerEventHandler(callback: dispatchEvent, action: handleRpc, timer: handleTimer, cancelTimer: cancelTimer)
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
@@ -104,18 +106,6 @@ func dispatchEvent(eventPtr: OpaquePointer?, toTheTrash: Bool) {
         if !toTheTrash {
             (NSApp.delegate as! AppDelegate).sendEvent(event)
         }
-    }
-}
-
-func handleAction(jsonPtr: UnsafePointer<Int8>?) {
-    if let ptr = jsonPtr {
-        let string = String(cString: ptr)
-
-        let message = try! JSONSerialization.jsonObject(with: string.data(using: .utf8)!) as! [String: AnyObject]
-        let method = message["method"] as! String
-        let params = message["params"] as! [String: AnyObject]
-
-        (NSApp.delegate as! AppDelegate).handleMessage(method: method, params: params)
     }
 }
 

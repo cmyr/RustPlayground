@@ -234,18 +234,13 @@ impl OneView {
     }
 
     fn compute_scroll_point(&self, sel: &Selection, update: &mut UpdateBuilder) {
-        if let Some(caret) = &sel.last().map(|r| r.end) {
-            let line = self.breaks.count::<BreaksMetric>(*caret);
-            let line_off = self.breaks.count_base_units::<BreaksMetric>(line);
-            let linecol;
-            if *caret == line_off && *caret != 0 {
-                linecol = LineCol { line: line - 1, col: line_off };
-            } else {
-                let col = caret - line_off;
-                linecol = LineCol { line, col };
-            }
-            update.scroll_to(linecol);
-        }
+        let end = sel.last().unwrap().end;
+        let line = self.text.line_of_offset(end);
+        let line_off = self.text.offset_of_line(line);
+        let col = end - line_off;
+
+        let linecol = LineCol { line, col, };
+        update.scroll_to(linecol)
     }
 
     fn update_breaks(&mut self, delta: &RopeDelta) {

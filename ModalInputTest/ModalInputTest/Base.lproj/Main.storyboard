@@ -725,13 +725,13 @@
                                     <rect key="frame" x="1" y="240" width="489" height="16"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
-                                <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="jqo-de-eQp">
+                                <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="jqo-de-eQp">
                                     <rect key="frame" x="474" y="1" width="16" height="255"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                             </scrollView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="U2e-jw-QX2">
-                                <rect key="frame" x="-2" y="0.0" width="37" height="17"/>
+                                <rect key="frame" x="8" y="0.0" width="37" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="tGI-y0-s06">
                                     <font key="font" usesAppearanceFont="YES"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -742,7 +742,7 @@
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="xq3-8F-meh" secondAttribute="trailing" id="06q-S7-PTg"/>
                             <constraint firstItem="xq3-8F-meh" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" id="Avb-Si-O8y"/>
-                            <constraint firstItem="U2e-jw-QX2" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="DjX-XH-81g"/>
+                            <constraint firstItem="U2e-jw-QX2" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="10" id="DjX-XH-81g"/>
                             <constraint firstAttribute="bottom" secondItem="U2e-jw-QX2" secondAttribute="bottom" id="KDL-OS-kX9"/>
                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="U2e-jw-QX2" secondAttribute="trailing" constant="20" symbolic="YES" id="ZLy-NX-IgP"/>
                             <constraint firstAttribute="bottom" secondItem="xq3-8F-meh" secondAttribute="bottom" id="bC3-EY-7xC"/>

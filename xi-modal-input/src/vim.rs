@@ -22,6 +22,7 @@ fn movement_from_str(s: &str) -> Option<Movement> {
 enum Mode {
     Insert,
     Command,
+    Visual,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -69,6 +70,11 @@ impl Handler for Machine {
             }
             Mode::Command => {
                 let r = self.handle_command(&event, &mut ctx);
+                ctx.free_event(event);
+                r
+            }
+            Mode::Visual => {
+                let r = self.handle_visual(&event, &mut ctx);
                 ctx.free_event(event);
                 r
             }
@@ -186,18 +192,24 @@ impl Machine {
             } else {
                 ctx.do_core_event(ViewEvent::Move(*motion).into(), *distance, &mut update);
             }
-            ctx.send_client_rpc("parse_state", json!({"state": &self.raw}));
-            self.state = CommandState::Ready;
-            self.raw = String::new();
+            self.change_state(CommandState::Ready, ctx);
             Some(update.build())
         } else if let CommandState::Failed = self.state {
-            self.state = CommandState::Ready;
-            ctx.send_client_rpc("parse_state", json!({"state": &self.raw}));
-            self.raw = String::new();
+            self.change_state(CommandState::Ready, ctx);
             None
         } else {
             ctx.send_client_rpc("parse_state", json!({"state": &self.raw}));
             None
         }
+    }
+
+    fn change_state(&mut self, new_state: CommandState, ctx: &mut EventCtx) {
+        self.state = new_state;
+        ctx.send_client_rpc("parse_state", json!({"state": &self.raw}));
+        self.raw.clear();
+    }
+
+    fn handle_visual(&mut self, event: &KeyEvent, ctx: &mut EventCtx) -> Option<Update> {
+        None
     }
 }

@@ -6,42 +6,29 @@ extern crate serde_derive;
 
 mod callbacks;
 mod input_handler;
+mod lines;
 mod rpc;
 mod update;
 mod vim;
 
 use libc::c_char;
 use std::borrow::Cow;
-use std::cell::RefCell;
-use std::collections::HashMap;
-use std::ffi::CString;
 
 use xi_core_lib::edit_types::{BufferEvent, EventDomain, SpecialEvent, ViewEvent};
 use xi_core_lib::rpc::{EditNotification, Rect};
 use xi_core_lib::selection::{InsertDrift, SelRegion, Selection};
 use xi_core_lib::view::NoView;
-use xi_core_lib::{edit_ops, linewrap::LineBreakCursor, movement, BufferConfig};
-use xi_rope::breaks2::{BreakBuilder, Breaks, BreaksMetric};
+use xi_core_lib::{edit_ops, movement, BufferConfig};
+use xi_rope::breaks2::Breaks;
 use xi_rope::{Cursor, LinesMetric, Rope, RopeDelta};
 
 use callbacks::{InvalidateCallback, RpcCallback};
 pub use input_handler::{EventCtx, EventPayload, Handler, KeyEvent, Plumber};
+pub use lines::Size;
+use lines::WidthCache;
 use rpc::Rpc;
 use update::{Update, UpdateBuilder};
 pub use vim::Machine as Vim;
-
-#[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub struct Size {
-    width: usize,
-    height: usize,
-}
-
-impl Size {
-    fn zero() -> Self {
-        Size { width: 0, height: 0 }
-    }
-}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LineCol {
@@ -63,18 +50,20 @@ pub struct OneView {
     config: BufferConfig,
     breaks: Breaks,
     frame: Rect,
-    width_cache: RefCell<HashMap<String, Size>>,
-    width_measure_fn: extern "C" fn(*const c_char) -> Size,
+    width_cache: WidthCache,
+    //width_measure_fn: extern "C" fn(*const c_char) -> Size,
     line_height: usize,
     content_size: Size,
 }
 
 impl OneView {
     pub fn new(width_measure_fn: extern "C" fn(*const c_char) -> Size) -> Self {
-        let mut this = OneView {
+        let width_cache = WidthCache::new(width_measure_fn);
+        let line_height = width_cache.measure_layout_size("a").height;
+        OneView {
             selection: SelRegion::caret(0).into(),
             text: Rope::from(""),
-            width_cache: RefCell::new(HashMap::new()),
+            width_cache,
             config: BufferConfig {
                 line_ending: "\n".to_string(),
                 tab_size: 4,
@@ -92,15 +81,9 @@ impl OneView {
             },
             frame: Rect::zero(),
             breaks: Breaks::default(),
-            line_height: 0,
-            width_measure_fn,
+            line_height,
             content_size: Size::zero(),
-        };
-
-        // hack, just grab height once
-        let size = this.measure_width("a");
-        this.line_height = size.height;
-        this
+        }
     }
 
     pub fn get_line(&self, idx: usize) -> Option<(Cow<str>, i32, (i32, i32))> {
@@ -239,7 +222,7 @@ impl OneView {
         let line_off = self.text.offset_of_line(line);
         let col = end - line_off;
 
-        let linecol = LineCol { line, col, };
+        let linecol = LineCol { line, col };
         update.scroll_to(linecol)
     }
 
@@ -249,59 +232,16 @@ impl OneView {
         let empty_breaks = Breaks::new_no_break(new_len);
         self.breaks.edit(iv, empty_breaks);
 
-        // ownership cheating: this is just a pointer clone
-        let text = self.text.clone();
+        assert_eq!(self.breaks.len(), self.text.len(), "breaks are all messed up");
 
-        assert_eq!(self.breaks.len(), text.len(), "breaks are all messed up");
-
-        let mut builder = BreakBuilder::new();
-        let mut cursor = Cursor::new(&text, iv.start());
+        let mut cursor = Cursor::new(&self.text, iv.start());
         cursor.at_or_prev::<LinesMetric>();
 
         let start = cursor.pos();
-        let end = cursor.next::<LinesMetric>().unwrap_or(text.len());
-        let mut last_word = start;
-        let mut last_line = start;
-        let mut break_cursor = LineBreakCursor::new(&text, start);
-        let mut cur_width = 0;
-        //eprintln!("updating for iv {:?}, new_len {} old_len {}", iv, new_len, text.len());
-        loop {
-            if last_word == end {
-                break;
-            }
-            let (next, is_hard) = break_cursor.next();
-            let this_word = text.slice_to_cow(last_word..next);
-            let Size { width, .. } = self.measure_width(&this_word);
-            cur_width += width;
-            //eprintln!("word '{}', width {} next {}", this_word, width, next);
-
-            if is_hard || next >= text.len() {
-                builder.add_break(next - last_line, cur_width);
-                last_line = next;
-                cur_width = 0;
-                if last_word >= end {
-                    break;
-                }
-            }
-            last_word = next;
-        }
-
-        let new_breaks = builder.build();
+        let end = cursor.next::<LinesMetric>().unwrap_or(self.text.len());
+        let new_breaks = lines::rewrap_region(&self.text, start..end, &self.width_cache);
         //eprintln!("editing {}..{} {:?}", start, end, &new_breaks);
         self.breaks.edit(start..end, new_breaks);
-    }
-
-    fn measure_width(&self, line: &str) -> Size {
-        //HACK: we want this method to take &self so we're using a refcell
-        let mut width_cache = self.width_cache.borrow_mut();
-        if let Some(size) = width_cache.get(line) {
-            return *size;
-        }
-
-        let cstr = CString::new(line).unwrap();
-        let size = (self.width_measure_fn)(cstr.as_ptr());
-        width_cache.insert(line.to_owned(), size);
-        size
     }
 
     fn compute_content_size(&self) -> Size {

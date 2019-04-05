@@ -286,11 +286,9 @@ impl OneView {
             last_word = next;
         }
 
-        //eprintln!("OLD {:?}", &self.breaks);
         let new_breaks = builder.build();
         //eprintln!("editing {}..{} {:?}", start, end, &new_breaks);
         self.breaks.edit(start..end, new_breaks);
-        //eprintln!("NEW {:?}", &self.breaks);
     }
 
     fn measure_width(&self, line: &str) -> Size {
@@ -426,6 +424,8 @@ fn event_from_str(string: &str) -> Option<EditNotification> {
         "pageDownAndModifySelection:" => Some(E::PageDownAndModifySelection),
         "pageUpAndModifySelection:" => Some(E::PageUpAndModifySelection),
         "transpose:" => Some(E::Transpose),
+        "selectAll:" => Some(E::SelectAll),
+        "cancelOperation:" => Some(E::CollapseSelections),
         _other => None,
         //(Some("scrollPageDown:"), None) => E::ScrollPageDown
         //(Some("scrollPageUp:"), None) =>

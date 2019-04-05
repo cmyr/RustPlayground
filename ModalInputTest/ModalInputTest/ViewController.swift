@@ -126,6 +126,40 @@ class ViewController: NSViewController {
             .string(forType: .string)
             .flatMap({ core.insertText($0) })
     }
+
+    override func selectAll(_ sender: Any?) {
+        core.sendRpc(method: "selectAll:", params: [])
+    }
+
+//    @objc func undo(_ sender: AnyObject?) {
+//        document.sendRpcAsync("undo", params: [])
+//    }
+//
+//    @objc func redo(_ sender: AnyObject?) {
+//        document.sendRpcAsync("redo", params: [])
+//    }
+
+//    @objc func cut(_ sender: AnyObject?) {
+//        let text = xiView.cut()
+//        updatePasteboard(with: text)
+//    }
+//
+//    @objc func copy(_ sender: AnyObject?) {
+//        let text = xiView.copy()
+//        updatePasteboard(with: text)
+//    }
+
+    override func indent(_ sender: Any?) {
+        core.sendRpc(method: "indent", params: [])
+    }
+
+    @objc func unindent(_ sender: Any?) {
+        core.sendRpc(method: "outdent", params: [])
+    }
+
+    @objc func reindent(_ sender: Any?) {
+        core.sendRpc(method: "reindent", params: [])
+    }
 }
 
 extension ViewController: LineSource {

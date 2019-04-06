@@ -19,7 +19,7 @@ class ViewController: NSViewController {
     var core: XiCoreProxy!
 
     enum Mode: String {
-        case command, insert
+        case command, insert, visual
     }
 
     var totalLines: Int = 0;
@@ -51,6 +51,8 @@ class ViewController: NSViewController {
                                                name: NSView.frameDidChangeNotification,
                                                object: scrollView)
         (NSApp.delegate as! AppDelegate).mainController = self
+        modeLabel.font = DefaultFont.shared
+        modeLabel.textColor = NSColor.lightGray
         if core.hasInputHandler {
             mode = .insert
         } else {

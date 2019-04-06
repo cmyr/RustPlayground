@@ -38,13 +38,14 @@ class EditView: NSView {
             let line = lines.getLine(line: UInt32(lineNumber)) ?? RawLine.placeholder()
             let attrString = NSMutableAttributedString(string: line.text, attributes: [.font: font, .foregroundColor: NSColor.black])
             let yPos = yOff + linespace * CGFloat(lineNumber)
+            // selections should cover the full extent of the text
+            let selY = yPos + font.descent
+
             if let selection = line.selection {
 
                 let selStart = font.isFixedPitch ? CGFloat(selection.startIndex) * charWidth : getVisualOffset(attrString, selection.startIndex)
                 let selEnd = font.isFixedPitch ?  CGFloat(selection.endIndex) * charWidth : getVisualOffset(attrString, selection.endIndex)
 
-                // selections should cover the full extent of the text
-                let selY = yPos + font.descent
 
                 let rect = CGRect(x: xOff + selStart, y: selY, width: selEnd - selStart, height: linespace).integral
                 NSColor.selectedTextBackgroundColor.setFill()
@@ -54,17 +55,17 @@ class EditView: NSView {
                 let cursorPos = font.isFixedPitch ? CGFloat(cursor) * charWidth : getVisualOffset(attrString, cursor)
 
                 let rect: NSRect
-                if lines.mode == .command {
+                if lines.mode != .insert {
                     let selWidth: CGFloat;
                     if font.isFixedPitch || cursorPos == 0 {
                         selWidth = charWidth
                     } else {
                         selWidth = cursorPos - getVisualOffset(attrString, cursor - 1)
                     }
-                    rect = NSRect(x: xOff + max(cursorPos - selWidth, 0), y: yPos, width: selWidth, height: linespace).integral
+                    rect = NSRect(x: xOff + max(cursorPos - selWidth, 0), y: selY, width: selWidth, height: linespace).integral
                     NSColor.lightGray.setFill()
                 } else {
-                    rect = NSRect(x: xOff + cursorPos, y: yPos + (linespace - 1), width: charWidth, height: font.underlineThickness).integral
+                    rect = NSRect(x: xOff + cursorPos, y: selY + (linespace - 1), width: charWidth, height: font.underlineThickness).integral
                     NSColor.black.setFill()
                 }
 

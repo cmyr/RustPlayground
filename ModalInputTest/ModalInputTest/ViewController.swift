@@ -20,9 +20,18 @@ class ViewController: NSViewController {
 
     enum Mode: String {
         case command, insert, visual
+
+        var drawBox: Bool {
+            switch self {
+            case .command, .visual:
+                return true
+            case .insert:
+                return false
+            }
+        }
     }
 
-    var totalLines: Int = 0;
+    var totalLines: Int = 1;
 
     var parseState: String = "" {
         didSet {

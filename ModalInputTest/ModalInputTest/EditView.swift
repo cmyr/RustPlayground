@@ -55,7 +55,7 @@ class EditView: NSView {
                 let cursorPos = font.isFixedPitch ? CGFloat(cursor) * charWidth : getVisualOffset(attrString, cursor)
 
                 let rect: NSRect
-                if lines.mode != .insert {
+                if lines.mode?.drawBox ?? false {
                     let selWidth: CGFloat;
                     if font.isFixedPitch || cursorPos == 0 {
                         selWidth = charWidth

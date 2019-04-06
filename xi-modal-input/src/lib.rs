@@ -53,7 +53,6 @@ pub struct OneView {
     breaks: Breaks,
     frame: Rect,
     width_cache: WidthCache,
-    //width_measure_fn: extern "C" fn(*const c_char) -> Size,
     line_height: usize,
     content_size: Size,
 }
@@ -108,20 +107,17 @@ impl OneView {
         let end = self.offset_of_line(idx + 1);
         let line = self.text.slice_to_cow(start..end);
 
-        eprintln!("line {}, {}..{} '{} len {}'", idx, start, end, line, self.text.len());
         let region = self.selection.regions_in_range(start, end).first();
 
         let caret = match region {
             Some(region) => {
                 let c = region.end;
-                let c_line = self.line_of_offset(c);
-                eprintln!("cursor {} is_up {} c_line {}", c, region.is_upstream(), c_line);
                 if (c > start && c < end)
                     || (!region.is_upstream() && c == start)
                     || (region.is_upstream() && c == end)
                     || (c == end && c == self.text.len() && self.line_of_offset(c) == idx)
                 {
-                    dbg!(c - start) as i32
+                    (c - start) as i32
                 } else {
                     -1
                 }
@@ -197,7 +193,6 @@ impl OneView {
 
             let newsize = self.compute_content_size();
             if newsize != self.content_size {
-                //eprintln!("size changed {:?} -> {:?}", self.content_size, newsize);
                 self.content_size = newsize;
                 update.content_size(newsize);
             }
@@ -257,7 +252,7 @@ impl OneView {
     fn update_breaks(&mut self, delta: &RopeDelta) {
         let (iv, new_len) = delta.summary();
         // first get breaks to be the right size
-        let empty_breaks = Breaks::new_no_break(new_len);
+        let empty_breaks = Breaks::new_no_break(new_len, 0);
         self.breaks.edit(iv, empty_breaks);
 
         assert_eq!(self.breaks.len(), self.text.len(), "breaks are all messed up iv {:?}", iv);

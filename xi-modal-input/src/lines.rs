@@ -39,14 +39,15 @@ where
 
     let mut breaks_iter = BreaksIter::new(text, interval.start, width_cache, view_width);
     while let Some(Break { offset, width, hard }) = breaks_iter.next() {
+        if offset == interval.end && !hard {
+            builder.add_no_break(offset - last_break, width);
+            break;
+        }
         if last_break >= interval.end {
             break;
         }
 
-        //if hard || offset >= text.len() {
         builder.add_break(offset - last_break, width);
-        //}
-
         last_break = offset;
     }
     builder.build()
@@ -162,5 +163,52 @@ impl<'a> Iterator for BreaksIter<'a> {
         } else {
             None
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::ffi::CStr;
+    use xi_core_lib::view::ViewMovement;
+
+    fn dummy_width_cache() -> WidthCache {
+        extern "C" fn dummy_width(string: *const c_char) -> Size {
+            let cstr = unsafe { CStr::from_ptr(string).to_str().unwrap() };
+            Size { width: cstr.len(), height: 0 }
+        }
+        WidthCache::new(dummy_width)
+    }
+
+    #[test]
+    fn my_understanding() {
+        let text: Rope = "hell".into();
+        assert_eq!(text.line_of_offset(4), 0);
+
+        let breaks = Breaks::new_no_break(text.len());
+        assert_eq!(breaks.line_of_offset(&text, 4), 0, "breaks");
+
+        let text: Rope = "hell\n".into();
+        let mut builder = BreakBuilder::new();
+        builder.add_break(5, 0);
+        let breaks = builder.build();
+
+        assert_eq!(text.line_of_offset(4), 0);
+        assert_eq!(breaks.line_of_offset(&text, 4), 0, "breaks");
+
+        assert_eq!(text.line_of_offset(5), 1);
+        assert_eq!(breaks.line_of_offset(&text, 5), 1, "breaks");
+    }
+
+    #[test]
+    fn offset_stuff() {
+        let text: Rope = "hello\nworld".into();
+        let wc = dummy_width_cache();
+        let breaks = rewrap_region(&text, .., &wc, None);
+        assert_eq!(breaks.line_of_offset(&text, 0), 0);
+        assert_eq!(breaks.line_of_offset(&text, 5), 0);
+        assert_eq!(breaks.line_of_offset(&text, 6), 1);
+        assert_eq!(breaks.line_of_offset(&text, text.len()), 1);
+        assert_eq!(breaks.offset_of_line(&text, 1), 6);
     }
 }

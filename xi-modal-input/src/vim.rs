@@ -19,6 +19,8 @@ fn movement_from_str(s: &str) -> Option<Movement> {
     }
 }
 
+#[derive(Debug, Clone, Copy, Serialize)]
+#[serde(rename_all = "snake_case")]
 enum Mode {
     Insert,
     Command,
@@ -99,8 +101,7 @@ impl Machine {
     fn handle_insert(&mut self, event: KeyEvent, ctx: &EventCtx) {
         let timeout_token = self.timeout_token.take();
         let mut to_command_mode = |event| {
-            self.mode = Mode::Command;
-            ctx.send_client_rpc("mode_change", json!({"mode": "command"}));
+            self.set_mode(Mode::Command, ctx);
             ctx.free_event(event);
         };
 
@@ -126,8 +127,11 @@ impl Machine {
         let mut update = UpdateBuilder::new();
 
         if let CommandState::Ready = self.state {
+            if chr == "v" {
+                self.set_mode(Mode::Visual, ctx);
+                return None;
+            }
             if ["i", "a", "A", "o", "O"].contains(&chr) {
-                self.mode = Mode::Insert;
                 if chr == "a" || chr == "A" {
                     let motion = match chr {
                         "a" => Movement::Right,
@@ -147,7 +151,7 @@ impl Machine {
                     ctx.do_core_event(BufferEvent::InsertNewline.into(), 1, &mut update);
                     ctx.do_core_event(ViewEvent::Move(Movement::Up).into(), 1, &mut update);
                 }
-                ctx.send_client_rpc("mode_change", json!({"mode": "insert"}));
+                self.set_mode(Mode::Insert, ctx);
                 ctx.send_client_rpc("parse_state", json!({"state": ""}));
                 return Some(update.build());
             }
@@ -209,7 +213,68 @@ impl Machine {
         self.raw.clear();
     }
 
+    fn set_mode(&mut self, new_mode: Mode, ctx: &EventCtx) {
+        self.mode = new_mode;
+        ctx.send_client_rpc("mode_change", json!({ "mode": new_mode }));
+    }
+
     fn handle_visual(&mut self, event: &KeyEvent, ctx: &mut EventCtx) -> Option<Update> {
-        None
+        let mut update = UpdateBuilder::new();
+        let chr = event.characters;
+        if chr == "Escape" {
+            self.set_mode(Mode::Command, ctx);
+        }
+
+        if chr == "d" {
+            ctx.do_core_event(BufferEvent::Backspace.into(), 1, &mut update);
+            self.set_mode(Mode::Command, ctx);
+            return Some(update.build());
+        }
+
+        if chr == "c" {
+            ctx.do_core_event(BufferEvent::Backspace.into(), 1, &mut update);
+            self.set_mode(Mode::Insert, ctx);
+            return Some(update.build());
+        }
+
+        self.state = match &self.state {
+            CommandState::Ready => {
+                self.raw.push_str(chr);
+                if let Some(motion) = movement_from_str(chr) {
+                    CommandState::Done(Command { motion, ty: CommandType::Move, distance: 1 })
+                } else if let Some(cmd) = CommandType::from_char(chr) {
+                    CommandState::AwaitMotion(cmd, 0)
+                } else if let Ok(num) = chr.parse() {
+                    CommandState::AwaitMotion(CommandType::Move, num)
+                } else {
+                    CommandState::Failed
+                }
+            }
+
+            CommandState::AwaitMotion(ty, dist) => {
+                self.raw.push_str(chr);
+                if let Some(motion) = movement_from_str(chr) {
+                    CommandState::Done(Command { motion, ty: *ty, distance: *dist.max(&1) })
+                } else if let Ok(num) = chr.parse::<usize>() {
+                    let new_dist = num + (dist * 10);
+                    CommandState::AwaitMotion(*ty, new_dist)
+                } else {
+                    CommandState::Failed
+                }
+            }
+            _ => unreachable!(),
+        };
+
+        if let CommandState::Done(Command { motion, distance, .. }) = &self.state {
+            ctx.do_core_event(ViewEvent::ModifySelection(*motion).into(), *distance, &mut update);
+            self.change_state(CommandState::Ready, ctx);
+            Some(update.build())
+        } else if let CommandState::Failed = self.state {
+            self.change_state(CommandState::Ready, ctx);
+            None
+        } else {
+            ctx.send_client_rpc("parse_state", json!({"state": &self.raw}));
+            None
+        }
     }
 }

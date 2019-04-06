@@ -35,7 +35,7 @@ class EditView: NSView {
 
 
         for lineNumber in 0..<lines.totalLines {
-            let line = lines.getLine(line: UInt32(lineNumber))!
+            let line = lines.getLine(line: UInt32(lineNumber)) ?? RawLine.placeholder()
             let attrString = NSMutableAttributedString(string: line.text, attributes: [.font: font, .foregroundColor: NSColor.black])
             let yPos = yOff + linespace * CGFloat(lineNumber)
             if let selection = line.selection {

@@ -130,6 +130,10 @@ class RawLine {
     let cursor: Int?
     let selection: Range<Int>?
 
+    static func placeholder() -> RawLine {
+        return RawLine(text: "PLACEHOLDER", cursor: nil, selection: nil)
+    }
+
     init(text: String, cursor: Int?, selection: Range<Int>?) {
         self.text = text
         self.cursor = cursor

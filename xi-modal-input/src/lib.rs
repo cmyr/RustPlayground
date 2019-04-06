@@ -239,7 +239,7 @@ impl OneView {
         let line_off = self.text.offset_of_line(line);
         let col = end - line_off;
 
-        let linecol = LineCol { line, col, };
+        let linecol = LineCol { line, col };
         update.scroll_to(linecol)
     }
 

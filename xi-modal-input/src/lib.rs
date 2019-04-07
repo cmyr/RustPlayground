@@ -240,7 +240,7 @@ impl OneView {
         }
 
         self.frame = new_frame;
-        eprintln!("viewport changed to {:?}", new_frame);
+        //eprintln!("viewport changed to {:?}", new_frame);
     }
 
     fn compute_scroll_point(&self, sel: &Selection, update: &mut UpdateBuilder) {
@@ -254,9 +254,9 @@ impl OneView {
     }
 
     fn rewrap_all(&mut self, new_width: usize) {
-        eprintln!("old breaks {:?}", &self.breaks);
+        //eprintln!("old breaks {:?}", &self.breaks);
         self.breaks = lines::rewrap_region(&self.text, .., &self.width_cache, new_width);
-        eprintln!("NEW breaks {:?}", &self.breaks);
+        //eprintln!("NEW breaks {:?}", &self.breaks);
     }
 
     //fn update_breaks(&mut self, delta: &RopeDelta) {

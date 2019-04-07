@@ -32,9 +32,10 @@ class EditView: NSView {
         let xOff: CGFloat = 2.0
         let yOff = font.topPadding
         let charWidth = font.characterWidth()
+        let first = min(Int((dirtyRect.minY / linespace).rounded(.down)), lines.totalLines)
+        let last = min(Int((dirtyRect.maxY / linespace).rounded(.up)), lines.totalLines)
 
-
-        for lineNumber in 0..<lines.totalLines {
+        for lineNumber in first..<last {
             let line = lines.getLine(line: UInt32(lineNumber)) ?? RawLine.placeholder()
             let attrString = NSMutableAttributedString(string: line.text, attributes: [.font: font, .foregroundColor: NSColor.black])
             let yPos = yOff + linespace * CGFloat(lineNumber)

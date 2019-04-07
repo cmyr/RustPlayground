@@ -33,7 +33,7 @@ where
 {
     let interval = interval.into_interval(text.len());
     let view_width = view_width.into();
-    eprintln!("rewrapping {} to {:?}", interval, view_width);
+    //eprintln!("rewrapping {} to {:?}", interval, view_width);
 
     let mut builder = BreakBuilder::new();
     let mut last_break = interval.start;
@@ -122,7 +122,7 @@ impl<'a> BreaksIter<'a> {
         let (next, hard) = self.cursor.next();
 
         let word = self.cursor.get_text().slice_to_cow(cur_pos..next);
-        eprint!("{} ", word);
+        //eprint!("{} ", word);
         let width = self.cache.measure_layout_size(&word).width;
         self.last = next;
 

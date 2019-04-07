@@ -78,7 +78,7 @@ class ViewController: NSViewController {
 
     func coreViewDidChange(core: XiCoreProxy, newLines: UInt32) {
         self.totalLines = Int(newLines)
-        self.editView.needsDisplay = true
+        self.editView.setNeedsDisplay(scrollView.documentVisibleRect)
     }
 
 

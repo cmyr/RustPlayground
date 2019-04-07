@@ -30,7 +30,7 @@ use rpc::Rpc;
 use update::{Update, UpdateBuilder};
 pub use vim::Machine as Vim;
 
-const ENABLE_WORDWRAP: bool = false;
+const ENABLE_WORDWRAP: bool = true;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LineCol {
@@ -187,7 +187,10 @@ impl OneView {
             let newtext = delta.apply(&self.text);
             let newsel = self.selection.apply_delta(&delta, true, InsertDrift::Default);
             self.text = newtext;
-            self.update_breaks(&delta);
+            let view_width = if self.config.word_wrap { Some(self.frame.width) } else { None };
+            self.breaks = lines::rewrap_region(&self.text, .., &self.width_cache, view_width);
+            //eprintln!("breaks: {:?}, width: {:?}", &self.breaks, view_width);
+            //self.update_breaks(&delta);
             self.compute_scroll_point(&newsel, update);
             self.selection = newsel;
 
@@ -227,8 +230,15 @@ impl OneView {
     fn viewport_change(&mut self, new_frame: Rect, update: &mut UpdateBuilder) {
         if self.config.word_wrap && new_frame.width != self.frame.width {
             self.rewrap_all(new_frame.width);
-            update.inval_lines(0..self.count_lines())
+            update.inval_lines(0..self.count_lines());
+
+            let newsize = self.compute_content_size();
+            if newsize != self.content_size {
+                self.content_size = newsize;
+                update.content_size(newsize);
+            }
         }
+
         self.frame = new_frame;
         eprintln!("viewport changed to {:?}", new_frame);
     }
@@ -249,26 +259,26 @@ impl OneView {
         eprintln!("NEW breaks {:?}", &self.breaks);
     }
 
-    fn update_breaks(&mut self, delta: &RopeDelta) {
-        let (iv, new_len) = delta.summary();
-        // first get breaks to be the right size
-        let empty_breaks = Breaks::new_no_break(new_len, 0);
-        self.breaks.edit(iv, empty_breaks);
+    //fn update_breaks(&mut self, delta: &RopeDelta) {
+    //let (iv, new_len) = delta.summary();
+    //// first get breaks to be the right size
+    //let empty_breaks = Breaks::new_no_break(new_len, 0);
+    //self.breaks.edit(iv, empty_breaks);
 
-        assert_eq!(self.breaks.len(), self.text.len(), "breaks are all messed up iv {:?}", iv);
+    //assert_eq!(self.breaks.len(), self.text.len(), "breaks are all messed up iv {:?}", iv);
 
-        let mut cursor = Cursor::new(&self.text, iv.start());
-        cursor.at_or_prev::<LinesMetric>();
+    //let mut cursor = Cursor::new(&self.text, iv.start());
+    //cursor.at_or_prev::<LinesMetric>();
 
-        let start = cursor.pos();
-        let end = cursor.next::<LinesMetric>().unwrap_or(self.text.len());
-        let view_width = if self.config.word_wrap { Some(self.frame.width) } else { None };
-        let new_breaks =
-            lines::rewrap_region(&self.text, start..end, &self.width_cache, view_width);
-        eprintln!("editing {}..{} {:?}", start, end, &new_breaks);
-        self.breaks.edit(start..end, new_breaks);
-        eprintln!("NEW {:?}", &self.breaks);
-    }
+    //let start = cursor.pos();
+    //let end = cursor.next::<LinesMetric>().unwrap_or(self.text.len());
+    //let view_width = if self.config.word_wrap { Some(self.frame.width) } else { None };
+    //let new_breaks =
+    //lines::rewrap_region(&self.text, start..end, &self.width_cache, view_width);
+    //eprintln!("editing {}..{} {:?}", start, end, &new_breaks);
+    //self.breaks.edit(start..end, new_breaks);
+    //eprintln!("NEW {:?}", &self.breaks);
+    //}
 
     fn compute_content_size(&self) -> Size {
         let height = self.count_lines() * self.line_height;
@@ -278,7 +288,7 @@ impl OneView {
 
     fn count_lines(&self) -> usize {
         if self.config.word_wrap {
-            self.breaks.count::<BreaksMetric>(self.breaks.len()).max(1)
+            self.breaks.count::<BreaksMetric>(self.breaks.len()) + 1
         } else {
             self.text.count::<LinesMetric>(self.text.len()) + 1
         }

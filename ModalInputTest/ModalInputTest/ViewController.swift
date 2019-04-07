@@ -14,7 +14,8 @@ class ViewController: NSViewController {
     @IBOutlet weak var scrollView: NSScrollView!
     @IBOutlet weak var modeLabel: NSTextFieldCell!
 
-    var contents = String();
+    var contents = String()
+    let minimumPadding: CGFloat = 2
 
     var core: XiCoreProxy!
 
@@ -72,6 +73,7 @@ class ViewController: NSViewController {
     override func viewDidAppear() {
         self.editView.lineSource = self
         self.view.window?.makeFirstResponder(self)
+        updateCoreFrame()
     }
 
     func coreViewDidChange(core: XiCoreProxy, newLines: UInt32) {
@@ -79,37 +81,58 @@ class ViewController: NSViewController {
         self.editView.needsDisplay = true
     }
 
-    var contentSize: CGSize = CGSize.zero {
+
+    /// The total size of the document, tracked in core.
+    var documentSize: CGSize = CGSize.zero {
         didSet {
-            if contentSize != oldValue {
+            if documentSize != oldValue {
             updateContentSize()
             }
         }
     }
 
     func scrollTo(_ line: Int, col: Int) {
-
-        let y = CGFloat(line) * DefaultFont.shared.linespace + 2
+        let y = CGFloat(line) * DefaultFont.shared.linespace + minimumPadding
         let lineText = core.getLine(UInt32(line))!
         let toMeasure = lineText.text.utf8.prefix(col)
         let x = measureStringWidth(String(toMeasure)!).width
 
         let rect = CGRect(origin: CGPoint(x: x, y: y),
                           size: CGSize(width: DefaultFont.shared.characterWidth(), height: DefaultFont.shared.linespace)).integral
-        print("scrollTo line \(line) col \(col), rect \(rect)")
         editView.scrollToVisible(rect)
     }
 
     @objc func frameDidChangeNotification(_ notification: Notification) {
-        core.frameChanged(newFrame: scrollView.documentVisibleRect)
-        updateContentSize()
+        updateCoreFrame()
     }
 
+    private var coreFrame = CGRect.zero {
+        didSet {
+            if coreFrame != oldValue {
+                core.frameChanged(newFrame: coreFrame)
+                updateContentSize()
+            }
+        }
+    }
+
+    /// Send the current frame to core. This is used for determining the visible
+    /// region, and for word wrapping.
+    func updateCoreFrame() {
+        let docFrame = scrollView.documentVisibleRect
+        let cursorPadding = DefaultFont.shared.characterWidth() + minimumPadding * 2
+        let size = CGSize(width: docFrame.width - cursorPadding, height: docFrame.height)
+        coreFrame = CGRect(origin: docFrame.origin, size: size)
+    }
+
+    /// Update the the size of the edit view.
+    ///
+    /// This is done if our frame changes (user interaction) or if the total size
+    /// of the document changes (by adding or removing lines, or changing the
+    /// width of the widest line.
     func updateContentSize() {
-        let cursorPadding = (DefaultFont.shared.characterWidth() * 3).rounded(.down)
         let size = CGSize(
-            width: max(contentSize.width + cursorPadding, scrollView.contentSize.width),
-            height: max(contentSize.height, scrollView.contentSize.height)
+            width: max(documentSize.width, scrollView.contentSize.width),
+            height: max(documentSize.height, scrollView.contentSize.height)
         )
         if size != editView.bounds.size {
             self.editView.frame = NSRect(origin: CGPoint.zero, size: size).integral

@@ -28,7 +28,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         // uncomment me for vim mode
-        core.registerEventHandler(callback: dispatchEvent, action: handleRpc, timer: handleTimer, cancelTimer: cancelTimer)
+//        core.registerEventHandler(callback: dispatchEvent, action: handleRpc, timer: handleTimer, cancelTimer: cancelTimer)
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
@@ -49,7 +49,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         case "content_size":
             let width = params["width"] as! Int
             let height = params["height"] as! Int
-            mainController?.contentSize = CGSize(width: width, height: height)
+            mainController?.documentSize = CGSize(width: width, height: height)
         case "scroll_to":
             let line = params["line"] as! Int
             let col = params["col"] as! Int

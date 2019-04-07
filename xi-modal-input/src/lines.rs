@@ -33,6 +33,7 @@ where
 {
     let interval = interval.into_interval(text.len());
     let view_width = view_width.into();
+    eprintln!("rewrapping {} to {:?}", interval, view_width);
 
     let mut builder = BreakBuilder::new();
     let mut last_break = interval.start;
@@ -112,6 +113,7 @@ impl<'a> BreaksIter<'a> {
         let (next, hard) = self.cursor.next();
 
         let word = self.cursor.get_text().slice_to_cow(cur_pos..next);
+        eprint!("{} ", word);
         let width = self.cache.measure_layout_size(&word).width;
         self.last = next;
 
@@ -129,6 +131,8 @@ impl<'a> Iterator for BreaksIter<'a> {
 
         while cur_offset < text_len {
             let Break { offset, width, hard } = self.next_pot_break();
+            eprintln!("w-{}, line_w {} ({})", width, line_width, width + line_width);
+
             if !hard {
                 if line_width == 0 && width >= self.view_width {
                     // we don't care about soft breaks at EOF
@@ -171,6 +175,7 @@ mod tests {
     use super::*;
     use std::ffi::CStr;
     use xi_core_lib::view::ViewMovement;
+    use xi_rope::breaks2::BreaksMetric;
 
     fn dummy_width_cache() -> WidthCache {
         extern "C" fn dummy_width(string: *const c_char) -> Size {
@@ -185,7 +190,7 @@ mod tests {
         let text: Rope = "hell".into();
         assert_eq!(text.line_of_offset(4), 0);
 
-        let breaks = Breaks::new_no_break(text.len());
+        let breaks = Breaks::new_no_break(text.len(), 0);
         assert_eq!(breaks.line_of_offset(&text, 4), 0, "breaks");
 
         let text: Rope = "hell\n".into();
@@ -210,5 +215,33 @@ mod tests {
         assert_eq!(breaks.line_of_offset(&text, 6), 1);
         assert_eq!(breaks.line_of_offset(&text, text.len()), 1);
         assert_eq!(breaks.offset_of_line(&text, 1), 6);
+    }
+
+    #[test]
+    fn soft_breaks_simple() {
+        let soft_lines = "\
+                          #eight# \
+                          one two \
+                          thirteenth \
+                          three \
+                          and"
+        .into();
+
+        let wc = dummy_width_cache();
+        let breaks = rewrap_region(&soft_lines, .., &wc, 8);
+        eprintln!("len {}, breaks {}\n {:?}", soft_lines.len(), breaks.len(), &breaks);
+        let get_line = |nb| {
+            let off = breaks.offset_of_line(&soft_lines, nb);
+            let offn = breaks.offset_of_line(&soft_lines, nb + 1);
+            eprintln!("{}: {}..{}", nb, off, offn);
+            soft_lines.slice_to_cow(off..offn)
+        };
+
+        assert_eq!(get_line(0), "#eight# ");
+        assert_eq!(get_line(1), "one two ");
+        assert_eq!(get_line(2), "thirteenth ");
+        assert_eq!(get_line(3), "three ");
+        assert_eq!(get_line(4), "and");
+        assert_eq!(breaks.count::<BreaksMetric>(breaks.len()), 5);
     }
 }

@@ -2,6 +2,7 @@
 
 use std::ops::Range;
 
+use crate::style::{Style, StyleId};
 use crate::{LineCol, Size};
 
 /// Represents state changes that ocurred while handling a user event.
@@ -10,6 +11,7 @@ pub struct Update {
     pub(crate) lines: Option<Range<usize>>,
     pub(crate) size: Option<Size>,
     pub(crate) scroll: Option<LineCol>,
+    pub(crate) styles: Option<Vec<(StyleId, Style)>>,
 }
 
 /// A type for collecting changes that occur while handling an event.
@@ -37,6 +39,11 @@ impl UpdateBuilder {
 
     pub(crate) fn scroll_to(&mut self, point: LineCol) {
         self.inner.scroll = Some(point);
+    }
+
+    pub(crate) fn new_styles(&mut self, styles: Vec<(StyleId, Style)>) {
+        debug_assert!(self.inner.styles.is_none(), "styles should be None");
+        self.inner.styles = Some(styles);
     }
 
     pub(crate) fn build(self) -> Update {

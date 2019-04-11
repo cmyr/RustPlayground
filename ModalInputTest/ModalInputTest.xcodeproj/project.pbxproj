@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6018ED18225FB15600B5DF38 /* Style.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6018ED17225FB15600B5DF38 /* Style.swift */; };
 		604B0F6022405C88007038E6 /* XiCoreProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 604B0F5F22405C88007038E6 /* XiCoreProxy.swift */; };
 		606644EB223FFED7006215A0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606644EA223FFED7006215A0 /* AppDelegate.swift */; };
 		606644ED223FFED7006215A0 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606644EC223FFED7006215A0 /* ViewController.swift */; };
@@ -37,6 +38,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		6018ED17225FB15600B5DF38 /* Style.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Style.swift; path = ModalInputTest/Style.swift; sourceTree = SOURCE_ROOT; };
 		603608D2224EC693002CEAC6 /* xicore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = xicore.h; path = "../xi-ffi/xicore.h"; sourceTree = "<group>"; };
 		604B0F5F22405C88007038E6 /* XiCoreProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XiCoreProxy.swift; sourceTree = "<group>"; };
 		606644E7223FFED7006215A0 /* ModalInputTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ModalInputTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -125,6 +127,7 @@
 			isa = PBXGroup;
 			children = (
 				606644FD223FFED9006215A0 /* ModalInputTestTests.swift */,
+				6018ED17225FB15600B5DF38 /* Style.swift */,
 				606644FF223FFED9006215A0 /* Info.plist */,
 			);
 			path = ModalInputTestTests;
@@ -285,6 +288,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				604B0F6022405C88007038E6 /* XiCoreProxy.swift in Sources */,
+				6018ED18225FB15600B5DF38 /* Style.swift in Sources */,
 				60BF2285225012DD002C0352 /* EditView.swift in Sources */,
 				606644ED223FFED7006215A0 /* ViewController.swift in Sources */,
 				606644EB223FFED7006215A0 /* AppDelegate.swift in Sources */,

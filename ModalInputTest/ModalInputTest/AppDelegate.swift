@@ -18,6 +18,8 @@ class DefaultFont {
 class AppDelegate: NSObject, NSApplicationDelegate {
     let core = XiCoreProxy(rpcCallback: handleRpc, updateCallback: handleUpdate, widthMeasure: measureWidth)
 
+    let styleMap = StyleMap()
+
     var mainController: ViewController? {
         didSet {
             mainController?.core = core
@@ -54,6 +56,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             let line = params["line"] as! Int
             let col = params["col"] as! Int
             mainController?.scrollTo(line, col: col)
+        case "new_styles":
+            // styles is a vec of (number, object) pairs
+            let rawStyles = params["styles"] as! [[AnyObject]]
+            rawStyles.map {
+                let styleId = $0[0] as! UInt32
+                let styleObject = $0[1] as! [String: AnyObject]
+                return (styleId, Style.fromJson(styleObject))
+                }
+                .forEach { styleMap.addStyle(withId: $0, style: $1) }
         default:
             print("unhandled method \(method)")
         }

@@ -3,11 +3,14 @@ extern crate libc;
 extern crate serde_json;
 #[macro_use]
 extern crate serde_derive;
+extern crate syntect;
 
 mod callbacks;
+mod highlighting;
 mod input_handler;
 mod lines;
 mod rpc;
+mod style;
 mod update;
 mod vim;
 
@@ -17,16 +20,18 @@ use std::borrow::Cow;
 use xi_core_lib::edit_types::{BufferEvent, EventDomain, SpecialEvent, ViewEvent};
 use xi_core_lib::rpc::{EditNotification, Rect};
 use xi_core_lib::selection::{InsertDrift, SelRegion, Selection};
-//use xi_core_lib::view::NoView;
 use xi_core_lib::{edit_ops, movement, BufferConfig};
 use xi_rope::breaks2::{Breaks, BreaksMetric};
-use xi_rope::{Cursor, LinesMetric, Rope, RopeDelta};
+use xi_rope::spans::Spans;
+use xi_rope::{LinesMetric, Rope, RopeDelta};
 
 use callbacks::{InvalidateCallback, RpcCallback};
+use highlighting::HighlightState;
 pub use input_handler::{EventCtx, EventPayload, Handler, KeyEvent, Plumber};
 pub use lines::Size;
 use lines::WidthCache;
 use rpc::Rpc;
+use style::StyleId;
 use update::{Update, UpdateBuilder};
 pub use vim::Machine as Vim;
 
@@ -51,9 +56,12 @@ pub struct OneView {
     text: Rope,
     config: BufferConfig,
     breaks: Breaks,
+    spans: Spans<StyleId>,
+    highlighter: HighlightState,
     frame: Rect,
     width_cache: WidthCache,
     line_height: usize,
+    /// The total size of the document, in logical pixels
     content_size: Size,
 }
 
@@ -82,6 +90,8 @@ impl OneView {
             },
             frame: Rect::zero(),
             breaks: Breaks::default(),
+            spans: Spans::default(),
+            highlighter: HighlightState::new(),
             line_height,
             content_size: Size::zero(),
         }
@@ -189,8 +199,12 @@ impl OneView {
             self.text = newtext;
             let view_width = if self.config.word_wrap { Some(self.frame.width) } else { None };
             self.breaks = lines::rewrap_region(&self.text, .., &self.width_cache, view_width);
-            //eprintln!("breaks: {:?}, width: {:?}", &self.breaks, view_width);
-            //self.update_breaks(&delta);
+            self.update_spans(&delta);
+
+            if let Some(styles) = self.highlighter.take_new_styles() {
+                update.new_styles(styles);
+            }
+
             self.compute_scroll_point(&newsel, update);
             self.selection = newsel;
 
@@ -225,6 +239,10 @@ impl OneView {
             BufferEvent::InsertTab => Some(edit_ops::insert(text, &self.selection, "\t")),
             _other => None,
         }
+    }
+
+    fn update_spans(&mut self, _delta: &RopeDelta) {
+        self.spans = self.highlighter.highlight_all(&self.text);
     }
 
     fn viewport_change(&mut self, new_frame: Rect, update: &mut UpdateBuilder) {
@@ -340,6 +358,11 @@ impl XiCore {
             self.rpc_callback
                 .call("content_size", json!({"width": newsize.width, "height": newsize.height}));
         }
+
+        if let Some(styles) = update.styles.take() {
+            self.rpc_callback.call("new_styles", json!({ "styles": styles }));
+        }
+
         if let Some(range) = update.lines.take() {
             self.invalidate_callback.call(range);
         }

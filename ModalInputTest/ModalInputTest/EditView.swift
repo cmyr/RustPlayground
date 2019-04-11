@@ -10,6 +10,7 @@ import Cocoa
 
 protocol LineSource {
     func getLine(line: UInt32) -> RawLine?;
+    func getStyle(styleId: StyleId) -> Style;
     var totalLines: Int { get }
     var mode: ViewController.Mode? { get }
 }
@@ -38,6 +39,13 @@ class EditView: NSView {
         for lineNumber in first..<last {
             let line = lines.getLine(line: UInt32(lineNumber)) ?? RawLine.placeholder()
             let attrString = NSMutableAttributedString(string: line.text, attributes: [.font: font, .foregroundColor: NSColor.black])
+
+            for styleSpan in line.styles {
+                let range = NSRange(location: styleSpan.start, length: styleSpan.len)
+                let style = lines.getStyle(styleId: styleSpan.styleId)
+                attrString.addAttributesForStyle(range, style: style)
+            }
+
             let yPos = yOff + linespace * CGFloat(lineNumber)
             // selections should cover the full extent of the text
             let selY = yPos + font.descent
@@ -106,5 +114,49 @@ extension NSFont {
                 return CGFloat(advance)
             }
         fatalError("font characterWidth() failed")
+    }
+    //FIXME: figure out how to do actual bold & italics
+    func italic() -> NSFont {
+//        if let family = self.familyName {
+//            let descriptor = fontDescriptor.withFamily(family).withSymbolicTraits(.italic)
+//            return NSFont(descriptor: descriptor, size: 0) ?? self
+//        }
+        return self
+    }
+
+    func bold() -> NSFont {
+//        if let family = self.familyName {
+//            let descriptor = fontDescriptor.withFamily(family).withSymbolicTraits(.bold)
+//            return NSFont(descriptor: descriptor, size: 0) ?? self
+//        }
+        return self
+    }
+}
+
+extension NSMutableAttributedString {
+    func addAttributesForStyle(_ range: NSRange, style: Style) {
+        var attrs = [NSAttributedString.Key : Any]()
+        if style.foreground.alphaComponent != 0 {
+            attrs[.foregroundColor] = style.foreground
+        }
+
+        //FIXME: background color is always set, plus is paints over cursors.
+        // And... probably selections. We should probably just handle this separately.
+//        if style.background.alphaComponent != 0 {
+//            attrs[.backgroundColor] = style.background
+//        }
+
+        if style.underline {
+            attrs[.underlineStyle] = NSUnderlineStyle.single
+        }
+
+        if style.italic {
+            attrs[.font] = DefaultFont.shared.italic()
+        }
+
+        if style.bold {
+            attrs[.font] = DefaultFont.shared.bold()
+        }
+        self.addAttributes(attrs, range: range)
     }
 }

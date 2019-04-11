@@ -2,13 +2,15 @@ use std::ffi::{CStr, CString};
 
 use libc::{c_char, int32_t, size_t, uint32_t};
 extern crate xi_modal_input;
-use xi_modal_input::{EventCtx, EventPayload, KeyEvent, OneView, Plumber, Size, Vim, XiCore};
+use xi_modal_input::{EventCtx, EventPayload, KeyEvent, Line, OneView, Plumber, Size, Vim, XiCore};
 
 #[repr(C)]
 pub struct XiLine {
     text: *const c_char,
     cursor: int32_t,
-    selection: [int32_t; 2],
+    selection: [size_t; 2],
+    styles: *const [size_t],
+    styles_len: size_t,
 }
 
 #[no_mangle]
@@ -99,13 +101,18 @@ pub extern "C" fn xiCoreGetLine(ptr: *mut XiCore, idx: uint32_t) -> *const XiLin
         &mut *ptr
     };
 
-    match  core.state.get_line(idx as usize) {
-        Some((line, cursor, sel)) => {
-            let cstring = CString::new(line.as_ref()).expect("bad string, very sad");
-            let xiline = XiLine { text: cstring.into_raw(), cursor, selection: [sel.0, sel.1] };
+    match core.state.get_line(idx as usize) {
+        Some(Line { line, caret, selection, styles }) => {
+            let text = CString::new(line.as_ref()).expect("bad string, very sad").into_raw();
+            let styles_len = styles.len();
+            let styles = Box::into_raw(styles.into_boxed_slice());
+
+            let cursor = caret.map(|v| v as i32).unwrap_or(-1);
+            let xiline =
+                XiLine { text, cursor, selection: [selection.0, selection.1], styles, styles_len };
             Box::into_raw(Box::new(xiline))
         }
-        None => std::ptr::null()
+        None => std::ptr::null(),
     }
 }
 

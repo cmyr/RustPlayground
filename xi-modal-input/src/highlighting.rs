@@ -63,8 +63,9 @@ impl Internal {
         let mut cursor = Cursor::new(text, 0);
         let mut total_offset = 0;
 
-        while let Some(next_line) = cursor.next::<LinesMetric>() {
-            let line = text.slice_to_cow(total_offset..next_line);
+        while total_offset < text.len() {
+            let next_break = cursor.next::<LinesMetric>().unwrap_or(text.len());
+            let line = text.slice_to_cow(total_offset..next_break);
             let mut last_pos = 0;
             let ops = parse_state.parse_line(line.trim_right_matches('\n'), syntax_set);
             for (pos, batch) in ops {
@@ -83,9 +84,11 @@ impl Internal {
             // add EOL span:
             let start = total_offset + last_pos;
             let end = start + (line.len() - last_pos);
-            let style = highlighter.style_for_stack(scope_state.as_slice());
-            let id = self.id_for_style(style);
-            b.add_span(start..end, id);
+            if start != end {
+                let style = highlighter.style_for_stack(scope_state.as_slice());
+                let id = self.id_for_style(style);
+                b.add_span(start..end, id);
+            }
             total_offset += line.len();
         }
         b.build()

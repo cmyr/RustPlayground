@@ -51,6 +51,15 @@ pub struct XiCore {
     pub handler: Option<Box<dyn Handler>>,
 }
 
+//pub fn get_line(&self, idx: usize) -> Option<(Cow<str>, i32, (i32, i32))> {
+pub struct Line<'a> {
+    pub line: Cow<'a, str>,
+    pub caret: Option<usize>,
+    pub selection: (usize, usize),
+    /// ranges and ids, as (start, len, id) triplets.
+    pub styles: Vec<usize>,
+}
+
 pub struct OneView {
     selection: Selection,
     text: Rope,
@@ -109,13 +118,14 @@ impl OneView {
         self.breaks.count::<BreaksMetric>(offset)
     }
 
-    pub fn get_line(&self, idx: usize) -> Option<(Cow<str>, i32, (i32, i32))> {
+    pub fn get_line<'a>(&'a self, idx: usize) -> Option<Line<'a>> {
         if idx > self.count_lines() {
             return None;
         }
         let start = self.offset_of_line(idx);
         let end = self.offset_of_line(idx + 1);
         let line = self.text.slice_to_cow(start..end);
+        let spans = self.spans.subseq(start..end);
 
         let region = self.selection.regions_in_range(start, end).first();
 
@@ -127,19 +137,24 @@ impl OneView {
                     || (region.is_upstream() && c == end)
                     || (c == end && c == self.text.len() && self.line_of_offset(c) == idx)
                 {
-                    (c - start) as i32
+                    Some(c - start)
                 } else {
-                    -1
+                    None
                 }
             }
-            None => -1,
+            None => None,
         };
 
         let line_sel =
             region.map(|r| (r.min().saturating_sub(start), r.max() - start)).unwrap_or((0, 0));
-        let sel_start = line_sel.0;
-        let sel_end = line_sel.1.min(line.len());
-        Some((line, caret, (sel_start as i32, sel_end as i32)))
+        let selection = (line_sel.0, line_sel.1.min(line.len()));
+
+        let styles = spans.iter().fold(Vec::new(), |mut v, (iv, style)| {
+            v.extend([iv.start(), iv.end() - iv.start(), *style as usize].into_iter());
+            v
+        });
+
+        Some(Line { line, caret, selection, styles })
     }
 
     fn handle_event(&mut self, event: EventDomain) -> Update {

@@ -96,7 +96,19 @@ class XiCoreProxy {
             } else {
                 selection = Int(line.pointee.selection.0)..<Int(line.pointee.selection.1)
             }
-            let result = RawLine(text: string, cursor: cursor, selection: selection)
+            assert(line.pointee.styles_len % 3 == 0, "styles are guaranteed to be triplets")
+            let buffer = UnsafeBufferPointer(start: line.pointee.styles, count: line.pointee.styles_len);
+            var i = 0
+            var styles = [StyleSpan]()
+            while i < buffer.count {
+                let start = buffer[i]
+                let len = buffer[i+1]
+                let styleId = buffer[i+2]
+                let style = StyleSpan(start: start, len: len, styleId: UInt32(styleId))
+                styles.append(style)
+                i += 3
+            }
+            let result = RawLine(text: string, cursor: cursor, selection: selection, styles: styles)
             xiLineFree(line)
             return result
 
@@ -125,19 +137,27 @@ class XiCoreProxy {
     }
 }
 
+struct StyleSpan {
+    let start: Int
+    let len: Int
+    let styleId: StyleId
+}
+
 class RawLine {
     let text: String
     let cursor: Int?
     let selection: Range<Int>?
+    let styles: [StyleSpan]
 
     static func placeholder() -> RawLine {
-        return RawLine(text: "PLACEHOLDER", cursor: nil, selection: nil)
+        return RawLine(text: "PLACEHOLDER", cursor: nil, selection: nil, styles: [])
     }
 
-    init(text: String, cursor: Int?, selection: Range<Int>?) {
+    init(text: String, cursor: Int?, selection: Range<Int>?, styles: [StyleSpan]) {
         self.text = text
         self.cursor = cursor
         self.selection = selection
+        self.styles = styles
     }
 }
 

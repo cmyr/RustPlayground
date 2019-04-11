@@ -200,4 +200,8 @@ extension ViewController: LineSource {
     func getLine(line: UInt32) -> RawLine? {
         return core?.getLine(line)
     }
+
+    func getStyle(styleId: StyleId) -> Style {
+        return (NSApp.delegate as! AppDelegate).styleMap.style(forId: styleId)
+    }
 }

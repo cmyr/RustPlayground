@@ -145,10 +145,15 @@ func measureWidth(strPtr: UnsafePointer<Int8>?) -> XiSize {
     return XiSize(width: Int(bounds.width), height: Int(bounds.height))
 }
 
-func measureStringWidth(_ string: String) -> CGRect {
-    let attrString = NSAttributedString(string: string, attributes: [.font: DefaultFont.shared])
+func measureStringWidth(_ string: String, font: NSFont? = nil) -> CGRect {
+    let font = font ?? DefaultFont.shared
+    let attrString = NSAttributedString(string: string, attributes: [.font: font])
 
     let ctLine = CTLineCreateWithAttributedString(attrString)
-    return CTLineGetBoundsWithOptions(ctLine, [])
-
+    // FIXME: we only use height as a standin for linespace, so just swap
+    // that in here. In the future we should have a separate method for getting
+    // font info.
+    let height = font.linespace
+    let rect = CTLineGetBoundsWithOptions(ctLine, [])
+    return CGRect(origin: rect.origin, size: CGSize(width: rect.width, height: height))
 }

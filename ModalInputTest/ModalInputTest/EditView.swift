@@ -30,7 +30,7 @@ class EditView: NSView {
         let font = DefaultFont.shared
         let linespace = font.linespace
         let xOff: CGFloat = 2.0
-        let yOff = font.topPadding
+        let yOff: CGFloat = 2.0
         let charWidth = font.characterWidth()
         let first = min(Int((dirtyRect.minY / linespace).rounded(.down)), lines.totalLines)
         let last = min(Int((dirtyRect.maxY / linespace).rounded(.up)), lines.totalLines)

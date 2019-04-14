@@ -133,8 +133,18 @@ extension NSFont {
     }
 }
 
+extension String {
+    func utf16OffsetForUtf8Offset(_ offsetUtf8: Int) -> Int {
+        return self.utf8.index(self.utf8.startIndex, offsetBy: offsetUtf8).utf16Offset(in: self)
+    }
+}
+
 extension NSMutableAttributedString {
     func addAttributesForStyle(_ range: NSRange, style: Style) {
+        let start = self.string.utf16OffsetForUtf8Offset(range.location)
+        let end = self.string.utf16OffsetForUtf8Offset(range.location + range.length)
+        let utf16Range = NSRange(location: start, length: end - start)
+
         var attrs = [NSAttributedString.Key : Any]()
         if style.foreground.alphaComponent != 0 {
             attrs[.foregroundColor] = style.foreground
@@ -157,6 +167,6 @@ extension NSMutableAttributedString {
         if style.bold {
             attrs[.font] = DefaultFont.shared.bold()
         }
-        self.addAttributes(attrs, range: range)
+        self.addAttributes(attrs, range: utf16Range)
     }
 }

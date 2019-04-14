@@ -148,6 +148,7 @@ pub extern "C" fn xiLineFree(ptr: *mut XiLine) {
     unsafe {
         let line = Box::from_raw(ptr);
         CString::from_raw(line.text as *mut _);
+        Box::from_raw(line.styles as *mut [usize]);
     }
 }
 

@@ -70,6 +70,12 @@ class ViewController: NSViewController {
         }
     }
 
+    override func viewWillAppear() {
+        super.viewWillAppear()
+        view.window!.styleMask = [view.window!.styleMask, .fullSizeContentView]
+        view.window!.titleVisibility = .hidden
+    }
+
     override func viewDidAppear() {
         self.editView.lineSource = self
         self.view.window?.makeFirstResponder(self)
@@ -121,7 +127,8 @@ class ViewController: NSViewController {
         let docFrame = scrollView.documentVisibleRect
         let cursorPadding = DefaultFont.shared.characterWidth() + minimumPadding * 2
         let size = CGSize(width: docFrame.width - cursorPadding, height: docFrame.height)
-        coreFrame = CGRect(origin: docFrame.origin, size: size)
+        //FIXME: 'ensureNonZero' is a hack, figure out how to do content insets
+        coreFrame = CGRect(origin: docFrame.origin.ensureNonZero(), size: size)
     }
 
     /// Update the the size of the edit view.
@@ -203,5 +210,11 @@ extension ViewController: LineSource {
 
     func getStyle(styleId: StyleId) -> Style {
         return (NSApp.delegate as! AppDelegate).styleMap.style(forId: styleId)
+    }
+}
+
+extension NSPoint {
+    func ensureNonZero() -> NSPoint {
+        return NSPoint(x: max(0, self.x), y: max(0, self.y))
     }
 }

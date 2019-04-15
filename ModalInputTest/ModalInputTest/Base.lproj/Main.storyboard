@@ -599,6 +599,18 @@
                                     </items>
                                 </menu>
                             </menuItem>
+                            <menuItem title="Cargo" id="yBJ-2Z-bvr">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Cargo" id="zAB-ed-m47">
+                                    <items>
+                                        <menuItem title="Build" keyEquivalent="b" id="RZB-au-jE5">
+                                            <connections>
+                                                <action selector="build:" target="Ady-hI-5gd" id="ASx-ga-uix"/>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
                             <menuItem title="View" id="H8h-7b-M4v">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="View" id="HyV-fh-RgO">
@@ -689,6 +701,29 @@
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="196" y="240" width="480" height="270"/>
                         <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
+                        <toolbar key="toolbar" implicitIdentifier="84750826-6B42-43EB-8B21-375964887724" autosavesConfiguration="NO" displayMode="iconOnly" sizeMode="regular" id="yqk-JZ-Tqz">
+                            <allowedToolbarItems>
+                                <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="ayk-AU-rl3"/>
+                                <toolbarItem implicitItemIdentifier="5A07218F-600A-452C-8157-452A1CE9D23D" label="" paletteLabel="" image="PlayIcon" sizingBehavior="auto" id="7QS-8p-NEL">
+                                    <nil key="toolTip"/>
+                                    <button key="view" verticalHuggingPriority="750" id="4A9-hC-f7B">
+                                        <rect key="frame" x="0.0" y="14" width="24" height="24"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                        <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="PlayIcon" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="wzt-1I-Kk6">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                    </button>
+                                    <connections>
+                                        <action selector="build:" target="Oky-zY-oP4" id="gnu-d9-Sue"/>
+                                    </connections>
+                                </toolbarItem>
+                            </allowedToolbarItems>
+                            <defaultToolbarItems>
+                                <toolbarItem reference="7QS-8p-NEL"/>
+                                <toolbarItem reference="ayk-AU-rl3"/>
+                            </defaultToolbarItems>
+                        </toolbar>
                         <connections>
                             <outlet property="delegate" destination="B8D-0N-5wS" id="98r-iN-zZc"/>
                         </connections>
@@ -699,7 +734,7 @@
                 </windowController>
                 <customObject id="Oky-zY-oP4" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="75" y="250"/>
+            <point key="canvasLocation" x="9" y="250"/>
         </scene>
         <!--View Controller-->
         <scene sceneID="hIz-AP-VOD">
@@ -760,4 +795,7 @@
             <point key="canvasLocation" x="219.5" y="782.5"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="PlayIcon" width="24" height="24"/>
+    </resources>
 </document>

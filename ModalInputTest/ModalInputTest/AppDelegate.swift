@@ -31,10 +31,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         // uncomment me for vim mode
 //        core.registerEventHandler(callback: dispatchEvent, action: handleRpc, timer: handleTimer, cancelTimer: cancelTimer)
+        insertPlaceholderText()
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
         // Insert code here to tear down your application
+    }
+
+    func insertPlaceholderText() {
+        let placeholderProgram = "fn main() {\n    println!(\"hello 🦀!\");\n}"
+        core.insertText(placeholderProgram)
     }
 
     func handleMessage(method: String, params: [String: AnyObject]) {

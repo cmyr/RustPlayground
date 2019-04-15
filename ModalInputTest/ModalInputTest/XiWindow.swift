@@ -9,6 +9,12 @@
 import Cocoa
 
 class XiWindow: NSWindow {
+
+    override init(contentRect: NSRect, styleMask style: NSWindow.StyleMask, backing backingStoreType: NSWindow.BackingStoreType, defer flag: Bool) {
+        super.init(contentRect: contentRect, styleMask: style, backing: backingStoreType, defer: flag)
+        styleMask = [styleMask, .fullSizeContentView]
+    }
+
     override func sendEvent(_ event: NSEvent) {
         let core = (NSApp.delegate as! AppDelegate).core
         if event.type == .keyDown && core.hasInputHandler {

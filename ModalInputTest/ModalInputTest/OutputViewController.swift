@@ -9,7 +9,7 @@
 import Cocoa
 
 class OutputViewController: NSViewController {
-    let outputFont = NSFont(name: "Menlo", size: 14.0)!
+    let outputFont = DefaultFont.shared
 
     @IBOutlet var outputTextView: NSTextView!
 

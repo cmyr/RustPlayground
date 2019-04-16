@@ -87,13 +87,11 @@ class EditViewController: NSViewController {
         self.editView.setNeedsDisplay(scrollView.documentVisibleRect)
     }
 
-    /// The total size of the document, tracked in core.
-    var documentSize: CGSize = CGSize.zero {
-        didSet {
-            if documentSize != oldValue {
-            updateContentSize()
-            }
-        }
+    /// Called by core. `newSize` is the smallest size that bounds the entire
+    /// document, in points.
+    func textLayoutSizeChanged(_ newSize: CGSize) {
+        editView.coreDocumentSize = newSize
+        view.needsLayout = true
     }
 
     func scrollTo(_ line: Int, col: Int) {
@@ -102,9 +100,14 @@ class EditViewController: NSViewController {
         let toMeasure = lineText.text.utf8.prefix(col)
         let x = measureStringWidth(String(toMeasure)!).width
 
+        // one line is the current line, one line is padding
+        let height = DefaultFont.shared.linespace * 2
+        let width = DefaultFont.shared.characterWidth() * 2
         let rect = CGRect(origin: CGPoint(x: x, y: y),
-                          size: CGSize(width: DefaultFont.shared.characterWidth(), height: DefaultFont.shared.linespace)).integral
-        editView.scrollToVisible(rect)
+                          size: CGSize(width: width , height: height)).integral
+
+            editView.scrollToVisible(rect)
+            editView.setNeedsDisplay(editView.visibleRect)
     }
 
     @objc func frameDidChangeNotification(_ notification: Notification) {
@@ -115,7 +118,6 @@ class EditViewController: NSViewController {
         didSet {
             if coreFrame != oldValue {
                 core.frameChanged(newFrame: coreFrame)
-                updateContentSize()
             }
         }
     }
@@ -128,21 +130,6 @@ class EditViewController: NSViewController {
         let size = CGSize(width: max(docFrame.width - cursorPadding, 0), height: docFrame.height)
         //FIXME: 'ensureNonZero' is a hack, figure out how to do content insets
         coreFrame = CGRect(origin: docFrame.origin.ensureNonZero(), size: size)
-    }
-
-    /// Update the the size of the edit view.
-    ///
-    /// This is done if our frame changes (user interaction) or if the total size
-    /// of the document changes (by adding or removing lines, or changing the
-    /// width of the widest line.
-    func updateContentSize() {
-        let size = CGSize(
-            width: max(documentSize.width, scrollView.contentSize.width),
-            height: max(documentSize.height, scrollView.contentSize.height)
-        )
-        if size != editView.bounds.size {
-            self.editView.frame = NSRect(origin: CGPoint.zero, size: size).integral
-        }
     }
 
     override func doCommand(by selector: Selector) {

@@ -749,7 +749,6 @@
                             </allowedToolbarItems>
                             <defaultToolbarItems>
                                 <toolbarItem reference="7QS-8p-NEL"/>
-                                <toolbarItem reference="gE6-Dg-YTu"/>
                                 <toolbarItem reference="ayk-AU-rl3"/>
                                 <toolbarItem reference="nTn-fh-Fu5"/>
                             </defaultToolbarItems>
@@ -805,11 +804,16 @@
                                     <rect key="frame" x="1" y="1" width="448" height="298"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <customView wantsLayer="YES" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xjA-QF-hok" customClass="EditView" customModule="ModalInputTest" customModuleProvider="target">
-                                            <rect key="frame" x="0.0" y="-200" width="490" height="257"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <customView wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xjA-QF-hok" customClass="EditView" customModule="ModalInputTest" customModuleProvider="target">
+                                            <rect key="frame" x="0.0" y="0.0" width="448" height="298"/>
                                         </customView>
                                     </subviews>
+                                    <constraints>
+                                        <constraint firstItem="xjA-QF-hok" firstAttribute="leading" secondItem="bSB-id-xlU" secondAttribute="leading" id="Cej-rf-Nux"/>
+                                        <constraint firstItem="xjA-QF-hok" firstAttribute="top" secondItem="bSB-id-xlU" secondAttribute="top" id="FxM-Ji-NEH"/>
+                                        <constraint firstAttribute="bottom" secondItem="xjA-QF-hok" secondAttribute="bottom" placeholder="YES" id="cQb-yO-8Qc"/>
+                                        <constraint firstAttribute="trailing" secondItem="xjA-QF-hok" secondAttribute="trailing" placeholder="YES" id="rgR-hf-gX9"/>
+                                    </constraints>
                                 </clipView>
                                 <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="dyU-Q4-fIt">
                                     <rect key="frame" x="1" y="283" width="448" height="16"/>

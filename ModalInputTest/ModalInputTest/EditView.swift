@@ -23,6 +23,23 @@ class EditView: NSView {
         return true
     }
 
+    /// The smallest size, in measured points, that bounds the
+    // entire document.
+    var coreDocumentSize = CGSize.zero {
+        didSet {
+            if coreDocumentSize != oldValue {
+                invalidateIntrinsicContentSize()
+            }
+        }
+    }
+
+    override var intrinsicContentSize: NSSize {
+        let charSpace = DefaultFont.shared.characterWidth() * 2
+        let lineHeight = DefaultFont.shared.linespace
+        return CGSize(width: coreDocumentSize.width + charSpace,
+                      height: coreDocumentSize.height + lineHeight)
+    }
+
     override func draw(_ dirtyRect: NSRect) {
         guard let lines = lineSource, lines.totalLines > 0 else { return }
         NSColor.white.setFill()

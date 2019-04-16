@@ -58,7 +58,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         case "content_size":
             let width = params["width"] as! Int
             let height = params["height"] as! Int
-            mainController?.documentSize = CGSize(width: width, height: height)
+            mainController?.textLayoutSizeChanged(CGSize(width: width, height: height))
         case "scroll_to":
             let line = params["line"] as! Int
             let col = params["col"] as! Int

@@ -15,6 +15,7 @@
 		606644F2223FFED8006215A0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 606644F0223FFED8006215A0 /* Main.storyboard */; };
 		606644FE223FFED9006215A0 /* ModalInputTestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606644FD223FFED9006215A0 /* ModalInputTestTests.swift */; };
 		608A1D4022657604001A79EB /* MainPlaygroundViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 608A1D3F22657604001A79EB /* MainPlaygroundViewController.swift */; };
+		608A1D42226627D2001A79EB /* OutputViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 608A1D41226627D2001A79EB /* OutputViewController.swift */; };
 		609A22672240504100A3F007 /* libximodal.h in Headers */ = {isa = PBXBuildFile; fileRef = 609A22662240504100A3F007 /* libximodal.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60A91D1322650A5B00240CC6 /* cargo_build.sh in Resources */ = {isa = PBXBuildFile; fileRef = 60A91D1222650A5B00240CC6 /* cargo_build.sh */; };
 		60A91D1522650D0100240CC6 /* Runner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60A91D1422650D0100240CC6 /* Runner.swift */; };
@@ -56,6 +57,7 @@
 		606644FD223FFED9006215A0 /* ModalInputTestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModalInputTestTests.swift; sourceTree = "<group>"; };
 		606644FF223FFED9006215A0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		608A1D3F22657604001A79EB /* MainPlaygroundViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainPlaygroundViewController.swift; sourceTree = "<group>"; };
+		608A1D41226627D2001A79EB /* OutputViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputViewController.swift; sourceTree = "<group>"; };
 		609A225F22404CF900A3F007 /* libximodal.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libximodal.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		609A22662240504100A3F007 /* libximodal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = libximodal.h; path = "../xi-ffi/libximodal.h"; sourceTree = "<group>"; };
 		609A2269224052B000A3F007 /* ModalInputTest-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ModalInputTest-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -129,6 +131,7 @@
 				604B0F5F22405C88007038E6 /* XiCoreProxy.swift */,
 				606644EE223FFED8006215A0 /* Assets.xcassets */,
 				606644F0223FFED8006215A0 /* Main.storyboard */,
+				608A1D41226627D2001A79EB /* OutputViewController.swift */,
 				606644F3223FFED8006215A0 /* Info.plist */,
 				606644F4223FFED8006215A0 /* ModalInputTest.entitlements */,
 			);
@@ -318,6 +321,7 @@
 				60BF2285225012DD002C0352 /* EditView.swift in Sources */,
 				606644ED223FFED7006215A0 /* EditViewController.swift in Sources */,
 				606644EB223FFED7006215A0 /* AppDelegate.swift in Sources */,
+				608A1D42226627D2001A79EB /* OutputViewController.swift in Sources */,
 				608A1D4022657604001A79EB /* MainPlaygroundViewController.swift in Sources */,
 				60A91D172265115E00240CC6 /* BundleResources.swift in Sources */,
 				60CC174F224591840075FDE5 /* XiWindow.swift in Sources */,

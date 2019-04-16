@@ -8,6 +8,11 @@
 
 import Foundation
 
+protocol RunnerOutputHandler {
+    func handleStdOut(text: String);
+    func handleStdErr(text: String);
+}
+
 /// Responsible for compiling and running a snippet.
 class Runner {
     //TODO: not this
@@ -22,7 +27,7 @@ class Runner {
         self.targetName = URL(string: fileName)!.deletingPathExtension().path
     }
 
-    func compile() -> Bool {
+    func compile(handler: RunnerOutputHandler) -> Bool {
         let task = Process()
         task.launchPath = scriptPath.path
         task.currentDirectoryPath = workDirectory.path
@@ -35,15 +40,15 @@ class Runner {
 
         outPipe.fileHandleForReading.readabilityHandler = { handle in
             let data = handle.availableData
-            if let errString = String(data: data, encoding: .utf8) {
-                print(errString, terminator: "")
+            if let outString = String(data: data, encoding: .utf8) {
+                handler.handleStdOut(text: outString)
             }
         }
 
         errPipe.fileHandleForReading.readabilityHandler = { handle in
             let data = handle.availableData
             if let errString = String(data: data, encoding: .utf8) {
-                print(errString, terminator: "")
+                handler.handleStdErr(text: errString)
             }
         }
 
@@ -55,7 +60,7 @@ class Runner {
         return task.terminationStatus == 0
     }
 
-    func run() {
+    func run(handler: RunnerOutputHandler) {
         let targetPath = workDirectory.appendingPathComponent(targetName, isDirectory: false).path
         let task = Process()
         task.launchPath = targetPath
@@ -68,17 +73,18 @@ class Runner {
 
         outPipe.fileHandleForReading.readabilityHandler = { handle in
             let data = handle.availableData
-            if let errString = String(data: data, encoding: .utf8) {
-                print(errString, terminator: "")
+            if let outString = String(data: data, encoding: .utf8) {
+                handler.handleStdOut(text: outString)
             }
         }
 
         errPipe.fileHandleForReading.readabilityHandler = { handle in
             let data = handle.availableData
             if let errString = String(data: data, encoding: .utf8) {
-                print(errString, terminator: "")
+                handler.handleStdErr(text: errString)
             }
         }
+
         task.launch()
         task.waitUntilExit()
     }

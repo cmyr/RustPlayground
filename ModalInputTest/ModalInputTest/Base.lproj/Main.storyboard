@@ -704,9 +704,9 @@
                         <toolbar key="toolbar" implicitIdentifier="84750826-6B42-43EB-8B21-375964887724" autosavesConfiguration="NO" displayMode="iconOnly" sizeMode="regular" id="yqk-JZ-Tqz">
                             <allowedToolbarItems>
                                 <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="ayk-AU-rl3"/>
-                                <toolbarItem implicitItemIdentifier="B31474D0-1922-4D2E-8099-332D211BF426" label="Custom View" paletteLabel="Show Bottom View" image="BottomIcon" sizingBehavior="auto" id="nTn-fh-Fu5">
+                                <toolbarItem implicitItemIdentifier="B31474D0-1922-4D2E-8099-332D211BF426" label="Custom View" paletteLabel="Show Bottom View" tag="10" image="BottomIcon" sizingBehavior="auto" id="nTn-fh-Fu5">
                                     <nil key="toolTip"/>
-                                    <button key="view" verticalHuggingPriority="750" id="Eca-GE-Ny7">
+                                    <button key="view" verticalHuggingPriority="750" tag="10" id="Eca-GE-Ny7">
                                         <rect key="frame" x="41" y="14" width="25" height="24"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="BottomIcon" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="eLZ-mn-lHm">
@@ -734,9 +734,22 @@
                                         <action selector="build:" target="Oky-zY-oP4" id="D6r-L4-lfn"/>
                                     </connections>
                                 </toolbarItem>
+                                <toolbarItem implicitItemIdentifier="A75A92C7-1230-4A4B-91DC-8FCC2786112E" label="Label" paletteLabel="Run Status" sizingBehavior="auto" id="gE6-Dg-YTu">
+                                    <nil key="toolTip"/>
+                                    <textField key="view" horizontalHuggingPriority="251" verticalHuggingPriority="750" id="60t-FW-PUE">
+                                        <rect key="frame" x="29" y="14" width="8" height="17"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="BDx-Sr-qSD">
+                                            <font key="font" usesAppearanceFont="YES"/>
+                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                </toolbarItem>
                             </allowedToolbarItems>
                             <defaultToolbarItems>
                                 <toolbarItem reference="7QS-8p-NEL"/>
+                                <toolbarItem reference="gE6-Dg-YTu"/>
                                 <toolbarItem reference="ayk-AU-rl3"/>
                                 <toolbarItem reference="nTn-fh-Fu5"/>
                             </defaultToolbarItems>
@@ -835,14 +848,51 @@
             </objects>
             <point key="canvasLocation" x="1091" y="221"/>
         </scene>
-        <!--View Controller-->
+        <!--Output View Controller-->
         <scene sceneID="5My-N1-mvJ">
             <objects>
-                <viewController id="j6D-vj-7OG" sceneMemberID="viewController">
+                <viewController id="j6D-vj-7OG" customClass="OutputViewController" customModule="ModalInputTest" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="yDw-Ga-GX2">
                         <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
                         <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" translatesAutoresizingMaskIntoConstraints="NO" id="alc-Dl-odW">
+                                <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
+                                <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="7lD-eS-wBd">
+                                    <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <textView editable="NO" importsGraphics="NO" richText="NO" horizontallyResizable="YES" verticallyResizable="YES" id="UIF-mc-bSn">
+                                            <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
+                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            <size key="minSize" width="450" height="300"/>
+                                            <size key="maxSize" width="450" height="10000000"/>
+                                            <color key="insertionPointColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                        </textView>
+                                    </subviews>
+                                </clipView>
+                                <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="x85-te-lLI">
+                                    <rect key="frame" x="-100" y="-100" width="240" height="16"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                                <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="4HV-gl-ee0">
+                                    <rect key="frame" x="434" y="0.0" width="16" height="300"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                            </scrollView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="alc-Dl-odW" firstAttribute="top" secondItem="yDw-Ga-GX2" secondAttribute="top" id="2FH-pY-FWX"/>
+                            <constraint firstAttribute="trailing" secondItem="alc-Dl-odW" secondAttribute="trailing" id="FJj-2m-dqk"/>
+                            <constraint firstAttribute="bottom" secondItem="alc-Dl-odW" secondAttribute="bottom" id="LOJ-Tr-UUc"/>
+                            <constraint firstItem="alc-Dl-odW" firstAttribute="leading" secondItem="yDw-Ga-GX2" secondAttribute="leading" id="l42-dC-m7K"/>
+                        </constraints>
                     </view>
+                    <connections>
+                        <outlet property="outputTextView" destination="UIF-mc-bSn" id="NeO-Ye-x03"/>
+                    </connections>
                 </viewController>
                 <customObject id="ciW-vU-bzH" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>

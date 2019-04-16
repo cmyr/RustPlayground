@@ -32,6 +32,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // uncomment me for vim mode
 //        core.registerEventHandler(callback: dispatchEvent, action: handleRpc, timer: handleTimer, cancelTimer: cancelTimer)
         insertPlaceholderText()
+        mainController?.view.window?.makeFirstResponder(mainController)
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {

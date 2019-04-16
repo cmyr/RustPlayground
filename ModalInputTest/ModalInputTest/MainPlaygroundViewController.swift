@@ -29,7 +29,6 @@ class MainPlaygroundViewController: NSSplitViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.window?.makeFirstResponder(editViewController)
     }
 
     override func viewDidAppear() {

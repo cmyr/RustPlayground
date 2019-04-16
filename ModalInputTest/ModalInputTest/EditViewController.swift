@@ -87,7 +87,6 @@ class EditViewController: NSViewController {
         self.editView.setNeedsDisplay(scrollView.documentVisibleRect)
     }
 
-
     /// The total size of the document, tracked in core.
     var documentSize: CGSize = CGSize.zero {
         didSet {

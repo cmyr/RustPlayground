@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class ViewController: NSViewController {
+class EditViewController: NSViewController {
 
     @IBOutlet weak var editView: EditView!
     @IBOutlet weak var scrollView: NSScrollView!
@@ -126,7 +126,7 @@ class ViewController: NSViewController {
     func updateCoreFrame() {
         let docFrame = scrollView.documentVisibleRect
         let cursorPadding = DefaultFont.shared.characterWidth() + minimumPadding * 2
-        let size = CGSize(width: docFrame.width - cursorPadding, height: docFrame.height)
+        let size = CGSize(width: max(docFrame.width - cursorPadding, 0), height: docFrame.height)
         //FIXME: 'ensureNonZero' is a hack, figure out how to do content insets
         coreFrame = CGRect(origin: docFrame.origin.ensureNonZero(), size: size)
     }
@@ -201,27 +201,9 @@ class ViewController: NSViewController {
     @objc func reindent(_ sender: Any?) {
         core.sendRpc(method: "reindent", params: [])
     }
-
-    @IBAction func build(_ sender: Any?) {
-        let workDirectory = "/Users/rofls/dev/hacking/macos_rustplay_test"
-        let fileName = "playground_test.rs"
-//        let execName = "playground_test"
-        let magicNumber: UInt32 = 6942069
-        let document = core!.getLine(magicNumber)!.text
-
-        let directory = URL(fileURLWithPath: workDirectory)
-        let fileUrl = directory.appendingPathComponent(fileName, isDirectory: false)
-
-        try! document.write(to: fileUrl, atomically: true, encoding: .utf8)
-        let scriptURL = BundleResources.buildScriptURL
-        let runner = Runner(scriptPath: scriptURL, fileName: fileName)
-        if runner.compile() {
-            runner.run()
-        }
-    }
 }
 
-extension ViewController: LineSource {
+extension EditViewController: LineSource {
     func getLine(line: UInt32) -> RawLine? {
         return core?.getLine(line)
     }

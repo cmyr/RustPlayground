@@ -20,7 +20,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     let styleMap = StyleMap()
 
-    var mainController: ViewController? {
+    var mainController: EditViewController? {
         didSet {
             mainController?.core = core
         }
@@ -47,7 +47,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         switch method {
         case "mode_change":
             let new_mode = params["mode"] as! String
-            mainController?.mode = ViewController.Mode(rawValue: new_mode)!
+            mainController?.mode = EditViewController.Mode(rawValue: new_mode)!
         case "parse_state":
             let newState = params["state"] as! String
             mainController?.parseState = newState;

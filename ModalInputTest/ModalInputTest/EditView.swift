@@ -12,7 +12,7 @@ protocol LineSource {
     func getLine(line: UInt32) -> RawLine?;
     func getStyle(styleId: StyleId) -> Style;
     var totalLines: Int { get }
-    var mode: ViewController.Mode? { get }
+    var mode: EditViewController.Mode? { get }
 }
 
 class EditView: NSView {

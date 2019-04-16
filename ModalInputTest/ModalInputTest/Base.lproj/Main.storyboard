@@ -704,10 +704,24 @@
                         <toolbar key="toolbar" implicitIdentifier="84750826-6B42-43EB-8B21-375964887724" autosavesConfiguration="NO" displayMode="iconOnly" sizeMode="regular" id="yqk-JZ-Tqz">
                             <allowedToolbarItems>
                                 <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="ayk-AU-rl3"/>
-                                <toolbarItem implicitItemIdentifier="5A07218F-600A-452C-8157-452A1CE9D23D" label="" paletteLabel="" image="PlayIcon" sizingBehavior="auto" id="7QS-8p-NEL">
+                                <toolbarItem implicitItemIdentifier="B31474D0-1922-4D2E-8099-332D211BF426" label="Custom View" paletteLabel="Show Bottom View" image="BottomIcon" sizingBehavior="auto" id="nTn-fh-Fu5">
+                                    <nil key="toolTip"/>
+                                    <button key="view" verticalHuggingPriority="750" id="Eca-GE-Ny7">
+                                        <rect key="frame" x="41" y="14" width="25" height="24"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                        <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="BottomIcon" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="eLZ-mn-lHm">
+                                            <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                    </button>
+                                    <connections>
+                                        <action selector="toggleOutputView:" target="Oky-zY-oP4" id="zM8-bt-exf"/>
+                                    </connections>
+                                </toolbarItem>
+                                <toolbarItem implicitItemIdentifier="5A07218F-600A-452C-8157-452A1CE9D23D" label="" paletteLabel="Run" image="PlayIcon" sizingBehavior="auto" id="7QS-8p-NEL">
                                     <nil key="toolTip"/>
                                     <button key="view" verticalHuggingPriority="750" id="4A9-hC-f7B">
-                                        <rect key="frame" x="0.0" y="14" width="25" height="24"/>
+                                        <rect key="frame" x="2" y="14" width="25" height="24"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="PlayIcon" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="wzt-1I-Kk6">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -717,13 +731,14 @@
                                         </buttonCell>
                                     </button>
                                     <connections>
-                                        <action selector="build:" target="Oky-zY-oP4" id="gnu-d9-Sue"/>
+                                        <action selector="build:" target="Oky-zY-oP4" id="D6r-L4-lfn"/>
                                     </connections>
                                 </toolbarItem>
                             </allowedToolbarItems>
                             <defaultToolbarItems>
                                 <toolbarItem reference="7QS-8p-NEL"/>
                                 <toolbarItem reference="ayk-AU-rl3"/>
+                                <toolbarItem reference="nTn-fh-Fu5"/>
                             </defaultToolbarItems>
                         </toolbar>
                         <connections>
@@ -835,6 +850,7 @@
         </scene>
     </scenes>
     <resources>
+        <image name="BottomIcon" width="50" height="50"/>
         <image name="PlayIcon" width="24" height="24"/>
     </resources>
 </document>

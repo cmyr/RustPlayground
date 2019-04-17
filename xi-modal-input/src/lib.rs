@@ -6,6 +6,7 @@ extern crate serde_derive;
 extern crate syntect;
 
 mod callbacks;
+mod gesture;
 mod highlighting;
 mod input_handler;
 mod lines;
@@ -18,14 +19,16 @@ use libc::c_char;
 use std::borrow::Cow;
 
 use xi_core_lib::edit_types::{BufferEvent, EventDomain, SpecialEvent, ViewEvent};
-use xi_core_lib::rpc::{EditNotification, Rect};
+use xi_core_lib::rpc::{EditNotification, GestureType, Rect};
 use xi_core_lib::selection::{InsertDrift, SelRegion, Selection};
+use xi_core_lib::view::ViewMovement;
 use xi_core_lib::{edit_ops, movement, BufferConfig};
 use xi_rope::breaks2::{Breaks, BreaksMetric};
 use xi_rope::spans::Spans;
 use xi_rope::{LinesMetric, Rope, RopeDelta};
 
 use callbacks::{InvalidateCallback, RpcCallback};
+use gesture::GestureContext;
 use highlighting::HighlightState;
 pub use input_handler::{EventCtx, EventPayload, Handler, KeyEvent, Plumber};
 pub use lines::Size;
@@ -212,8 +215,18 @@ impl OneView {
                 region.start = region.end;
                 Some(region.into())
             }
+            ViewEvent::Gesture { line, col, ty } => self.handle_gesture(line, col, ty),
             _other => None,
         }
+    }
+
+    fn handle_gesture(&mut self, line: u64, col: u64, ty: GestureType) -> Option<Selection> {
+        let line = line as usize;
+        let col = col as usize;
+        let offset = self.breaks.line_col_to_offset(&self.text, line, col);
+        let ctx = GestureContext::new(&self.text, &self.selection);
+        let new_sel = ctx.selection_for_gesture(offset, ty);
+        Some(new_sel)
     }
 
     fn handle_edit(&mut self, event: BufferEvent, update: &mut UpdateBuilder) {
@@ -364,6 +377,16 @@ impl XiCore {
         let event = match msg.method {
             "insert" => E::Insert { chars: msg.params["chars"].as_str().unwrap().to_owned() },
             "viewport_change" => E::ViewportChange(msg.get_params()),
+            "gesture" => {
+                #[derive(Deserialize)]
+                struct Params {
+                    line: u64,
+                    col: u64,
+                    ty: GestureType,
+                };
+                let Params { line, col, ty } = msg.get_params();
+                E::Gesture { line, col, ty }
+            }
             other => match event_from_str(other) {
                 Some(event) => event,
                 None => {

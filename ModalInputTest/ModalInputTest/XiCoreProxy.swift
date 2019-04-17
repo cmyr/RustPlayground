@@ -81,6 +81,13 @@ class XiCoreProxy {
         sendRpc(method: "viewport_change", params: params)
     }
 
+    func doGesture(position: BufferPosition, type: Any) {
+        let params = ["line": position.line,
+                      "col": position.column,
+                      "ty": type]
+        sendRpc(method: "gesture", params: params)
+    }
+
     func doCommand(_ command: String) {
         sendRpc(method: command, params: [])
     }

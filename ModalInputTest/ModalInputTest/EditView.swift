@@ -15,9 +15,13 @@ protocol LineSource {
     var mode: EditViewController.Mode? { get }
 }
 
+/// A line-column index into a displayed text buffer.
+typealias BufferPosition = (line: Int, column: Int)
+
 class EditView: NSView {
 
     var lineSource: LineSource?
+    let minimumPadding: CGFloat = 2.0
 
     override var isFlipped: Bool {
         return true
@@ -47,9 +51,8 @@ class EditView: NSView {
 
         let font = DefaultFont.shared
         let linespace = font.linespace
-        let xOff: CGFloat = 2.0
-        let yOff: CGFloat = 2.0
         let charWidth = font.characterWidth()
+
         let first = min(Int((dirtyRect.minY / linespace).rounded(.down)), lines.totalLines)
         let last = min(Int((dirtyRect.maxY / linespace).rounded(.up)), lines.totalLines)
 
@@ -63,7 +66,7 @@ class EditView: NSView {
                 attrString.addAttributesForStyle(range, style: style)
             }
 
-            let yPos = yOff + linespace * CGFloat(lineNumber)
+            let yPos = minimumPadding + linespace * CGFloat(lineNumber)
             // selections should cover the full extent of the text
             let selY = yPos + font.descent
 
@@ -73,7 +76,7 @@ class EditView: NSView {
                 let selEnd = font.isFixedPitch ?  CGFloat(selection.endIndex) * charWidth : getVisualOffset(attrString, selection.endIndex)
 
 
-                let rect = CGRect(x: xOff + selStart, y: selY, width: selEnd - selStart, height: linespace).integral
+                let rect = CGRect(x: minimumPadding + selStart, y: selY, width: selEnd - selStart, height: linespace).integral
                 NSColor.selectedTextBackgroundColor.setFill()
                 rect.fill()
             }
@@ -88,17 +91,17 @@ class EditView: NSView {
                     } else {
                         selWidth = cursorPos - getVisualOffset(attrString, cursor - 1)
                     }
-                    rect = NSRect(x: xOff + max(cursorPos - selWidth, 0), y: selY, width: selWidth, height: linespace).integral
+                    rect = NSRect(x: minimumPadding + max(cursorPos - selWidth, 0), y: selY, width: selWidth, height: linespace).integral
                     NSColor.lightGray.setFill()
                 } else {
-                    rect = NSRect(x: xOff + cursorPos, y: selY + (linespace - 1), width: charWidth, height: font.underlineThickness).integral
+                    rect = NSRect(x: minimumPadding + cursorPos, y: selY + (linespace - 1), width: charWidth, height: font.underlineThickness).integral
                     NSColor.black.setFill()
                 }
 
                 rect.fill()
             }
 
-            attrString.draw(at: NSPoint(x: xOff, y: yPos))
+            attrString.draw(at: NSPoint(x: minimumPadding, y: yPos))
 
         }
     }
@@ -107,6 +110,32 @@ class EditView: NSView {
         let ctLine = CTLineCreateWithAttributedString(line)
         let pos = CTLineGetOffsetForStringIndex(ctLine, cursorPos, nil)
         return pos
+    }
+
+    func yOffsetToLine(_ y: CGFloat) -> Int {
+        let y = max(y - minimumPadding, 0)
+        return Int(floor(y / DefaultFont.shared.linespace))
+    }
+
+    func lineIxToBaseline(_ lineIx: Int) -> CGFloat {
+        return CGFloat(lineIx + 1) * DefaultFont.shared.linespace
+    }
+
+    func bufferPositionFromPoint(_ point: NSPoint) -> BufferPosition {
+        let point = self.convert(point, from: nil)
+        let lineIx = yOffsetToLine(point.y)
+        if let line = lineSource?.getLine(line: UInt32(lineIx)) {
+            let s = line.text
+            let attrString = NSAttributedString(string: s, attributes: [.font: DefaultFont.shared])
+            let ctline = CTLineCreateWithAttributedString(attrString)
+            let relPos = NSPoint(x: point.x - minimumPadding, y: lineIxToBaseline(lineIx) - point.y)
+            let utf16_ix = CTLineGetStringIndexForPosition(ctline, relPos)
+            if utf16_ix != kCFNotFound {
+                let col = s.utf8offsetForUtf16Offset(utf16_ix)
+                return BufferPosition(line: lineIx, column: col)
+            }
+        }
+        return BufferPosition(line: lineIx, column: 0)
     }
 }
 
@@ -153,6 +182,10 @@ extension NSFont {
 extension String {
     func utf16OffsetForUtf8Offset(_ offsetUtf8: Int) -> Int {
         return self.utf8.index(self.utf8.startIndex, offsetBy: offsetUtf8).utf16Offset(in: self)
+    }
+
+    func utf8offsetForUtf16Offset(_ offsetUtf16: Int) -> Int {
+        return Substring(self.utf16.prefix(offsetUtf16)).utf8.count
     }
 }
 

@@ -14,7 +14,6 @@ class StyleMap {
     private var inner: [StyleId: Style] = [:]
 
     func addStyle(withId styleId: StyleId, style: Style) {
-        print("adding style \(styleId): \(style)")
         inner[styleId] = style
     }
 

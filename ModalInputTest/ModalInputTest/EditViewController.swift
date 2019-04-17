@@ -139,11 +139,78 @@ class EditViewController: NSViewController {
 
     override func insertText(_ insertString: Any) {
         core.insertText(insertString as! String)
-        super.insertText(insertString)
     }
 
     override func keyDown(with event: NSEvent) {
         self.interpretKeyEvents([event])
+    }
+
+    // Determines the gesture type based on flags and click count.
+    private func clickGestureType(event: NSEvent) -> Any {
+        func granularity(for event: NSEvent) -> String {
+            if event.clickCount >= 3 {
+                return "line"
+            } else if event.clickCount == 2 {
+                return "word"
+            } else {
+                return "point"
+            }
+        }
+
+        let gran = granularity(for: event)
+
+        if event.modifierFlags.contains(.shift) {
+            return [
+                "select_extend": [
+                    "granularity": gran
+                ]
+            ]
+        } else {
+            return [
+                "select": [
+                    "granularity": gran,
+                    "multi": event.modifierFlags.contains(.command)
+                ]
+            ]
+        }
+    }
+
+    private var lastDragPosition: BufferPosition?
+    /// handles autoscrolling when a drag gesture exists the window
+    private var dragTimer: Timer?
+    private var dragEvent: NSEvent?
+
+    override func mouseDown(with theEvent: NSEvent) {
+
+        let position = editView.bufferPositionFromPoint(theEvent.locationInWindow)
+        lastDragPosition = position
+        core.doGesture(position: position,
+                       type: clickGestureType(event: theEvent))
+
+        dragTimer = Timer.scheduledTimer(timeInterval: TimeInterval(1.0/60), target: self, selector: #selector(_autoscrollTimerCallback), userInfo: nil, repeats: true)
+        dragEvent = theEvent
+    }
+
+    override func mouseDragged(with theEvent: NSEvent) {
+        editView.autoscroll(with: theEvent)
+        let position = editView .bufferPositionFromPoint(theEvent.locationInWindow)
+        if let last = lastDragPosition, last != position {
+            lastDragPosition = position
+            core.doGesture(position: position, type: "drag")
+        }
+        dragEvent = theEvent
+    }
+
+    override func mouseUp(with theEvent: NSEvent) {
+        dragTimer?.invalidate()
+        dragTimer = nil
+        dragEvent = nil
+    }
+
+    @objc func _autoscrollTimerCallback() {
+        if let event = dragEvent {
+            mouseDragged(with: event)
+        }
     }
 
     @objc func paste(_ sender: AnyObject?) {

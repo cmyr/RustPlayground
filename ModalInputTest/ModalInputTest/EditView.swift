@@ -106,9 +106,10 @@ class EditView: NSView {
         }
     }
 
-    func getVisualOffset(_ line: NSAttributedString, _ cursorPos: Int) -> CGFloat {
+    func getVisualOffset(_ line: NSAttributedString, _ utf8Offset: Int) -> CGFloat {
+        let index = line.string.utf16OffsetForUtf8Offset(utf8Offset)
         let ctLine = CTLineCreateWithAttributedString(line)
-        let pos = CTLineGetOffsetForStringIndex(ctLine, cursorPos, nil)
+        let pos = CTLineGetOffsetForStringIndex(ctLine, index, nil)
         return pos
     }
 

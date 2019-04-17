@@ -149,10 +149,6 @@ impl<'a> Iterator for BreaksIter<'a> {
 
             if !hard {
                 if line_width == 0 && width >= self.view_width {
-                    // we don't care about soft breaks at EOF
-                    if offset == text_len {
-                        return None;
-                    }
                     // this is a single word longer than a line; always break afterwords
                     return Some(Break { offset, width, hard });
                 }
@@ -280,5 +276,13 @@ mod tests {
         assert_eq!(breaks.offset_of_line(&text, 1), 6);
         assert_eq!(breaks.offset_of_line(&text, 2), 10);
         assert_eq!(breaks.count::<BreaksMetric>(breaks.len()), 2, "{:?}", &breaks);
+    }
+
+    #[test]
+    fn weird_length_issue() {
+        let text = "aaaaaaaabbbbbbbbcccccccdddddddd".into();
+        let wc = dummy_width_cache();
+        let breaks = rewrap_region(&text, .., &wc, 20);
+        assert_eq!(breaks.max_width(), text.len());
     }
 }

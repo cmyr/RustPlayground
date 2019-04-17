@@ -164,12 +164,7 @@ impl OneView {
     fn whole_thing(&self) -> Line<'static> {
         let mut text = self.text.to_string();
         text.push('\n');
-        Line {
-            line: Cow::Owned(text),
-            caret: None,
-            selection: (0, 0),
-            styles: Vec::new(),
-        }
+        Line { line: Cow::Owned(text), caret: None, selection: (0, 0), styles: Vec::new() }
     }
 
     fn handle_event(&mut self, event: EventDomain) -> Update {
@@ -228,7 +223,7 @@ impl OneView {
             let newsel = self.selection.apply_delta(&delta, true, InsertDrift::Default);
             self.text = newtext;
             let view_width = if self.config.word_wrap { Some(self.frame.width) } else { None };
-            self.breaks = lines::rewrap_region(&self.text, .., &self.width_cache, view_width);
+            self.rewrap_all(view_width);
             self.update_spans(&delta);
 
             if let Some(styles) = self.highlighter.take_new_styles() {
@@ -301,7 +296,7 @@ impl OneView {
         update.scroll_to(linecol)
     }
 
-    fn rewrap_all(&mut self, new_width: usize) {
+    fn rewrap_all<T: Into<Option<usize>>>(&mut self, new_width: T) {
         //eprintln!("old breaks {:?}", &self.breaks);
         self.breaks = lines::rewrap_region(&self.text, .., &self.width_cache, new_width);
         //eprintln!("NEW breaks {:?}", &self.breaks);
@@ -385,6 +380,7 @@ impl XiCore {
 
     pub fn send_update(&self, mut update: Update) {
         if let Some(newsize) = update.size.take() {
+            eprintln!("newsize: {:?}", newsize);
             self.rpc_callback
                 .call("content_size", json!({"width": newsize.width, "height": newsize.height}));
         }

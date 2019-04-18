@@ -28,7 +28,7 @@ use xi_rope::spans::Spans;
 use xi_rope::{LinesMetric, Rope, RopeDelta};
 
 use callbacks::{InvalidateCallback, RpcCallback};
-use gesture::GestureContext;
+use gesture::{DragState, GestureContext};
 use highlighting::HighlightState;
 pub use input_handler::{EventCtx, EventPayload, Handler, KeyEvent, Plumber};
 pub use lines::Size;
@@ -54,7 +54,6 @@ pub struct XiCore {
     pub handler: Option<Box<dyn Handler>>,
 }
 
-//pub fn get_line(&self, idx: usize) -> Option<(Cow<str>, i32, (i32, i32))> {
 pub struct Line<'a> {
     pub line: Cow<'a, str>,
     pub caret: Option<usize>,
@@ -66,6 +65,7 @@ pub struct Line<'a> {
 pub struct OneView {
     selection: Selection,
     text: Rope,
+    drag_state: Option<DragState>,
     config: BufferConfig,
     breaks: Breaks,
     spans: Spans<StyleId>,
@@ -84,6 +84,7 @@ impl OneView {
         OneView {
             selection: SelRegion::caret(0).into(),
             text: Rope::from(""),
+            drag_state: None,
             width_cache,
             config: BufferConfig {
                 line_ending: "\n".to_string(),
@@ -224,7 +225,7 @@ impl OneView {
         let line = line as usize;
         let col = col as usize;
         let offset = self.breaks.line_col_to_offset(&self.text, line, col);
-        let ctx = GestureContext::new(&self.text, &self.selection);
+        let mut ctx = GestureContext::new(&self.text, &self.selection, &mut self.drag_state);
         let new_sel = ctx.selection_for_gesture(offset, ty);
         Some(new_sel)
     }

@@ -102,7 +102,6 @@ class EditView: NSView {
             let yPos = linespace * CGFloat(lineNumber)
 
             attrString.draw(at: NSPoint(x: X_OFFSET, y: yPos))
-
         }
     }
 

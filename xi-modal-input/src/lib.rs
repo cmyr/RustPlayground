@@ -185,6 +185,13 @@ impl OneView {
     }
 
     fn handle_view_event(&mut self, event: ViewEvent, update: &mut UpdateBuilder) {
+        if let ViewEvent::Copy = event {
+            if let Some(s) = edit_ops::extract_sel_regions(&self.text, &self.selection) {
+                update.set_pasteboard(s.to_string());
+            }
+            return;
+        }
+
         if let Some(new_selection) = self.selection_for_event(event) {
             self.compute_scroll_point(&new_selection, update);
             self.selection = new_selection;
@@ -231,6 +238,15 @@ impl OneView {
     }
 
     fn handle_edit(&mut self, event: BufferEvent, update: &mut UpdateBuilder) {
+        if let BufferEvent::Cut = event {
+            if let Some(s) = edit_ops::extract_sel_regions(&self.text, &self.selection) {
+                update.set_pasteboard(s.to_string());
+            } else {
+                // cut with no non-caret selections is a noop
+                return;
+            }
+        }
+
         if let Some(delta) = self.edit_for_event(event) {
             eprintln!("handling edit {:?}", &delta);
             let newtext = delta.apply(&self.text);
@@ -271,6 +287,10 @@ impl OneView {
                 &mut kring,
             ),
             BufferEvent::Backspace => {
+                edit_ops::delete_backward(text, &self.breaks, &self.selection, &self.config)
+            }
+            BufferEvent::Cut => {
+                debug_assert!(self.selection.iter().all(|s| !s.is_caret()));
                 edit_ops::delete_backward(text, &self.breaks, &self.selection, &self.config)
             }
             BufferEvent::Insert(chars) => Some(edit_ops::insert(text, &self.selection, chars)),
@@ -420,6 +440,10 @@ impl XiCore {
         if let Some(scroll) = update.scroll.take() {
             self.rpc_callback.call("scroll_to", scroll)
         }
+
+        if let Some(pasteboard) = update.pasteboard.take() {
+            self.rpc_callback.call("set_pasteboard", json!({ "text": pasteboard }))
+        }
     }
 }
 
@@ -479,6 +503,8 @@ fn event_from_str(string: &str) -> Option<EditNotification> {
         "transpose:" => Some(E::Transpose),
         "selectAll:" => Some(E::SelectAll),
         "cancelOperation:" => Some(E::CollapseSelections),
+        "copy" => Some(E::CopyAsync),
+        "cut" => Some(E::CutAsync),
         _other => None,
         //(Some("scrollPageDown:"), None) => E::ScrollPageDown
         //(Some("scrollPageUp:"), None) =>

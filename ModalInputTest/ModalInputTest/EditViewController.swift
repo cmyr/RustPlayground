@@ -233,15 +233,13 @@ class EditViewController: NSViewController {
 //        document.sendRpcAsync("redo", params: [])
 //    }
 
-//    @objc func cut(_ sender: AnyObject?) {
-//        let text = xiView.cut()
-//        updatePasteboard(with: text)
-//    }
-//
-//    @objc func copy(_ sender: AnyObject?) {
-//        let text = xiView.copy()
-//        updatePasteboard(with: text)
-//    }
+    @objc func cut(_ sender: AnyObject?) {
+        core.doCommand("cut")
+    }
+
+    @objc func copy(_ sender: AnyObject?) {
+        core.doCommand("copy")
+    }
 
     override func indent(_ sender: Any?) {
         core.sendRpc(method: "indent", params: [])

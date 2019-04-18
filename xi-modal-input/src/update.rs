@@ -12,6 +12,7 @@ pub struct Update {
     pub(crate) size: Option<Size>,
     pub(crate) scroll: Option<LineCol>,
     pub(crate) styles: Option<Vec<(StyleId, Style)>>,
+    pub(crate) pasteboard: Option<String>,
 }
 
 /// A type for collecting changes that occur while handling an event.
@@ -44,6 +45,11 @@ impl UpdateBuilder {
     pub(crate) fn new_styles(&mut self, styles: Vec<(StyleId, Style)>) {
         debug_assert!(self.inner.styles.is_none(), "styles should be None");
         self.inner.styles = Some(styles);
+    }
+
+    /// This text will be sent to the client's system pasteboard.
+    pub(crate) fn set_pasteboard(&mut self, text: String) {
+        self.inner.pasteboard = text.into()
     }
 
     pub(crate) fn build(self) -> Update {

@@ -72,6 +72,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 return (styleId, Style.fromJson(styleObject))
                 }
                 .forEach { styleMap.addStyle(withId: $0, style: $1) }
+        case "set_pasteboard":
+            let text = params["text"] as! String
+            let pasteboard = NSPasteboard.general
+            pasteboard.clearContents()
+            pasteboard.writeObjects([text as NSPasteboardWriting])
         default:
             print("unhandled method \(method)")
         }

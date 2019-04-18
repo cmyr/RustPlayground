@@ -18,10 +18,11 @@ protocol LineSource {
 /// A line-column index into a displayed text buffer.
 typealias BufferPosition = (line: Int, column: Int)
 
+let X_OFFSET: CGFloat = 2.0
+
 class EditView: NSView {
 
     var lineSource: LineSource?
-    let minimumPadding: CGFloat = 2.0
 
     override var isFlipped: Bool {
         return true
@@ -66,9 +67,7 @@ class EditView: NSView {
                 attrString.addAttributesForStyle(range, style: style)
             }
 
-            let yPos = minimumPadding + linespace * CGFloat(lineNumber)
-            // selections should cover the full extent of the text
-            let selY = yPos + font.descent
+            let selY = font.topPadding + linespace * CGFloat(lineNumber)
 
             if let selection = line.selection {
 
@@ -76,12 +75,12 @@ class EditView: NSView {
                 let selEnd = font.isFixedPitch ?  CGFloat(selection.endIndex) * charWidth : getVisualOffset(attrString, selection.endIndex)
 
 
-                let rect = CGRect(x: minimumPadding + selStart, y: selY, width: selEnd - selStart, height: linespace).integral
+                let rect = CGRect(x: X_OFFSET + selStart, y: selY, width: selEnd - selStart, height: linespace).integral
                 NSColor.selectedTextBackgroundColor.setFill()
                 rect.fill()
             }
             if let cursor = line.cursor {
-                let cursorPos = font.isFixedPitch ? CGFloat(cursor) * charWidth : getVisualOffset(attrString, cursor)
+                let cursorPos = getVisualOffset(attrString, cursor)
 
                 let rect: NSRect
                 if lines.mode?.drawBox ?? false {
@@ -91,17 +90,18 @@ class EditView: NSView {
                     } else {
                         selWidth = cursorPos - getVisualOffset(attrString, cursor - 1)
                     }
-                    rect = NSRect(x: minimumPadding + max(cursorPos - selWidth, 0), y: selY, width: selWidth, height: linespace).integral
+                    rect = NSRect(x: X_OFFSET + max(cursorPos - selWidth, 0), y: selY, width: selWidth, height: linespace).integral
                     NSColor.lightGray.setFill()
                 } else {
-                    rect = NSRect(x: minimumPadding + cursorPos, y: selY + (linespace - 1), width: charWidth, height: font.underlineThickness).integral
+                    rect = NSRect(x: X_OFFSET + cursorPos, y: selY + (linespace - 1), width: charWidth, height: font.underlineThickness).integral
                     NSColor.black.setFill()
                 }
 
                 rect.fill()
             }
+            let yPos = linespace * CGFloat(lineNumber)
 
-            attrString.draw(at: NSPoint(x: minimumPadding, y: yPos))
+            attrString.draw(at: NSPoint(x: X_OFFSET, y: yPos))
 
         }
     }
@@ -114,8 +114,8 @@ class EditView: NSView {
     }
 
     func yOffsetToLine(_ y: CGFloat) -> Int {
-        let y = max(y - minimumPadding, 0)
-        return Int(floor(y / DefaultFont.shared.linespace))
+        let adjustY = max(y - DefaultFont.shared.topPadding, 0)
+        return Int(floor(adjustY / DefaultFont.shared.linespace))
     }
 
     func lineIxToBaseline(_ lineIx: Int) -> CGFloat {
@@ -129,7 +129,7 @@ class EditView: NSView {
             let s = line.text
             let attrString = NSAttributedString(string: s, attributes: [.font: DefaultFont.shared])
             let ctline = CTLineCreateWithAttributedString(attrString)
-            let relPos = NSPoint(x: point.x - minimumPadding, y: lineIxToBaseline(lineIx) - point.y)
+            let relPos = NSPoint(x: point.x - X_OFFSET, y: lineIxToBaseline(lineIx) - point.y)
             let utf16_ix = CTLineGetStringIndexForPosition(ctline, relPos)
             if utf16_ix != kCFNotFound {
                 let col = s.utf8offsetForUtf16Offset(utf16_ix)
@@ -140,17 +140,18 @@ class EditView: NSView {
     }
 }
 
+//NOTE: this is imperfect. See https://stackoverflow.com/a/5635981
 extension NSFont {
     var descent: CGFloat {
-        return -self.descender
+        return (-self.descender).rounded()
     }
 
     var linespace: CGFloat {
-        return ceil(self.ascender + descent + self.leading)
+        return ceil(self.ascender.rounded() + descent + self.leading.rounded())
     }
 
     var topPadding: CGFloat {
-        return descent + self.leading
+        return descent + self.leading.rounded()
     }
 
     func characterWidth() -> CGFloat {

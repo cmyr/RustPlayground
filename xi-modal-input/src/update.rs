@@ -2,8 +2,9 @@
 
 use std::ops::Range;
 
+use crate::lines::Size;
 use crate::style::{Style, StyleId};
-use crate::{LineCol, Size};
+use crate::view::LineCol;
 
 /// Represents state changes that ocurred while handling a user event.
 #[derive(Debug, Clone, Default)]

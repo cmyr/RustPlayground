@@ -174,6 +174,9 @@ impl OneView {
         }
 
         if let Some(new_selection) = self.selection_for_event(event) {
+            // we always break undo if the user does a move/gesture
+            self.last_edit = EditType::Other;
+            self.undo_stack.update_current_undo(|undo| undo.sel_before = new_selection.clone());
             self.compute_scroll_point(&new_selection, update);
             self.selection = new_selection;
         }
@@ -234,7 +237,7 @@ impl OneView {
             BufferEvent::Undo => {
                 if let Some(undo_state) = self.undo_stack.undo() {
                     self.text = undo_state.text.clone();
-                    self.selection = undo_state.sel_after.clone();
+                    self.selection = undo_state.sel_before.clone();
                 } else {
                     return;
                 }
@@ -258,9 +261,10 @@ impl OneView {
                     let new_undo = ViewUndo::new(newtext.clone(), newsel.clone(), newsel.clone());
                     self.undo_stack.add_undo_group(new_undo);
                 } else {
-                    self.undo_stack.update_head_undo(|undo| {
+                    self.undo_stack.update_current_undo(|undo| {
                         undo.text = newtext.clone();
                         undo.sel_after = newsel.clone();
+                        undo.sel_before = newsel.clone();
                     })
                 }
                 self.text = newtext;
@@ -332,7 +336,6 @@ impl OneView {
         }
 
         self.frame = new_frame;
-        //eprintln!("viewport changed to {:?}", new_frame);
     }
 
     fn compute_scroll_point(&self, sel: &Selection, update: &mut UpdateBuilder) {

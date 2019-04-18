@@ -72,10 +72,11 @@ impl<T> UndoStack<T> {
         }
     }
 
-    pub(crate) fn update_head_undo(&mut self, mut f: impl FnMut(&mut T)) {
-        if self.live_index == self.stack.len() - 1 {
-            f(self.stack.back_mut().unwrap())
-        }
+    /// Modify the state for the currently active undo group.
+    /// This might be done if an edit occurs that combines with the previous undo,
+    /// or if we want to save selection state.
+    pub(crate) fn update_current_undo(&mut self, mut f: impl FnMut(&mut T)) {
+        f(self.stack.get_mut(self.live_index).unwrap())
     }
 }
 

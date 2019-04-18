@@ -225,13 +225,13 @@ class EditViewController: NSViewController {
         core.sendRpc(method: "selectAll:", params: [])
     }
 
-//    @objc func undo(_ sender: AnyObject?) {
-//        document.sendRpcAsync("undo", params: [])
-//    }
-//
-//    @objc func redo(_ sender: AnyObject?) {
-//        document.sendRpcAsync("redo", params: [])
-//    }
+    @objc func undo(_ sender: AnyObject?) {
+        core.doCommand("undo")
+    }
+
+    @objc func redo(_ sender: AnyObject?) {
+        core.doCommand("redo")
+    }
 
     @objc func cut(_ sender: AnyObject?) {
         core.doCommand("cut")

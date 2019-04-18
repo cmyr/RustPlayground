@@ -150,6 +150,8 @@ fn event_from_str(string: &str) -> Option<EditNotification> {
         "cancelOperation:" => Some(E::CollapseSelections),
         "copy" => Some(E::CopyAsync),
         "cut" => Some(E::CutAsync),
+        "undo" => Some(E::Undo),
+        "redo" => Some(E::Redo),
         _other => None,
         //(Some("scrollPageDown:"), None) => E::ScrollPageDown
         //(Some("scrollPageUp:"), None) =>

@@ -13,6 +13,7 @@ mod input_handler;
 mod lines;
 mod rpc;
 mod style;
+mod undo;
 mod update;
 mod view;
 mod vim;

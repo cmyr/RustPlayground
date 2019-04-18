@@ -17,6 +17,7 @@ use crate::highlighting::HighlightState;
 use crate::lines::Size;
 use crate::lines::WidthCache;
 use crate::style::StyleId;
+use crate::undo::{EditType, UndoStack, ViewUndo};
 use crate::update::{Update, UpdateBuilder};
 
 const ENABLE_WORDWRAP: bool = true;
@@ -39,6 +40,8 @@ pub struct OneView {
     selection: Selection,
     text: Rope,
     drag_state: Option<DragState>,
+    undo_stack: UndoStack<ViewUndo>,
+    last_edit: EditType,
     config: BufferConfig,
     breaks: Breaks,
     spans: Spans<StyleId>,
@@ -54,10 +57,15 @@ impl OneView {
     pub fn new(width_measure_fn: extern "C" fn(*const c_char) -> Size) -> Self {
         let width_cache = WidthCache::new(width_measure_fn);
         let line_height = width_cache.measure_layout_size("a").height;
+        let selection: Selection = SelRegion::caret(0).into();
+        let text = Rope::from("");
+        let init_undo = ViewUndo::new(text.clone(), selection.clone(), selection.clone());
         OneView {
-            selection: SelRegion::caret(0).into(),
-            text: Rope::from(""),
             drag_state: None,
+            text,
+            selection,
+            undo_stack: UndoStack::new(init_undo),
+            last_edit: EditType::Other,
             width_cache,
             config: BufferConfig {
                 line_ending: "\n".to_string(),
@@ -220,31 +228,65 @@ impl OneView {
             }
         }
 
-        if let Some(delta) = self.edit_for_event(event) {
-            eprintln!("handling edit {:?}", &delta);
-            let newtext = delta.apply(&self.text);
-            let newsel = self.selection.apply_delta(&delta, true, InsertDrift::Default);
-            self.text = newtext;
-            let view_width = if self.config.word_wrap { Some(self.frame.width) } else { None };
-            self.rewrap_all(view_width);
-            self.update_spans(&delta);
+        let this_edit_type = EditType::from_event(&event);
 
-            if let Some(styles) = self.highlighter.take_new_styles() {
-                update.new_styles(styles);
+        match event {
+            BufferEvent::Undo => {
+                if let Some(undo_state) = self.undo_stack.undo() {
+                    self.text = undo_state.text.clone();
+                    self.selection = undo_state.sel_after.clone();
+                } else {
+                    return;
+                }
             }
-
-            self.compute_scroll_point(&newsel, update);
-            self.selection = newsel;
-
-            let newsize = self.compute_content_size();
-            if newsize != self.content_size {
-                self.content_size = newsize;
-                update.content_size(newsize);
+            BufferEvent::Redo => {
+                if let Some(redo_state) = self.undo_stack.redo() {
+                    self.text = redo_state.text.clone();
+                    self.selection = redo_state.sel_after.clone();
+                } else {
+                    return;
+                }
             }
-
-            //TODO: more careful inval
-            update.inval_lines(0..self.count_lines());
+            other => {
+                let delta = match self.edit_for_event(other) {
+                    Some(d) => d,
+                    None => return,
+                };
+                let newtext = delta.apply(&self.text);
+                let newsel = self.selection.apply_delta(&delta, true, InsertDrift::Default);
+                if this_edit_type.breaks_undo_group(self.last_edit) {
+                    let new_undo = ViewUndo::new(newtext.clone(), newsel.clone(), newsel.clone());
+                    self.undo_stack.add_undo_group(new_undo);
+                } else {
+                    self.undo_stack.update_head_undo(|undo| {
+                        undo.text = newtext.clone();
+                        undo.sel_after = newsel.clone();
+                    })
+                }
+                self.text = newtext;
+                self.selection = newsel;
+                self.last_edit = this_edit_type;
+            }
         }
+
+        let view_width = if self.config.word_wrap { Some(self.frame.width) } else { None };
+        self.rewrap_all(view_width);
+        self.update_spans();
+
+        if let Some(styles) = self.highlighter.take_new_styles() {
+            update.new_styles(styles);
+        }
+
+        self.compute_scroll_point(&self.selection, update);
+
+        let newsize = self.compute_content_size();
+        if newsize != self.content_size {
+            self.content_size = newsize;
+            update.content_size(newsize);
+        }
+
+        //TODO: more careful inval
+        update.inval_lines(0..self.count_lines());
     }
 
     fn edit_for_event(&mut self, event: BufferEvent) -> Option<RopeDelta> {
@@ -273,7 +315,7 @@ impl OneView {
         }
     }
 
-    fn update_spans(&mut self, _delta: &RopeDelta) {
+    fn update_spans(&mut self) {
         self.spans = self.highlighter.highlight_all(&self.text);
     }
 

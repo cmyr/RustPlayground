@@ -10,7 +10,7 @@ use xi_core_lib::view::ViewMovement;
 use xi_core_lib::{edit_ops, movement, BufferConfig};
 use xi_rope::breaks2::{Breaks, BreaksMetric};
 use xi_rope::spans::Spans;
-use xi_rope::{LinesMetric, Rope, RopeDelta};
+use xi_rope::{DeltaBuilder, Interval, LinesMetric, Rope, RopeDelta, RopeInfo};
 
 use crate::gesture::{DragState, GestureContext};
 use crate::highlighting::HighlightState;
@@ -21,6 +21,8 @@ use crate::undo::{EditType, UndoStack, ViewUndo};
 use crate::update::{Update, UpdateBuilder};
 
 const ENABLE_WORDWRAP: bool = true;
+
+type RopeDeltaBuilder = DeltaBuilder<RopeInfo>;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LineCol {
@@ -110,6 +112,7 @@ impl OneView {
         if idx > self.count_lines() {
             return None;
         }
+
         let start = self.offset_of_line(idx);
         let end = self.offset_of_line(idx + 1);
         let line = self.text.slice_to_cow(start..end);
@@ -232,6 +235,7 @@ impl OneView {
         }
 
         let this_edit_type = EditType::from_event(&event);
+        let mut edit_delta: Option<RopeDelta> = None;
 
         match event {
             BufferEvent::Undo => {
@@ -269,11 +273,24 @@ impl OneView {
                 }
                 self.text = newtext;
                 self.selection = newsel;
+                edit_delta = Some(delta);
                 self.last_edit = this_edit_type;
             }
         }
 
         let view_width = if self.config.word_wrap { Some(self.frame.width) } else { None };
+
+        //TODO: do we need to update spans before we compute autoindent?
+        // let's try not first :o
+        if let Some(delta) = edit_delta.take() {
+            if let Some(indent_delta) = self.auto_indent(&delta, this_edit_type) {
+                self.text = indent_delta.apply(&self.text);
+                let new_sel = self.selection.apply_delta(&indent_delta, true, InsertDrift::Default);
+                self.selection = new_sel;
+            }
+            eprintln!("no indent for {:?}", this_edit_type);
+        }
+
         self.rewrap_all(view_width);
         self.update_spans();
 
@@ -317,6 +334,141 @@ impl OneView {
             BufferEvent::InsertTab => Some(edit_ops::insert(text, &self.selection, "\t")),
             _other => None,
         }
+    }
+
+    fn auto_indent(&mut self, delta: &RopeDelta, edit_type: EditType) -> Option<RopeDelta> {
+        let mut builder = RopeDeltaBuilder::new(self.text.len());
+        for region in delta.iter_inserts() {
+            let line = self.line_of_offset(region.new_offset);
+            match edit_type {
+                EditType::InsertNewline => self.indent_after_newline(line + 1, &mut builder),
+                EditType::InsertChars => {
+                    let start = region.new_offset;
+                    let end = region.new_offset + region.len;
+                    if !self
+                        .text
+                        .slice_to_cow(start..end)
+                        .as_bytes()
+                        .iter()
+                        .all(u8::is_ascii_whitespace)
+                    {
+                        self.indent_after_insert(line, &mut builder);
+                    }
+                }
+                _ => (),
+            }
+        }
+        if builder.is_empty() {
+            None
+        } else {
+            Some(builder.build())
+        }
+    }
+
+    fn indent_after_newline(&mut self, new_line_num: usize, builder: &mut RopeDeltaBuilder) {
+        let tab_size = self.config.tab_size;
+        let current_indent = self.indent_level_of_line(new_line_num);
+        let base_indent = self
+            .previous_nonblank_line(new_line_num)
+            .map(|l| self.indent_level_of_line(l))
+            .unwrap_or(0);
+
+        let increase_level = self.test_increase(new_line_num);
+        let decrease_level = self.test_decrease(new_line_num);
+        let increase = if increase_level { tab_size } else { 0 };
+        let decrease = if decrease_level { tab_size } else { 0 };
+        let final_level = base_indent + increase - decrease;
+        if final_level != current_indent {
+            self.set_indent(builder, new_line_num, final_level);
+        }
+    }
+
+    fn indent_after_insert(&mut self, line: usize, builder: &mut RopeDeltaBuilder) {
+        let tab_size = self.config.tab_size;
+        let current_indent = self.indent_level_of_line(line);
+        if line == 0 || current_indent == 0 {
+            return;
+        }
+
+        let just_increased = self.test_increase(line);
+        let decrease = self.test_decrease(line);
+        let prev_line = self.previous_nonblank_line(line);
+        let mut indent_level = prev_line.map(|l| self.indent_level_of_line(l)).unwrap_or(0);
+        if decrease {
+            // the first line after an increase should just match the previous line
+            if !just_increased {
+                indent_level = indent_level.saturating_sub(tab_size);
+            }
+            // we don't want to change indent level if this line doesn't
+            // match `test_decrease`, because the user could have changed
+            // it manually, and we respect that.
+            if indent_level != current_indent {
+                self.set_indent(builder, line, indent_level);
+            }
+        }
+    }
+
+    fn set_indent(&self, builder: &mut RopeDeltaBuilder, line: usize, level: usize) {
+        let edit_start = self.offset_of_line(line);
+        let edit_len = {
+            let line = self.get_line_str(line);
+            line.as_bytes().iter().take_while(|b| **b == b' ' || **b == b'\t').count()
+        };
+
+        let use_spaces = self.config.translate_tabs_to_spaces;
+        let tab_size = self.config.tab_size;
+
+        let indent_text = if use_spaces { n_spaces(level) } else { n_tabs(level / tab_size) };
+
+        let iv = Interval::new(edit_start, edit_start + edit_len);
+        builder.replace(iv, indent_text.into());
+    }
+
+    fn indent_level_of_line(&self, line_num: usize) -> usize {
+        let tab_size = self.config.tab_size;
+        let line = self.get_line_str(line_num);
+        line.as_bytes()
+            .iter()
+            .take_while(|b| **b == b' ' || **b == b'\t')
+            .map(|b| if b == &b' ' { 1 } else { tab_size })
+            .sum()
+    }
+
+    fn previous_nonblank_line(&self, mut line_num: usize) -> Option<usize> {
+        debug_assert!(line_num > 0);
+        while line_num > 0 {
+            line_num -= 1;
+            let line = self.get_line_str(line_num);
+            if !line.bytes().all(|b| b.is_ascii_whitespace()) {
+                return Some(line_num);
+            }
+        }
+        None
+    }
+
+    /// Test whether the indent level should be increased for this line,
+    /// by testing the _previous_ line against a regex.
+    fn test_increase(&self, line: usize) -> bool {
+        debug_assert!(line > 0, "increasing indent requires a previous line");
+        let prev_line = match self.previous_nonblank_line(line) {
+            Some(l) => l,
+            None => return false,
+        };
+        let metadata = self.highlighter.metadata_for_line(prev_line);
+        let line = self.get_line_str(prev_line);
+        metadata.increase_indent(&line)
+    }
+
+    /// Test whether the indent level for this line should be decreased, by
+    /// checking this line against a regex.
+    fn test_decrease(&mut self, line: usize) -> bool {
+        assert!(line <= self.count_lines());
+        if line == 0 || line == self.count_lines() {
+            return false;
+        }
+        let metadata = self.highlighter.metadata_for_line(line);
+        let line = self.get_line_str(line);
+        metadata.decrease_indent(&line)
     }
 
     fn update_spans(&mut self) {
@@ -381,6 +533,12 @@ impl OneView {
         Size { width, height }
     }
 
+    fn get_line_str(&self, line_num: usize) -> Cow<str> {
+        let line_start = self.text.offset_of_line(line_num);
+        let line_end = self.text.offset_of_line(line_num + 1);
+        self.text.slice_to_cow(line_start..line_end)
+    }
+
     fn count_lines(&self) -> usize {
         if self.config.word_wrap {
             self.breaks.count::<BreaksMetric>(self.breaks.len()) + 1
@@ -388,4 +546,17 @@ impl OneView {
             self.text.count::<LinesMetric>(self.text.len()) + 1
         }
     }
+}
+
+fn n_spaces(n: usize) -> &'static str {
+    // when someone opens an issue complaining about this we know we've made it
+    const MAX_SPACES: usize = 160;
+    static MANY_SPACES: [u8; MAX_SPACES] = [b' '; MAX_SPACES];
+    unsafe { ::std::str::from_utf8_unchecked(&MANY_SPACES[..n.min(MAX_SPACES)]) }
+}
+
+fn n_tabs(n: usize) -> &'static str {
+    const MAX_TABS: usize = 40;
+    static MANY_TABS: [u8; MAX_TABS] = [b'\t'; MAX_TABS];
+    unsafe { ::std::str::from_utf8_unchecked(&MANY_TABS[..n.min(MAX_TABS)]) }
 }

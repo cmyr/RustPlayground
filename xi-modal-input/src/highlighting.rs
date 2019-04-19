@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::io::{BufReader, Cursor as IoCursor};
 
 use syntect::highlighting::{Highlighter, Style as SyntectStyle, Theme, ThemeSet};
-use syntect::parsing::{ParseState, ScopeStack, SyntaxSet};
+use syntect::parsing::{ParseState, ScopeStack, ScopedMetadata, SyntaxSet};
 use xi_rope::spans::{Spans, SpansBuilder};
 use xi_rope::{Cursor, LinesMetric, Rope};
 
@@ -18,7 +18,7 @@ pub(crate) struct HighlightState {
 
 #[derive(Debug, Default, Clone)]
 struct Internal {
-    parse_state: Vec<(ParseState, ScopeStack)>,
+    parse_state: Vec<ScopeStack>,
     style_table: HashMap<Style, StyleId>,
     new_styles: Option<Vec<(StyleId, Style)>>,
     next_style_id: StyleId,
@@ -42,6 +42,11 @@ impl HighlightState {
     /// Returns any newly defined styles. These should be sent to the client.
     pub(crate) fn take_new_styles(&mut self) -> Option<Vec<(StyleId, Style)>> {
         self.state.new_styles.take()
+    }
+
+    pub(crate) fn metadata_for_line(&self, line: usize) -> ScopedMetadata {
+        let scope = &self.state.parse_state[line];
+        self.syntax_set.metadata().metadata_for_scope(scope.as_slice())
     }
 }
 
@@ -67,7 +72,7 @@ impl Internal {
             let next_break = cursor.next::<LinesMetric>().unwrap_or(text.len());
             let line = text.slice_to_cow(total_offset..next_break);
             let mut last_pos = 0;
-            let ops = parse_state.parse_line(line.trim_right_matches('\n'), syntax_set);
+            let ops = parse_state.parse_line(line.trim_end_matches('\n'), syntax_set);
             for (pos, batch) in ops {
                 if !scope_state.is_empty() {
                     let start = total_offset + last_pos;
@@ -90,6 +95,7 @@ impl Internal {
                 b.add_span(start..end, id);
             }
             total_offset += line.len();
+            self.parse_state.push(scope_state.clone());
         }
         b.build()
     }

@@ -23,6 +23,7 @@
 		60BF2285225012DD002C0352 /* EditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60BF2284225012DD002C0352 /* EditView.swift */; };
 		60BF2286225511BD002C0352 /* libximodal.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 609A225F22404CF900A3F007 /* libximodal.a */; };
 		60CC174F224591840075FDE5 /* XiWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60CC174E224591840075FDE5 /* XiWindow.swift */; };
+		60D8C746226A4D2800440860 /* OutputTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60D8C745226A4D2800440860 /* OutputTextView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -66,6 +67,7 @@
 		60A91D162265115E00240CC6 /* BundleResources.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundleResources.swift; sourceTree = "<group>"; };
 		60BF2284225012DD002C0352 /* EditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditView.swift; sourceTree = "<group>"; };
 		60CC174E224591840075FDE5 /* XiWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XiWindow.swift; sourceTree = "<group>"; };
+		60D8C745226A4D2800440860 /* OutputTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputTextView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -123,6 +125,7 @@
 			children = (
 				606644EA223FFED7006215A0 /* AppDelegate.swift */,
 				606644EC223FFED7006215A0 /* EditViewController.swift */,
+				60D8C745226A4D2800440860 /* OutputTextView.swift */,
 				60A91D162265115E00240CC6 /* BundleResources.swift */,
 				60A91D1422650D0100240CC6 /* Runner.swift */,
 				60BF2284225012DD002C0352 /* EditView.swift */,
@@ -319,6 +322,7 @@
 				604B0F6022405C88007038E6 /* XiCoreProxy.swift in Sources */,
 				6018ED18225FB15600B5DF38 /* Style.swift in Sources */,
 				60BF2285225012DD002C0352 /* EditView.swift in Sources */,
+				60D8C746226A4D2800440860 /* OutputTextView.swift in Sources */,
 				606644ED223FFED7006215A0 /* EditViewController.swift in Sources */,
 				606644EB223FFED7006215A0 /* AppDelegate.swift in Sources */,
 				608A1D42226627D2001A79EB /* OutputViewController.swift in Sources */,

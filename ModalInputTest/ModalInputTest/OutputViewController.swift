@@ -32,9 +32,6 @@ class OutputViewController: NSViewController {
         let attributes = attributes ?? [.foregroundColor: NSColor.black]
         let insertedRange = NSRange(location: EOFRange.location, length: string.count)
         self.outputTextView.textStorage?.addAttributes(attributes, range: insertedRange)
-
-        let bottom = CGRect(x: 2, y: outputTextView.frame.maxY + 20, width: 0, height: 0)
-        outputTextView.scrollToVisible(bottom)
     }
 }
 

@@ -43,14 +43,18 @@ class Runner {
         outPipe.fileHandleForReading.readabilityHandler = { handle in
             let data = handle.availableData
             if let outString = String(data: data, encoding: .utf8) {
-                handler.handleStdOut(text: outString)
+                if outString.count > 0 {
+                    handler.handleStdOut(text: outString)
+                }
             }
         }
 
         errPipe.fileHandleForReading.readabilityHandler = { handle in
             let data = handle.availableData
             if let errString = String(data: data, encoding: .utf8) {
-                handler.handleStdErr(text: errString)
+                if errString.count > 0 {
+                    handler.handleStdErr(text: errString)
+                }
             }
         }
 
@@ -78,14 +82,18 @@ class Runner {
         outPipe.fileHandleForReading.readabilityHandler = { handle in
             let data = handle.availableData
             if let outString = String(data: data, encoding: .utf8) {
-                handler.handleStdOut(text: outString)
+                if outString.count > 0 {
+                    handler.handleStdOut(text: outString)
+                }
             }
         }
 
         errPipe.fileHandleForReading.readabilityHandler = { handle in
             let data = handle.availableData
             if let errString = String(data: data, encoding: .utf8) {
-                handler.handleStdErr(text: errString)
+               if errString.count > 0 {
+                    handler.handleStdErr(text: errString)
+                }
             }
         }
 

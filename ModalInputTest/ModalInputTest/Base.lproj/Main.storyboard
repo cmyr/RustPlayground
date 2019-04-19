@@ -727,6 +727,8 @@
                                         <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="BottomIcon" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="eLZ-mn-lHm">
                                             <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                                             <font key="font" metaFont="system"/>
+                                            <string key="keyEquivalent">Y</string>
+                                            <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                                         </buttonCell>
                                     </button>
                                     <connections>
@@ -741,7 +743,9 @@
                                         <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="PlayIcon" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="wzt-1I-Kk6">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
-                                            <string key="keyEquivalent">b</string>
+                                            <string key="keyEquivalent" base64-UTF8="YES">
+CQ
+</string>
                                             <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                                         </buttonCell>
                                     </button>

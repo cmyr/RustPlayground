@@ -14,7 +14,7 @@ use xi_rope::spans::Spans;
 use xi_rope::{DeltaBuilder, Interval, LinesMetric, Rope, RopeDelta, RopeInfo};
 
 use crate::gesture::{DragState, GestureContext};
-use crate::highlighting::HighlightState;
+use crate::highlighting::{lines_for_selection, HighlightState};
 use crate::lines::Size;
 use crate::lines::WidthCache;
 use crate::style::StyleId;
@@ -291,7 +291,6 @@ impl OneView {
                 let new_sel = self.selection.apply_delta(&indent_delta, true, InsertDrift::Default);
                 self.selection = new_sel;
             }
-            eprintln!("no indent for {:?}", this_edit_type);
         }
 
         self.rewrap_all(view_width);
@@ -336,10 +335,26 @@ impl OneView {
             BufferEvent::InsertNewline => Some(edit_ops::insert(text, &self.selection, "\n")),
             BufferEvent::InsertTab => Some(edit_ops::insert(text, &self.selection, "\t")),
             BufferEvent::ToggleComment => self.toggle_comment(),
+            BufferEvent::Indent => Some(self.modify_indent(true)),
+            BufferEvent::Outdent => Some(self.modify_indent(false)),
             _other => {
                 eprintln!("unhandled edit event {:?}", _other);
                 None
             }
+        }
+    }
+
+    fn modify_indent(&self, increase: bool) -> RopeDelta {
+        let lines = lines_for_selection(&self.text, &self.selection);
+        let tab_text = if self.config.translate_tabs_to_spaces {
+            n_spaces(self.config.tab_size)
+        } else {
+            "\t"
+        };
+        if increase {
+            edit_ops::indent(&self.text, lines.iter().cloned().flatten(), tab_text)
+        } else {
+            edit_ops::outdent(&self.text, lines.iter().cloned().flatten(), tab_text)
         }
     }
 
@@ -479,7 +494,6 @@ impl OneView {
     }
 
     fn toggle_comment(&self) -> Option<RopeDelta> {
-        use crate::highlighting::lines_for_selection;
         let mut builder = RopeDeltaBuilder::new(self.text.len());
         let line_ranges = lines_for_selection(&self.text, &self.selection);
         for range in line_ranges {

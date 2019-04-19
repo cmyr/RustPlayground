@@ -8,6 +8,7 @@ use crate::input_handler::{Handler, Plumber};
 use crate::rpc::Rpc;
 use crate::update::Update;
 use crate::view::OneView;
+use crate::lines::Size;
 
 pub struct XiCore {
     pub rpc_callback: RpcCallback,
@@ -68,10 +69,9 @@ impl XiCore {
     }
 
     pub fn send_update(&self, mut update: Update) {
-        if let Some(newsize) = update.size.take() {
-            eprintln!("newsize: {:?}", newsize);
+        if let Some(Size { width, height }) = update.size.take() {
             self.rpc_callback
-                .call("content_size", json!({"width": newsize.width, "height": newsize.height}));
+                .call("content_size", json!({"width": width, "height": height}));
         }
 
         if let Some(styles) = update.styles.take() {
@@ -153,6 +153,8 @@ fn event_from_str(string: &str) -> Option<EditNotification> {
         "undo" => Some(E::Undo),
         "redo" => Some(E::Redo),
         "toggle_comment" => Some(E::ToggleComment),
+        "indent" => Some(E::Indent),
+        "outdent" => Some(E::Outdent),
         _other => None,
         //(Some("scrollPageDown:"), None) => E::ScrollPageDown
         //(Some("scrollPageUp:"), None) =>

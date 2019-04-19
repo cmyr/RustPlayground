@@ -170,6 +170,16 @@
                                                 <action selector="toggleComment:" target="Ady-hI-5gd" id="abi-nj-icN"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="Shift Right" keyEquivalent="]" id="bLG-jQ-Shy">
+                                            <connections>
+                                                <action selector="indent:" target="Ady-hI-5gd" id="MvT-nk-3Rg"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Shift Left" keyEquivalent="[" id="eLA-2c-8ex">
+                                            <connections>
+                                                <action selector="outdent:" target="Ady-hI-5gd" id="JKV-AC-rEG"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem isSeparatorItem="YES" id="uyl-h8-XO2"/>
                                         <menuItem title="Find" id="4EN-yA-p0u">
                                             <modifierMask key="keyEquivalentModifierMask"/>

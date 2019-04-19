@@ -240,17 +240,13 @@ class EditViewController: NSViewController {
         core.doCommand("copy")
     }
 
-//    override func indent(_ sender: Any?) {
-//        core.sendRpc(method: "indent", params: [])
-//    }
-//
-//    @objc func unindent(_ sender: Any?) {
-//        core.sendRpc(method: "outdent", params: [])
-//    }
-//
-//    @objc func reindent(_ sender: Any?) {
-//        core.sendRpc(method: "reindent", params: [])
-//    }
+    @objc override func indent(_ sender: Any?) {
+        core.doCommand("indent")
+    }
+
+    @objc func outdent(_ sender: Any?) {
+        core.doCommand("outdent")
+    }
 
     @objc func toggleComment(_ sender: Any?) {
         core.doCommand("toggle_comment")

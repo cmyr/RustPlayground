@@ -25,6 +25,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             mainController?.core = core
         }
     }
+
+    lazy var preferencesWindowController: PreferencesWindowController = {
+        return NSStoryboard.main?.instantiateController(withIdentifier: "preferences") as! PreferencesWindowController;
+    }()
+
     var scheduledEvents = [UInt32: NSEvent]()
     var nextWorkItemId: UInt32 = 0
 
@@ -42,6 +47,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func insertPlaceholderText() {
         let placeholderProgram = "fn main() {\n    println!(\"hello 🦀!\");\n}"
         core.insertText(placeholderProgram)
+    }
+
+    @IBAction func displayPreferencePane(_: Any?) {
+        self.preferencesWindowController.showWindow(nil)
     }
 
     func handleMessage(method: String, params: [String: AnyObject]) {

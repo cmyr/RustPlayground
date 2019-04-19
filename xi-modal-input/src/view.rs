@@ -333,7 +333,10 @@ impl OneView {
             }
             BufferEvent::Insert(chars) => Some(edit_ops::insert(text, &self.selection, chars)),
             BufferEvent::InsertNewline => Some(edit_ops::insert(text, &self.selection, "\n")),
-            BufferEvent::InsertTab => Some(edit_ops::insert(text, &self.selection, "\t")),
+            BufferEvent::InsertTab => {
+                let (delta, _) = edit_ops::insert_tab(text, &self.selection, &self.config);
+                Some(delta)
+            }
             BufferEvent::ToggleComment => self.toggle_comment(),
             BufferEvent::Indent => Some(self.modify_indent(true)),
             BufferEvent::Outdent => Some(self.modify_indent(false)),

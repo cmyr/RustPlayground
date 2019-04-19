@@ -76,6 +76,7 @@ class MainPlaygroundViewController: NSSplitViewController {
 
         try! document.write(to: fileUrl, atomically: true, encoding: .utf8)
         let scriptURL = BundleResources.buildScriptURL
+        outputViewController.clearOutput()
         let runner = Runner(scriptPath: scriptURL, fileName: fileName)
         if runner.compile(handler: outputViewController) {
             runner.run(handler: outputViewController)

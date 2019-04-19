@@ -9,6 +9,7 @@
 import Foundation
 
 protocol RunnerOutputHandler {
+    func printInfo(text: String);
     func handleStdOut(text: String);
     func handleStdErr(text: String);
 }
@@ -28,6 +29,7 @@ class Runner {
     }
 
     func compile(handler: RunnerOutputHandler) -> Bool {
+        handler.printInfo(text: "Compiling")
         let task = Process()
         task.launchPath = scriptPath.path
         task.currentDirectoryPath = workDirectory.path
@@ -55,12 +57,14 @@ class Runner {
         task.launch()
         task.waitUntilExit()
         if task.terminationStatus != 0 {
+            handler.printInfo(text: "Compilation failed")
             print("build failed")
         }
         return task.terminationStatus == 0
     }
 
     func run(handler: RunnerOutputHandler) {
+        handler.printInfo(text: "Running")
         let targetPath = workDirectory.appendingPathComponent(targetName, isDirectory: false).path
         let task = Process()
         task.launchPath = targetPath
@@ -87,5 +91,6 @@ class Runner {
 
         task.launch()
         task.waitUntilExit()
+        handler.printInfo(text: "Done")
     }
 }

@@ -1,8 +1,10 @@
 use std::collections::HashMap;
 use std::io::{BufReader, Cursor as IoCursor};
+use std::ops::Range;
 
 use syntect::highlighting::{Highlighter, Style as SyntectStyle, Theme, ThemeSet};
 use syntect::parsing::{ParseState, ScopeStack, ScopedMetadata, SyntaxSet};
+use xi_core_lib::selection::Selection;
 use xi_rope::spans::{Spans, SpansBuilder};
 use xi_rope::{Cursor, LinesMetric, Rope};
 
@@ -115,4 +117,39 @@ impl Internal {
             }
         }
     }
+}
+
+//TODO: no idea where this should go
+//TODO: rewrite using std::iter::from_fn?
+/// Returns the set of line ranges that include a selection. (Lines that include
+/// multiple selections are only included once.)
+pub(crate) fn lines_for_selection(text: &Rope, sel: &Selection) -> Vec<(Range<usize>)> {
+    let mut prev_range: Option<Range<usize>> = None;
+    let mut line_ranges = Vec::new();
+    // we send selection state to syntect in the form of a vec of line ranges,
+    // so we combine overlapping selections to get the minimum set of ranges.
+    for region in sel.iter() {
+        let start = text.line_of_offset(region.min());
+        let end = text.line_of_offset(region.max()) + 1;
+        let line_range = start..end;
+        let prev = prev_range.take();
+        match (prev, line_range) {
+            (None, range) => prev_range = Some(range),
+            (Some(ref prev), ref range) if range.start <= prev.end => {
+                let combined =
+                    Range { start: prev.start.min(range.start), end: prev.end.max(range.end) };
+                prev_range = Some(combined);
+            }
+            (Some(prev), range) => {
+                line_ranges.push(prev);
+                prev_range = Some(range);
+            }
+        }
+    }
+
+    if let Some(prev) = prev_range {
+        line_ranges.push(prev);
+    }
+
+    line_ranges
 }

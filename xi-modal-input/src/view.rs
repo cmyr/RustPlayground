@@ -2,6 +2,7 @@
 
 use libc::c_char;
 use std::borrow::Cow;
+use std::ops::Range;
 
 use xi_core_lib::edit_types::{BufferEvent, EventDomain, SpecialEvent, ViewEvent};
 use xi_core_lib::rpc::{GestureType, Rect};
@@ -23,6 +24,8 @@ use crate::update::{Update, UpdateBuilder};
 const ENABLE_WORDWRAP: bool = true;
 
 type RopeDeltaBuilder = DeltaBuilder<RopeInfo>;
+
+type LineRange = Range<usize>;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LineCol {
@@ -332,7 +335,11 @@ impl OneView {
             BufferEvent::Insert(chars) => Some(edit_ops::insert(text, &self.selection, chars)),
             BufferEvent::InsertNewline => Some(edit_ops::insert(text, &self.selection, "\n")),
             BufferEvent::InsertTab => Some(edit_ops::insert(text, &self.selection, "\t")),
-            _other => None,
+            BufferEvent::ToggleComment => self.toggle_comment(),
+            _other => {
+                eprintln!("unhandled edit event {:?}", _other);
+                None
+            }
         }
     }
 
@@ -469,6 +476,75 @@ impl OneView {
         let metadata = self.highlighter.metadata_for_line(line);
         let line = self.get_line_str(line);
         metadata.decrease_indent(&line)
+    }
+
+    fn toggle_comment(&self) -> Option<RopeDelta> {
+        use crate::highlighting::lines_for_selection;
+        let mut builder = RopeDeltaBuilder::new(self.text.len());
+        let line_ranges = lines_for_selection(&self.text, &self.selection);
+        for range in line_ranges {
+            self.toggle_comment_line_range(range, &mut builder);
+        }
+        if builder.is_empty() {
+            None
+        } else {
+            Some(builder.build())
+        }
+    }
+
+    fn toggle_comment_line_range(&self, range: LineRange, builder: &mut RopeDeltaBuilder) {
+        let metadata = self.highlighter.metadata_for_line(range.start);
+        let comment_str = match metadata.line_comment() {
+            Some(s) => s,
+            None => return,
+        };
+
+        let line = self.get_line_str(range.start);
+        if line.trim() == comment_str.trim() || line.trim().starts_with(&comment_str) {
+            self.remove_comment(range, comment_str, builder);
+        } else {
+            self.add_comment(range, comment_str, builder);
+        }
+    }
+
+    fn remove_comment(&self, range: LineRange, comment_str: &str, builder: &mut RopeDeltaBuilder) {
+        for num in range {
+            let offset = self.offset_of_line(num);
+            let line = self.get_line_str(num);
+            let (comment_start, len) = match line.find(&comment_str) {
+                Some(off) => (offset + off, comment_str.len()),
+                None if line.trim() == comment_str.trim() => (offset, comment_str.trim().len()),
+                None => continue,
+            };
+
+            let iv = Interval::new(comment_start, comment_start + len);
+            builder.delete(iv);
+        }
+    }
+
+    fn add_comment(&self, range: LineRange, comment_str: &str, builder: &mut RopeDeltaBuilder) {
+        // when commenting out multiple lines, we insert all comment markers at
+        // the same indent level: that of the least indented line.
+        let line_offset = range
+            .clone()
+            .map(|num| {
+                let line = self.get_line_str(num);
+                line.as_bytes().iter().position(|b| *b != b' ' && *b != b'\t').unwrap_or(0)
+            })
+            .min()
+            .unwrap_or(0);
+
+        let comment_txt = Rope::from(&comment_str);
+        for num in range {
+            let offset = self.offset_of_line(num);
+            let line = self.get_line_str(num);
+            if line.trim().starts_with(&comment_str) {
+                continue;
+            }
+
+            let iv = Interval::new(offset + line_offset, offset + line_offset);
+            builder.replace(iv, comment_txt.clone());
+        }
     }
 
     fn update_spans(&mut self) {

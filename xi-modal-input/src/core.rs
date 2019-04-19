@@ -152,6 +152,7 @@ fn event_from_str(string: &str) -> Option<EditNotification> {
         "cut" => Some(E::CutAsync),
         "undo" => Some(E::Undo),
         "redo" => Some(E::Redo),
+        "toggle_comment" => Some(E::ToggleComment),
         _other => None,
         //(Some("scrollPageDown:"), None) => E::ScrollPageDown
         //(Some("scrollPageUp:"), None) =>

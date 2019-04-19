@@ -214,7 +214,6 @@ class EditViewController: NSViewController {
     }
 
     @objc func paste(_ sender: AnyObject?) {
-        print("paste")
         NSPasteboard
             .general
             .string(forType: .string)
@@ -222,7 +221,7 @@ class EditViewController: NSViewController {
     }
 
     override func selectAll(_ sender: Any?) {
-        core.sendRpc(method: "selectAll:", params: [])
+        core.doCommand("selectAll:")
     }
 
     @objc func undo(_ sender: AnyObject?) {
@@ -241,16 +240,20 @@ class EditViewController: NSViewController {
         core.doCommand("copy")
     }
 
-    override func indent(_ sender: Any?) {
-        core.sendRpc(method: "indent", params: [])
-    }
+//    override func indent(_ sender: Any?) {
+//        core.sendRpc(method: "indent", params: [])
+//    }
+//
+//    @objc func unindent(_ sender: Any?) {
+//        core.sendRpc(method: "outdent", params: [])
+//    }
+//
+//    @objc func reindent(_ sender: Any?) {
+//        core.sendRpc(method: "reindent", params: [])
+//    }
 
-    @objc func unindent(_ sender: Any?) {
-        core.sendRpc(method: "outdent", params: [])
-    }
-
-    @objc func reindent(_ sender: Any?) {
-        core.sendRpc(method: "reindent", params: [])
+    @objc func toggleComment(_ sender: Any?) {
+        core.doCommand("toggle_comment")
     }
 }
 

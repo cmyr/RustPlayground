@@ -24,6 +24,7 @@
 		60BF2286225511BD002C0352 /* libximodal.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 609A225F22404CF900A3F007 /* libximodal.a */; };
 		60CC174F224591840075FDE5 /* XiWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60CC174E224591840075FDE5 /* XiWindow.swift */; };
 		60D05FAD226A7ED10045615B /* PreferencesWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60D05FAC226A7ED10045615B /* PreferencesWindowController.swift */; };
+		60D05FAF226B9B410045615B /* PreferencesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60D05FAE226B9B410045615B /* PreferencesViewController.swift */; };
 		60D8C746226A4D2800440860 /* OutputTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60D8C745226A4D2800440860 /* OutputTextView.swift */; };
 /* End PBXBuildFile section */
 
@@ -69,6 +70,7 @@
 		60BF2284225012DD002C0352 /* EditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditView.swift; sourceTree = "<group>"; };
 		60CC174E224591840075FDE5 /* XiWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XiWindow.swift; sourceTree = "<group>"; };
 		60D05FAC226A7ED10045615B /* PreferencesWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesWindowController.swift; sourceTree = "<group>"; };
+		60D05FAE226B9B410045615B /* PreferencesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesViewController.swift; sourceTree = "<group>"; };
 		60D8C745226A4D2800440860 /* OutputTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputTextView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -126,6 +128,7 @@
 			isa = PBXGroup;
 			children = (
 				606644EA223FFED7006215A0 /* AppDelegate.swift */,
+				60D05FAE226B9B410045615B /* PreferencesViewController.swift */,
 				606644EC223FFED7006215A0 /* EditViewController.swift */,
 				60D8C745226A4D2800440860 /* OutputTextView.swift */,
 				60A91D162265115E00240CC6 /* BundleResources.swift */,
@@ -138,6 +141,7 @@
 				606644F0223FFED8006215A0 /* Main.storyboard */,
 				60D05FAC226A7ED10045615B /* PreferencesWindowController.swift */,
 				608A1D41226627D2001A79EB /* OutputViewController.swift */,
+				6018ED17225FB15600B5DF38 /* Style.swift */,
 				606644F3223FFED8006215A0 /* Info.plist */,
 				606644F4223FFED8006215A0 /* ModalInputTest.entitlements */,
 			);
@@ -148,7 +152,6 @@
 			isa = PBXGroup;
 			children = (
 				606644FD223FFED9006215A0 /* ModalInputTestTests.swift */,
-				6018ED17225FB15600B5DF38 /* Style.swift */,
 				606644FF223FFED9006215A0 /* Info.plist */,
 			);
 			path = ModalInputTestTests;
@@ -330,6 +333,7 @@
 				606644EB223FFED7006215A0 /* AppDelegate.swift in Sources */,
 				60D05FAD226A7ED10045615B /* PreferencesWindowController.swift in Sources */,
 				608A1D42226627D2001A79EB /* OutputViewController.swift in Sources */,
+				60D05FAF226B9B410045615B /* PreferencesViewController.swift in Sources */,
 				608A1D4022657604001A79EB /* MainPlaygroundViewController.swift in Sources */,
 				60A91D172265115E00240CC6 /* BundleResources.swift in Sources */,
 				60CC174F224591840075FDE5 /* XiWindow.swift in Sources */,

@@ -9,13 +9,24 @@
 import Cocoa
 
 class OutputViewController: NSViewController {
-    let outputFont = DefaultFont.shared
+    var outputFont: NSFont {
+        return EditorPreferences.shared.consoleFont
+    }
 
     @IBOutlet var outputTextView: NSTextView!
 
     override func viewDidLoad() {
         super.viewDidLoad()
         outputTextView.frame = view.frame
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(consoleFontChanged),
+                                               name: EditorPreferences.consoleFontChangedNotification,
+                                               object: nil)
+    }
+
+    @objc func consoleFontChanged(_ notification: Notification) {
+        outputTextView.font = self.outputFont
+        outputTextView.needsDisplay = true
     }
 
     func clearOutput() {

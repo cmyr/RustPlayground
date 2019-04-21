@@ -72,6 +72,10 @@ class XiCoreProxy {
         sendRpc(method: "insert", params: ["chars": text])
     }
 
+    func updateConfig(_ settings: [String: Any]) {
+        sendRpc(method: "config_change", params: ["changes": settings])
+    }
+
     func frameChanged(newFrame rect: CGRect) {
         let rect = rect.integral
         let params = ["x": rect.origin.x,

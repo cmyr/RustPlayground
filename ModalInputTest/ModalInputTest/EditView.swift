@@ -39,8 +39,8 @@ class EditView: NSView {
     }
 
     override var intrinsicContentSize: NSSize {
-        let charSpace = DefaultFont.shared.characterWidth() * 2
-        let lineHeight = DefaultFont.shared.linespace
+        let charSpace = EditorPreferences.shared.editorFont.characterWidth() * 2
+        let lineHeight = EditorPreferences.shared.editorFont.linespace
         return CGSize(width: coreDocumentSize.width + charSpace,
                       height: coreDocumentSize.height + lineHeight)
     }
@@ -50,7 +50,7 @@ class EditView: NSView {
         NSColor.white.setFill()
         dirtyRect.fill()
 
-        let font = DefaultFont.shared
+        let font = EditorPreferences.shared.editorFont
         let linespace = font.linespace
         let charWidth = font.characterWidth()
 
@@ -113,12 +113,12 @@ class EditView: NSView {
     }
 
     func yOffsetToLine(_ y: CGFloat) -> Int {
-        let adjustY = max(y - DefaultFont.shared.topPadding, 0)
-        return Int(floor(adjustY / DefaultFont.shared.linespace))
+        let adjustY = max(y - EditorPreferences.shared.editorFont.topPadding, 0)
+        return Int(floor(adjustY / EditorPreferences.shared.editorFont.linespace))
     }
 
     func lineIxToBaseline(_ lineIx: Int) -> CGFloat {
-        return CGFloat(lineIx + 1) * DefaultFont.shared.linespace
+        return CGFloat(lineIx + 1) * EditorPreferences.shared.editorFont.linespace
     }
 
     func bufferPositionFromPoint(_ point: NSPoint) -> BufferPosition {
@@ -126,7 +126,7 @@ class EditView: NSView {
         let lineIx = yOffsetToLine(point.y)
         if let line = lineSource?.getLine(line: UInt32(lineIx)) {
             let s = line.text
-            let attrString = NSAttributedString(string: s, attributes: [.font: DefaultFont.shared])
+            let attrString = NSAttributedString(string: s, attributes: [.font: EditorPreferences.shared.editorFont])
             let ctline = CTLineCreateWithAttributedString(attrString)
             let relPos = NSPoint(x: point.x - X_OFFSET, y: lineIxToBaseline(lineIx) - point.y)
             let utf16_ix = CTLineGetStringIndexForPosition(ctline, relPos)
@@ -212,11 +212,11 @@ extension NSMutableAttributedString {
         }
 
         if style.italic {
-            attrs[.font] = DefaultFont.shared.italic()
+            attrs[.font] = EditorPreferences.shared.editorFont.italic()
         }
 
         if style.bold {
-            attrs[.font] = DefaultFont.shared.bold()
+            attrs[.font] = EditorPreferences.shared.editorFont.bold()
         }
         self.addAttributes(attrs, range: utf16Range)
     }

@@ -60,8 +60,14 @@ class EditViewController: NSViewController {
                                                selector: #selector(frameDidChangeNotification),
                                                name: NSView.frameDidChangeNotification,
                                                object: scrollView)
+
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(editorFontChangedNotification),
+                                               name: EditorPreferences.editorFontChangedNotification,
+                                               object: nil)
+
         (NSApp.delegate as! AppDelegate).mainController = self
-        modeLabel.font = DefaultFont.shared
+        modeLabel.font = EditorPreferences.shared.editorFont
         modeLabel.textColor = NSColor.lightGray
         if core.hasInputHandler {
             mode = .insert
@@ -95,19 +101,24 @@ class EditViewController: NSViewController {
     }
 
     func scrollTo(_ line: Int, col: Int) {
-        let y = CGFloat(line) * DefaultFont.shared.linespace + minimumPadding
+        let y = CGFloat(line) * EditorPreferences.shared.editorFont.linespace + minimumPadding
         let lineText = core.getLine(UInt32(line))!
         let toMeasure = lineText.text.utf8.prefix(col)
         let x = measureStringWidth(String(toMeasure)!).width
 
         // one line is the current line, one line is padding
-        let height = DefaultFont.shared.linespace * 2
-        let width = DefaultFont.shared.characterWidth() * 2
+        let height = EditorPreferences.shared.editorFont.linespace * 2
+        let width = EditorPreferences.shared.editorFont.characterWidth() * 2
         let rect = CGRect(origin: CGPoint(x: x, y: y),
                           size: CGSize(width: width , height: height)).integral
 
             editView.scrollToVisible(rect)
             editView.setNeedsDisplay(editView.visibleRect)
+    }
+
+    @objc func editorFontChangedNotification(_ notification: Notification) {
+        editView.needsDisplay = true
+        editView.invalidateIntrinsicContentSize()
     }
 
     @objc func frameDidChangeNotification(_ notification: Notification) {
@@ -126,7 +137,7 @@ class EditViewController: NSViewController {
     /// region, and for word wrapping.
     func updateCoreFrame() {
         let docFrame = scrollView.documentVisibleRect
-        let cursorPadding = DefaultFont.shared.characterWidth() + minimumPadding * 2
+        let cursorPadding = EditorPreferences.shared.editorFont.characterWidth() + minimumPadding * 2
         let size = CGSize(width: max(docFrame.width - cursorPadding, 0), height: docFrame.height)
         //FIXME: 'ensureNonZero' is a hack, figure out how to do content insets
         coreFrame = CGRect(origin: docFrame.origin.ensureNonZero(), size: size)

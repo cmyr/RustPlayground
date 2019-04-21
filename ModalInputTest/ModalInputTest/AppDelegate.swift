@@ -8,14 +8,13 @@
 
 import Cocoa
 
-class DefaultFont {
-//    static let shared = NSFont(name: "Input Sans", size: 14.0)!
-    static let shared = NSFont(name: "Input Sans", size: 24.0)!
-//    static let shared = NSFont(name: "Zapfino", size: 36.0)!
-}
-
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
+    /// Convenience access to the AppDelegate instance
+    static var shared: AppDelegate {
+        return (NSApp.delegate as! AppDelegate)
+    }
+
     let core = XiCoreProxy(rpcCallback: handleRpc, updateCallback: handleUpdate, widthMeasure: measureWidth)
 
     let styleMap = StyleMap()
@@ -178,7 +177,7 @@ func measureWidth(strPtr: UnsafePointer<Int8>?) -> XiSize {
 }
 
 func measureStringWidth(_ string: String, font: NSFont? = nil) -> CGRect {
-    let font = font ?? DefaultFont.shared
+    let font = font ?? EditorPreferences.shared.editorFont
     let attrString = NSAttributedString(string: string, attributes: [.font: font])
 
     let ctLine = CTLineCreateWithAttributedString(attrString)

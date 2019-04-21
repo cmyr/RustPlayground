@@ -19,7 +19,7 @@ class EditorPreferences {
 
     enum Keys: String {
         case translateTabsToSpaces = "translate_tabs_to_spaces"
-        case tabWidth = "tab_width"
+        case tabWidth = "tab_size"
         case autoIndent = "auto_indent"
         case enableLineBreaking = "word_wrap"
         case editorFontFace = "font_face"
@@ -68,6 +68,17 @@ class EditorPreferences {
 
         self.editorFont = NSFont(name: editorFont, size: editorFontSize) ?? NSFont.systemFont(ofSize: editorFontSize)
         self.consoleFont = NSFont(name: consoleFont, size: consoleFontSize) ?? NSFont.systemFont(ofSize: consoleFontSize)
+    }
+
+    func syncAllWithCore() {
+        core.updateConfig([
+            Keys.autoIndent.rawValue: autoIndentEnabled,
+            Keys.editorFontFace.rawValue: editorFont.fontName,
+            Keys.editorFontSize.rawValue: editorFont.pointSize,
+            Keys.enableLineBreaking.rawValue: lineWrappingEnabled,
+            Keys.tabWidth.rawValue: tabWidth,
+            Keys.translateTabsToSpaces.rawValue: indentWithSpaces,
+            ])
     }
 
     private var core: XiCoreProxy {

@@ -73,7 +73,7 @@ class XiCoreProxy {
     }
 
     func updateConfig(_ settings: [String: Any]) {
-        sendRpc(method: "config_change", params: ["changes": settings])
+        sendRpc(method: "modify_user_config", params: ["domain": "general", "changes": settings])
     }
 
     func frameChanged(newFrame rect: CGRect) {

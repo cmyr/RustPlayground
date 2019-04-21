@@ -65,6 +65,11 @@ impl WidthCache {
         WidthCache { cache: RefCell::new(HashMap::new()), measure_fn }
     }
 
+    /// Clear all cached values
+    pub fn reset(&self) {
+        self.cache.borrow_mut().clear();
+    }
+
     pub fn measure_layout_size(&self, line: &str) -> Size {
         //HACK: we want this method to take &self so we're using a refcell
         let mut cache = self.cache.borrow_mut();

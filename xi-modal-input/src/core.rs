@@ -5,10 +5,10 @@ use xi_core_lib::rpc::EditNotification;
 
 use crate::callbacks::{InvalidateCallback, RpcCallback};
 use crate::input_handler::{Handler, Plumber};
+use crate::lines::Size;
 use crate::rpc::Rpc;
 use crate::update::Update;
 use crate::view::OneView;
-use crate::lines::Size;
 
 pub struct XiCore {
     pub rpc_callback: RpcCallback,
@@ -41,6 +41,15 @@ impl XiCore {
         };
 
         eprintln!("core handle_msg {:?}", msg.method);
+
+        if msg.method == "modify_user_config" {
+            let changes = msg.params["changes"].as_object().unwrap().to_owned();
+            if let Some(update) = self.state.update_config(changes) {
+                self.send_update(update);
+            }
+            return;
+        }
+
         let event = match msg.method {
             "insert" => E::Insert { chars: msg.params["chars"].as_str().unwrap().to_owned() },
             "viewport_change" => E::ViewportChange(msg.get_params()),
@@ -70,8 +79,7 @@ impl XiCore {
 
     pub fn send_update(&self, mut update: Update) {
         if let Some(Size { width, height }) = update.size.take() {
-            self.rpc_callback
-                .call("content_size", json!({"width": width, "height": height}));
+            self.rpc_callback.call("content_size", json!({"width": width, "height": height}));
         }
 
         if let Some(styles) = update.styles.take() {

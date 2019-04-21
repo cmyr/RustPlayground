@@ -58,6 +58,8 @@ pub struct OneView {
     content_size: Size,
 }
 
+type ConfigMap = serde_json::Map<String, serde_json::Value>;
+
 impl OneView {
     pub fn new(width_measure_fn: extern "C" fn(*const c_char) -> Size) -> Self {
         let width_cache = WidthCache::new(width_measure_fn);
@@ -169,6 +171,58 @@ impl OneView {
             },
         }
         builder.build()
+    }
+
+    pub(crate) fn update_config(&mut self, changes: ConfigMap) -> Option<Update> {
+        let mut update_breaks = false;
+        let mut reset_cache = false;
+
+        for (key, value) in changes {
+            match key.as_str() {
+                "translate_tabs_to_spaces" => {
+                    self.config.translate_tabs_to_spaces = serde_json::from_value(value).unwrap()
+                }
+                "tab_size" => self.config.tab_size = serde_json::from_value(value).unwrap(),
+                "auto_indent" => self.config.auto_indent = serde_json::from_value(value).unwrap(),
+                "word_wrap" => {
+                    self.config.word_wrap = serde_json::from_value(value).unwrap();
+                    update_breaks = true;
+                }
+                "font_face" => {
+                    self.config.font_face = serde_json::from_value(value).unwrap();
+                    update_breaks = true;
+                    reset_cache = true;
+                }
+
+                "font_size" => {
+                    self.config.font_size = serde_json::from_value(value).unwrap();
+                    update_breaks = true;
+                    reset_cache = true;
+                }
+                _other => eprintln!("unexpected config key {}", _other),
+            }
+        }
+
+        if reset_cache {
+            self.width_cache.reset();
+            self.line_height = self.width_cache.measure_layout_size("a").height;
+        }
+
+        if update_breaks {
+            let view_width = if self.config.word_wrap { Some(self.frame.width) } else { None };
+            self.rewrap_all(view_width);
+            let mut builder = UpdateBuilder::new();
+            builder.inval_lines(0..self.count_lines());
+            let newsize = self.compute_content_size();
+            if newsize != self.content_size {
+                self.content_size = newsize;
+                builder.content_size(newsize);
+            }
+
+            return Some(builder.build());
+        }
+
+        None
     }
 
     fn handle_view_event(&mut self, event: ViewEvent, update: &mut UpdateBuilder) {
@@ -285,11 +339,13 @@ impl OneView {
 
         //TODO: do we need to update spans before we compute autoindent?
         // let's try not first :o
-        if let Some(delta) = edit_delta.take() {
-            if let Some(indent_delta) = self.auto_indent(&delta, this_edit_type) {
-                self.text = indent_delta.apply(&self.text);
-                let new_sel = self.selection.apply_delta(&indent_delta, true, InsertDrift::Default);
-                self.selection = new_sel;
+        if self.config.auto_indent {
+            if let Some(delta) = edit_delta.take() {
+                if let Some(delta) = self.auto_indent(&delta, this_edit_type) {
+                    self.text = delta.apply(&self.text);
+                    let new_sel = self.selection.apply_delta(&delta, true, InsertDrift::Default);
+                    self.selection = new_sel;
+                }
             }
         }
 

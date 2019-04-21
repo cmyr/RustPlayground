@@ -11,6 +11,7 @@ import Cocoa
 fileprivate let MIN_TAB_WIDTH = 1;
 fileprivate let MAX_TAB_WIDTH = 40;
 fileprivate let SPACES_MENU_ITEM_TAG = 10;
+fileprivate let TAB_MENU_ITEM_TAG = 20;
 
 class EditorPreferences {
     static let editorFontChangedNotification = Notification.Name(rawValue: "net.cmyr.rust-playground.editorFontChanged")
@@ -191,8 +192,13 @@ class PreferencesViewController: NSViewController {
         tabWidthStepper.maxValue = Double(MAX_TAB_WIDTH)
 
         // set initial values from saved preferences
+        let useSpaces = EditorPreferences.shared.indentWithSpaces
         tabWidthStepper.integerValue = EditorPreferences.shared.tabWidth
         tabWidthTextField.integerValue = EditorPreferences.shared.tabWidth
+        tabWidthTextField.isEnabled = useSpaces
+
+        let indentMenuSelectedTag = useSpaces ? SPACES_MENU_ITEM_TAG : TAB_MENU_ITEM_TAG
+        indentSelectButton.selectItem(withTag: indentMenuSelectedTag)
 
         autoIndentCheckButton.state = EditorPreferences.shared.autoIndentEnabled ? .on : .off
         lineWrappingCheckButton.state = EditorPreferences.shared.lineWrappingEnabled ? .on : .off
@@ -213,6 +219,7 @@ class PreferencesViewController: NSViewController {
     @IBAction func indentSelectAction(_ sender: NSPopUpButton) {
         let useSpaces = sender.selectedItem?.tag == SPACES_MENU_ITEM_TAG
         EditorPreferences.shared.indentWithSpaces = useSpaces
+        tabWidthTextField.isEnabled = useSpaces
     }
 
     @IBAction func tabWidthTextFieldAction(_ sender: NSTextField) {

@@ -180,7 +180,9 @@ class EditViewController: NSViewController {
             return [
                 "select": [
                     "granularity": gran,
-                    "multi": event.modifierFlags.contains(.command)
+                    // multi cursor is currently disabled
+//                    "multi": event.modifierFlags.contains(.command)
+                    "multi": false,
                 ]
             ]
         }

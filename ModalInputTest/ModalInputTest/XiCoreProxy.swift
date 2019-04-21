@@ -96,6 +96,14 @@ class XiCoreProxy {
         sendRpc(method: command, params: [])
     }
 
+    /// returns the total contents of the buffer
+    func getDocument() -> String {
+        // hack; we're overriding the getline API in core if passed this
+        // special line number
+        let magicNumber: UInt32 = 6942069
+        return getLine(magicNumber)!.text
+    }
+
     func getLine(_ lineNumber: UInt32) -> RawLine? {
         let line = xiCoreGetLine(_inner, lineNumber);
         if let line =  line {

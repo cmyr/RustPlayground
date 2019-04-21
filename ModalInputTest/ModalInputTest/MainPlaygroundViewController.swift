@@ -70,14 +70,11 @@ class MainPlaygroundViewController: NSSplitViewController {
     @IBAction func build(_ sender: Any?) {
         let workDirectory = "/Users/rofls/dev/hacking/macos_rustplay_test"
         let fileName = "playground_test.rs"
-        //        let execName = "playground_test"
-        let magicNumber: UInt32 = 6942069
-
         if !outputViewIsVisible {
              outputViewIsVisible = true
         }
 
-        let document = (NSApp.delegate as! AppDelegate).core.getLine(magicNumber)!.text
+        let document = AppDelegate.shared.core.getDocument()
 
         let directory = URL(fileURLWithPath: workDirectory)
         let fileUrl = directory.appendingPathComponent(fileName, isDirectory: false)

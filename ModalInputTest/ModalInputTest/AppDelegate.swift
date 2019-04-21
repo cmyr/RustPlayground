@@ -10,6 +10,8 @@ import Cocoa
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
+    static let stashDocumentKey = "net.cmyr.rust-playground.allDocumentContents"
+
     /// Convenience access to the AppDelegate instance
     static var shared: AppDelegate {
         return (NSApp.delegate as! AppDelegate)
@@ -41,12 +43,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
-        // Insert code here to tear down your application
+        let bufferContents = core.getDocument()
+        UserDefaults.standard.set(bufferContents, forKey: AppDelegate.stashDocumentKey)
     }
 
     func insertPlaceholderText() {
         let placeholderProgram = "fn main() {\n    println!(\"hello 🦀!\");\n}"
-        core.insertText(placeholderProgram)
+        let savedContents = UserDefaults.standard.string(forKey: AppDelegate.stashDocumentKey)
+        core.insertText(savedContents ?? placeholderProgram)
     }
 
     @IBAction func displayPreferencePane(_: Any?) {

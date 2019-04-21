@@ -127,7 +127,8 @@ class EditorPreferences {
         let newEditorSize = editorFont.pointSize + editorSizeStep
         editorFont = NSFontManager.shared.convert(editorFont,
                                                   toSize: newEditorSize)
-        let consoleSizeStep = sizeAdjustmentUnitForFont(editorFont)
+
+        let consoleSizeStep = sizeAdjustmentUnitForFont(consoleFont)
         let newConsoleSize = consoleFont.pointSize + consoleSizeStep
         consoleFont = NSFontManager.shared.convert(consoleFont,
                                                    toSize: newConsoleSize)
@@ -138,7 +139,8 @@ class EditorPreferences {
         let newEditorSize = editorFont.pointSize - editorSizeStep
         editorFont = NSFontManager.shared.convert(editorFont,
                                                   toSize: newEditorSize)
-        let consoleSizeStep = sizeAdjustmentUnitForFont(editorFont)
+
+        let consoleSizeStep = sizeAdjustmentUnitForFont(consoleFont)
         let newConsoleSize = consoleFont.pointSize - consoleSizeStep
         consoleFont = NSFontManager.shared.convert(consoleFont,
                                                    toSize: newConsoleSize)
@@ -184,11 +186,17 @@ class PreferencesViewController: NSViewController {
         autoIndentCheckButton.state = EditorPreferences.shared.autoIndentEnabled ? .on : .off
         lineWrappingCheckButton.state = EditorPreferences.shared.lineWrappingEnabled ? .on : .off
 
-        let editorFont = EditorPreferences.shared.editorFont
-        editorFontButton.title = "\(editorFont.familyName ?? editorFont.fontName) \(editorFont.pointSize)"
+        updateFontButtonTitles()
 
-        let consoleFont = EditorPreferences.shared.consoleFont
-        consoleFontButton.title = "\(consoleFont.familyName ?? consoleFont.fontName) \(consoleFont.pointSize)"
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(fontChangedNotification),
+                                               name: EditorPreferences.editorFontChangedNotification,
+                                               object: nil)
+
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(fontChangedNotification),
+                                               name: EditorPreferences.consoleFontChangedNotification,
+                                               object: nil)
     }
 
     @IBAction func indentSelectAction(_ sender: NSPopUpButton) {
@@ -227,7 +235,20 @@ class PreferencesViewController: NSViewController {
         showFontManager()
     }
 
-    func showFontManager() {
+    @objc func fontChangedNotification(_ notification: Notification) {
+        updateFontButtonTitles()
+    }
+
+    private func updateFontButtonTitles() {
+        let editorFont = EditorPreferences.shared.editorFont
+        let consoleFont = EditorPreferences.shared.consoleFont
+
+        editorFontButton.title = "\(editorFont.familyName ?? editorFont.fontName) \(editorFont.pointSize)"
+
+        consoleFontButton.title = "\(consoleFont.familyName ?? consoleFont.fontName) \(consoleFont.pointSize)"
+    }
+
+    private func showFontManager() {
         NSFontManager.shared.target = self
         NSFontManager.shared.orderFrontFontPanel(nil)
     }

@@ -55,6 +55,14 @@ class MainPlaygroundViewController: NSSplitViewController {
         }
     }
 
+    @IBAction func increaseFontSize(_ sender: Any?) {
+        EditorPreferences.shared.increaseFontSize()
+    }
+
+    @IBAction func decreaseFontSize(_ sender: Any?) {
+        EditorPreferences.shared.decreaseFontSize()
+    }
+
     @IBAction func toggleOutputView(_ sender: NSButton?) {
         outputViewIsVisible = !outputViewIsVisible
     }

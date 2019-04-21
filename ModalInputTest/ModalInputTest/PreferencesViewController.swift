@@ -121,6 +121,35 @@ class EditorPreferences {
             // NOTE: core doesn't know about the console
         }
     }
+
+    func increaseFontSize() {
+        let editorSizeStep = sizeAdjustmentUnitForFont(editorFont)
+        let newEditorSize = editorFont.pointSize + editorSizeStep
+        editorFont = NSFontManager.shared.convert(editorFont,
+                                                  toSize: newEditorSize)
+        let consoleSizeStep = sizeAdjustmentUnitForFont(editorFont)
+        let newConsoleSize = consoleFont.pointSize + consoleSizeStep
+        consoleFont = NSFontManager.shared.convert(consoleFont,
+                                                   toSize: newConsoleSize)
+    }
+
+    func decreaseFontSize() {
+        let editorSizeStep = sizeAdjustmentUnitForFont(editorFont)
+        let newEditorSize = editorFont.pointSize - editorSizeStep
+        editorFont = NSFontManager.shared.convert(editorFont,
+                                                  toSize: newEditorSize)
+        let consoleSizeStep = sizeAdjustmentUnitForFont(editorFont)
+        let newConsoleSize = consoleFont.pointSize - consoleSizeStep
+        consoleFont = NSFontManager.shared.convert(consoleFont,
+                                                   toSize: newConsoleSize)
+    }
+
+    // As the font size increases, the step size should also increase.
+    // This is a very hacky approximation of that behaviour.
+    private func sizeAdjustmentUnitForFont(_ font: NSFont) -> CGFloat {
+        let adjustmentFactor: CGFloat = 10.0
+        return max(1, (font.pointSize / adjustmentFactor).rounded(.down))
+    }
 }
 
 

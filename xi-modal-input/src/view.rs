@@ -420,7 +420,7 @@ impl OneView {
     fn auto_indent(&mut self, delta: &RopeDelta, edit_type: EditType) -> Option<RopeDelta> {
         let mut builder = RopeDeltaBuilder::new(self.text.len());
         for region in delta.iter_inserts() {
-            let line = self.line_of_offset(region.new_offset);
+            let line = self.text.line_of_offset(region.new_offset);
             match edit_type {
                 EditType::InsertNewline => self.indent_after_newline(line + 1, &mut builder),
                 EditType::InsertChars => {
@@ -490,7 +490,7 @@ impl OneView {
     }
 
     fn set_indent(&self, builder: &mut RopeDeltaBuilder, line: usize, level: usize) {
-        let edit_start = self.offset_of_line(line);
+        let edit_start = self.text.offset_of_line(line);
         let edit_len = {
             let line = self.get_line_str(line);
             line.as_bytes().iter().take_while(|b| **b == b' ' || **b == b'\t').count()
@@ -535,9 +535,13 @@ impl OneView {
             Some(l) => l,
             None => return false,
         };
-        let metadata = self.highlighter.metadata_for_line(prev_line);
-        let line = self.get_line_str(prev_line);
-        metadata.increase_indent(&line)
+        if let Some(metadata) = self.highlighter.metadata_for_line(prev_line) {
+            let line = self.get_line_str(prev_line);
+            metadata.increase_indent(&line)
+        } else {
+            eprintln!("missing metadata for line {}", line);
+            false
+        }
     }
 
     /// Test whether the indent level for this line should be decreased, by
@@ -547,9 +551,14 @@ impl OneView {
         if line == 0 || line == self.count_lines() {
             return false;
         }
-        let metadata = self.highlighter.metadata_for_line(line);
-        let line = self.get_line_str(line);
-        metadata.decrease_indent(&line)
+
+        if let Some(metadata) = self.highlighter.metadata_for_line(line) {
+            let line = self.get_line_str(line);
+            metadata.decrease_indent(&line)
+        } else {
+            eprintln!("missing metadata for line {}", line);
+            false
+        }
     }
 
     fn toggle_comment(&self) -> Option<RopeDelta> {
@@ -566,17 +575,18 @@ impl OneView {
     }
 
     fn toggle_comment_line_range(&self, range: LineRange, builder: &mut RopeDeltaBuilder) {
-        let metadata = self.highlighter.metadata_for_line(range.start);
-        let comment_str = match metadata.line_comment() {
-            Some(s) => s,
-            None => return,
-        };
+        if let Some(metadata) = self.highlighter.metadata_for_line(range.start) {
+            let comment_str = match metadata.line_comment() {
+                Some(s) => s,
+                None => return,
+            };
 
-        let line = self.get_line_str(range.start);
-        if line.trim() == comment_str.trim() || line.trim().starts_with(&comment_str) {
-            self.remove_comment(range, comment_str, builder);
-        } else {
-            self.add_comment(range, comment_str, builder);
+            let line = self.get_line_str(range.start);
+            if line.trim() == comment_str.trim() || line.trim().starts_with(&comment_str) {
+                self.remove_comment(range, comment_str, builder);
+            } else {
+                self.add_comment(range, comment_str, builder);
+            }
         }
     }
 

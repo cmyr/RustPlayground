@@ -46,9 +46,9 @@ impl HighlightState {
         self.state.new_styles.take()
     }
 
-    pub(crate) fn metadata_for_line(&self, line: usize) -> ScopedMetadata {
-        let scope = &self.state.parse_state[line];
-        self.syntax_set.metadata().metadata_for_scope(scope.as_slice())
+    pub(crate) fn metadata_for_line(&self, line: usize) -> Option<ScopedMetadata> {
+        let scope = &self.state.parse_state.get(line)?;
+        Some(self.syntax_set.metadata().metadata_for_scope(scope.as_slice()))
     }
 }
 

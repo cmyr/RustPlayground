@@ -78,6 +78,11 @@
             isEnabled = "YES">
          </EnvironmentVariable>
          <EnvironmentVariable
+            key = "RUSTUP_HOME"
+            value = "/some/fake/place"
+            isEnabled = "NO">
+         </EnvironmentVariable>
+         <EnvironmentVariable
             key = "PATH"
             value = "/Users/rofls/.cargo/bin:/usr/bin"
             isEnabled = "YES">

@@ -29,6 +29,11 @@ class MainPlaygroundViewController: NSSplitViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        print("init toolchains \(AppDelegate.shared.toolchains)")
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(toolchainsChanged(_:)),
+                                               name: AppDelegate.toolchainsChangedNotification,
+                                               object: nil)
     }
 
     override func viewDidAppear() {
@@ -36,6 +41,10 @@ class MainPlaygroundViewController: NSSplitViewController {
         let initSplitHeight = max(200, view.frame.height / 3).rounded(.down);
         splitView.setPosition(view.frame.height - initSplitHeight, ofDividerAt: 0)
         splitViewItems[1].isCollapsed = true
+    }
+
+    @objc func toolchainsChanged(_ notification: Notification) {
+        print("toolchains changed \(AppDelegate.shared.toolchains)")
     }
 
     var outputViewIsVisible: Bool = false {

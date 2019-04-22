@@ -11,6 +11,7 @@ import Cocoa
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
     static let stashDocumentKey = "net.cmyr.rust-playground.allDocumentContents"
+    static let toolchainsChangedNotification = Notification.Name(rawValue: "net.cmyr.rust-playground.toolchainsChangedNotification")
 
     /// Convenience access to the AppDelegate instance
     static var shared: AppDelegate {
@@ -30,6 +31,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     lazy var preferencesWindowController: PreferencesWindowController = {
         return NSStoryboard.main?.instantiateController(withIdentifier: "preferences") as! PreferencesWindowController;
     }()
+
+
+    /// The available rust toolchains
+    private(set) var toolchains: [Toolchain] = [] {
+        didSet {
+         NotificationCenter.default.post(name: AppDelegate.toolchainsChangedNotification, object: self)
+        }
+    }
 
     var scheduledEvents = [UInt32: NSEvent]()
     var nextWorkItemId: UInt32 = 0
@@ -54,7 +63,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func gotToolchains(_ toolchainResult: Result<[Toolchain], PlaygroundError>) {
-        print("got toolchains \(toolchainResult)")
+        switch toolchainResult {
+        case .success(let greatNews):
+            self.toolchains = greatNews
+        case .failure(let badNews):
+            if let window = NSApp.mainWindow {
+                let alert = NSAlert(error: badNews)
+                alert.messageText = badNews.message
+                alert.beginSheetModal(for: window, completionHandler: nil)
+            }
+        }
     }
 
     func insertPlaceholderText() {

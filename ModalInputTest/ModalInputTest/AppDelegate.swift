@@ -40,11 +40,21 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         EditorPreferences.shared.syncAllWithCore()
         insertPlaceholderText()
         mainController?.view.window?.makeFirstResponder(mainController)
+        DispatchQueue.global(qos: .default).async { [weak self] in
+            let toolchains = listToolchains()
+            DispatchQueue.main.async {
+                self?.gotToolchains(toolchains)
+            }
+        }
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
         let bufferContents = core.getDocument()
         UserDefaults.standard.set(bufferContents, forKey: AppDelegate.stashDocumentKey)
+    }
+
+    func gotToolchains(_ toolchainResult: Result<[Toolchain], PlaygroundError>) {
+        print("got toolchains \(toolchainResult)")
     }
 
     func insertPlaceholderText() {

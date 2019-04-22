@@ -9,6 +9,10 @@
 /* Begin PBXBuildFile section */
 		6018ED18225FB15600B5DF38 /* Style.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6018ED17225FB15600B5DF38 /* Style.swift */; };
 		604B0F6022405C88007038E6 /* XiCoreProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 604B0F5F22405C88007038E6 /* XiCoreProxy.swift */; };
+		604C7ACC226E572C00F6B277 /* playground.h in Headers */ = {isa = PBXBuildFile; fileRef = 604C7ACB226E572C00F6B277 /* playground.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		604C7ACE226E582C00F6B277 /* libplayground.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 604C7AC7226E56DC00F6B277 /* libplayground.a */; };
+		604C7AD0226E597700F6B277 /* Playground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 604C7ACF226E597700F6B277 /* Playground.swift */; };
+		604C7AD7226E671E00F6B277 /* libcurl.4.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 604C7AD3226E64FC00F6B277 /* libcurl.4.tbd */; };
 		606644EB223FFED7006215A0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606644EA223FFED7006215A0 /* AppDelegate.swift */; };
 		606644ED223FFED7006215A0 /* EditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606644EC223FFED7006215A0 /* EditViewController.swift */; };
 		606644EF223FFED8006215A0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 606644EE223FFED8006215A0 /* Assets.xcassets */; };
@@ -49,6 +53,12 @@
 		6018ED17225FB15600B5DF38 /* Style.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Style.swift; path = ModalInputTest/Style.swift; sourceTree = SOURCE_ROOT; };
 		603608D2224EC693002CEAC6 /* xicore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = xicore.h; path = "../xi-ffi/xicore.h"; sourceTree = "<group>"; };
 		604B0F5F22405C88007038E6 /* XiCoreProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XiCoreProxy.swift; sourceTree = "<group>"; };
+		604C7AC7226E56DC00F6B277 /* libplayground.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libplayground.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		604C7ACB226E572C00F6B277 /* playground.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = playground.h; path = "../playground-utils-ffi/playground.h"; sourceTree = "<group>"; };
+		604C7ACF226E597700F6B277 /* Playground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Playground.swift; path = ModalInputTest/Playground.swift; sourceTree = "<group>"; };
+		604C7AD1226E64EA00F6B277 /* libcurl.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcurl.tbd; path = usr/lib/libcurl.tbd; sourceTree = SDKROOT; };
+		604C7AD3226E64FC00F6B277 /* libcurl.4.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcurl.4.tbd; path = usr/lib/libcurl.4.tbd; sourceTree = SDKROOT; };
+		604C7AD5226E654400F6B277 /* libcurl.3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcurl.3.tbd; path = usr/lib/libcurl.3.tbd; sourceTree = SDKROOT; };
 		606644E7223FFED7006215A0 /* ModalInputTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ModalInputTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		606644EA223FFED7006215A0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		606644EC223FFED7006215A0 /* EditViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditViewController.swift; sourceTree = "<group>"; };
@@ -75,10 +85,19 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		604C7AC5226E56DC00F6B277 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				604C7AD7226E671E00F6B277 /* libcurl.4.tbd in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		606644E4223FFED7006215A0 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				604C7ACE226E582C00F6B277 /* libplayground.a in Frameworks */,
 				60BF2286225511BD002C0352 /* libximodal.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -96,6 +115,9 @@
 		600D761222405AC400CC9D90 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				604C7AD5226E654400F6B277 /* libcurl.3.tbd */,
+				604C7AD3226E64FC00F6B277 /* libcurl.4.tbd */,
+				604C7AD1226E64EA00F6B277 /* libcurl.tbd */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -108,6 +130,8 @@
 				606644FC223FFED9006215A0 /* ModalInputTestTests */,
 				606644E8223FFED7006215A0 /* Products */,
 				609A2269224052B000A3F007 /* ModalInputTest-Bridging-Header.h */,
+				604C7ACF226E597700F6B277 /* Playground.swift */,
+				604C7ACB226E572C00F6B277 /* playground.h */,
 				609A22662240504100A3F007 /* libximodal.h */,
 				603608D2224EC693002CEAC6 /* xicore.h */,
 				600D761222405AC400CC9D90 /* Frameworks */,
@@ -120,6 +144,7 @@
 				606644E7223FFED7006215A0 /* ModalInputTest.app */,
 				606644F9223FFED9006215A0 /* ModalInputTestTests.xctest */,
 				609A225F22404CF900A3F007 /* libximodal.a */,
+				604C7AC7226E56DC00F6B277 /* libplayground.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -168,6 +193,14 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
+		604C7AC3226E56DC00F6B277 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				604C7ACC226E572C00F6B277 /* playground.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		609A225B22404CF900A3F007 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -179,6 +212,24 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		604C7AC6226E56DC00F6B277 /* playground */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 604C7ACA226E56DC00F6B277 /* Build configuration list for PBXNativeTarget "playground" */;
+			buildPhases = (
+				604C7AC3226E56DC00F6B277 /* Headers */,
+				604C7AC4226E56DC00F6B277 /* Sources */,
+				604C7AC5226E56DC00F6B277 /* Frameworks */,
+				604C7ACD226E573A00F6B277 /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = playground;
+			productName = playground;
+			productReference = 604C7AC7226E56DC00F6B277 /* libplayground.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 		606644E6223FFED7006215A0 /* ModalInputTest */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 60664502223FFED9006215A0 /* Build configuration list for PBXNativeTarget "ModalInputTest" */;
@@ -241,6 +292,9 @@
 				LastUpgradeCheck = 1010;
 				ORGANIZATIONNAME = "Colin Rofls";
 				TargetAttributes = {
+					604C7AC6226E56DC00F6B277 = {
+						CreatedOnToolsVersion = 10.2.1;
+					};
 					606644E6223FFED7006215A0 = {
 						CreatedOnToolsVersion = 10.1;
 						LastSwiftMigration = 1020;
@@ -276,6 +330,7 @@
 				606644E6223FFED7006215A0 /* ModalInputTest */,
 				606644F8223FFED9006215A0 /* ModalInputTestTests */,
 				609A225E22404CF900A3F007 /* ximodal */,
+				604C7AC6226E56DC00F6B277 /* playground */,
 			);
 		};
 /* End PBXProject section */
@@ -301,6 +356,23 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		604C7ACD226E573A00F6B277 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# When building from Xcode we want to ensure that `cargo` is in PATH.\n# as a convenience, add the default cargo install location\nexport PATH=\"$PATH:${HOME}/.cargo/bin\"\n\nset -e\n\nif [[ $CONFIGURATION = \"Debug\" ]]; then\nRUST_CONFIGURATION=\"debug\"\nRUST_CONFIGURATION_FLAG=\"\"\nelse\nRUST_CONFIGURATION=\"release\"\nRUST_CONFIGURATION_FLAG=\"--release\"\nfi\n\nCRATE_ROOT=\"${SRCROOT}/../playground-utils-ffi\"\nOUTDIR=\"$CRATE_ROOT/target/${RUST_CONFIGURATION}\"\nPRODUCT_NAME=\"libplayground.a\"\n\ncd \"${CRATE_ROOT}\"\n\necho \"building ${CRATE_ROOT}, conf ${RUST_CONFIGURATION}, action ${ACTION}\"\n\nif [[ ${ACTION:-build} = \"build\" ]]; then\ncargo build $RUST_CONFIGURATION_FLAG\necho \"cargo built, copying to ${BUILT_PRODUCTS_DIR}\"\ncp \"${OUTDIR}/${PRODUCT_NAME}\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}\"\nelif [[ $ACTION = \"clean\" ]]; then\necho \"cleaing\"\ncargo clean\nfi\n\nset +e\n";
+		};
 		609A226322404D0D00A3F007 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -321,6 +393,13 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		604C7AC4226E56DC00F6B277 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		606644E3223FFED7006215A0 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -329,6 +408,7 @@
 				6018ED18225FB15600B5DF38 /* Style.swift in Sources */,
 				60BF2285225012DD002C0352 /* EditView.swift in Sources */,
 				60D8C746226A4D2800440860 /* OutputTextView.swift in Sources */,
+				604C7AD0226E597700F6B277 /* Playground.swift in Sources */,
 				606644ED223FFED7006215A0 /* EditViewController.swift in Sources */,
 				606644EB223FFED7006215A0 /* AppDelegate.swift in Sources */,
 				60D05FAD226A7ED10045615B /* PreferencesWindowController.swift in Sources */,
@@ -376,6 +456,26 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		604C7AC8226E56DC00F6B277 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		604C7AC9226E56DC00F6B277 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
 		60664500223FFED9006215A0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -601,6 +701,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		604C7ACA226E56DC00F6B277 /* Build configuration list for PBXNativeTarget "playground" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				604C7AC8226E56DC00F6B277 /* Debug */,
+				604C7AC9226E56DC00F6B277 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		606644E2223FFED7006215A0 /* Build configuration list for PBXProject "ModalInputTest" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

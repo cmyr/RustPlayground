@@ -5,10 +5,7 @@ authors = ["Colin Rofls <colin@cmyr.net>"]
 edition = "2018"
 
 [dependencies]
+dirs = "1.0"
 serde = "1.0"
 serde_derive = "1.0"
-
-[dependencies.rustup]
-version = "1.17"
-git = "https://github.com/rust-lang/rustup.rs.git"
-
+semver = "0.9"

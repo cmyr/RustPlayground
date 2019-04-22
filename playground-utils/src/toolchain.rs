@@ -1,8 +1,5 @@
-use std::sync::Arc;
-
 use crate::error::Error;
-
-use rustup::Cfg;
+use crate::rustup;
 
 const NATIVE_TOOLCHAIN: &str = "x86_64-apple-darwin";
 
@@ -30,10 +27,7 @@ impl ToolchainInfo {
 
 /// Lists the installed toolchains for this target (macos)
 pub fn list_toolchains() -> Result<Vec<ToolchainInfo>, Error> {
-    let cfg = Cfg::from_env(Arc::new(move |n| {
-        eprintln!("{}", n);
-    }))?;
-    let toolchains = cfg.list_toolchains()?;
+    let toolchains = rustup::list_toolchains()?;
     let toolchains = toolchains
         .into_iter()
         .filter(|t| t.ends_with(NATIVE_TOOLCHAIN))

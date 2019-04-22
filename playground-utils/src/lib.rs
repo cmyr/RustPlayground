@@ -2,6 +2,7 @@
 extern crate serde_derive;
 
 mod error;
+mod rustup;
 mod toolchain;
 
 #[cfg(not(target_os = "macos"))]

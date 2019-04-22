@@ -61,11 +61,19 @@ fn get_toolchains_dir() -> Result<PathBuf, Error> {
 }
 
 fn get_rustup_home() -> Result<PathBuf, Error> {
-    if let Some(home) = env::var_os("RUSTUP_HOME") {
-        return Ok(home.into());
+    fn get_rustup_home_path() -> Result<PathBuf, Error> {
+        if let Some(home) = env::var_os("RUSTUP_HOME") {
+            return Ok(home.into());
+        }
+        dirs::home_dir().map(|p| p.join(".rustup")).ok_or_else(|| Error::MissingRustup)
     }
 
-    dirs::home_dir().map(|p| p.join(".rustup")).ok_or_else(|| Error::MissingRustup)
+    let rustup_home = get_rustup_home_path()?;
+    if is_directory(&rustup_home) {
+        Ok(rustup_home)
+    } else {
+        Err(Error::MissingRustup)
+    }
 }
 
 fn toolchain_sort<T: AsRef<str>>(v: &mut Vec<T>) {

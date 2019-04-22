@@ -11,9 +11,9 @@ impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         use Error::*;
         match self {
-            MissingRustup => write!(f, "Cannot find rustup"),
-            ReadingToolchainsDir => write!(f, "Cannot read toolchains directory"),
-            ToolchainParseError(e) => write!(f, "Error parsing toolchain: {}", e),
+            MissingRustup => write!(f, "Cannot find rustup."),
+            ReadingToolchainsDir => write!(f, "Cannot read toolchains directory."),
+            ToolchainParseError(e) => write!(f, "Error parsing toolchain: '{}'.", e),
         }
     }
 }

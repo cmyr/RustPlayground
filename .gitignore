@@ -4,6 +4,9 @@ xi-modal-input/target
 xi-ffi/Cargo.lock
 xi-ffi/target
 
+playground-utils/Cargo.lock
+playground-utils/target
+
 ModalInputTest/*.a
 
 ### macOS ###

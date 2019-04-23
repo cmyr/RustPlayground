@@ -11,6 +11,7 @@ import Cocoa
 let OUTPUT_TOOLBAR_ITEM_TAG = 10;
 let TOOLCHAIN_SELECT_TOOLBAR_ITEM_TAG = 13;
 let RUN_TOOLBAR_ITEM_TAG = 14;
+let ACTIVITY_SPINNER_TOOLBAR_ITEM_TAG = -1;
 
 let TOOLCHAIN_ITEM_TAG_OFFSET = 1000;
 
@@ -45,12 +46,20 @@ class MainPlaygroundViewController: NSSplitViewController {
         return toolbarItem!.view as! NSButton
     }()
 
+    lazy var activitySpinner: NSProgressIndicator = {
+        let toolbarItem = view.window?.toolbar?.items.first {
+            $0.tag == ACTIVITY_SPINNER_TOOLBAR_ITEM_TAG
+        }
+        return toolbarItem!.view as! NSProgressIndicator
+    }()
+
     override func viewDidLoad() {
         super.viewDidLoad()
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(toolchainsChanged(_:)),
                                                name: AppDelegate.toolchainsChangedNotification,
                                                object: nil)
+
 
     }
 
@@ -59,6 +68,7 @@ class MainPlaygroundViewController: NSSplitViewController {
         let initSplitHeight = max(200, view.frame.height / 3).rounded(.down);
         splitView.setPosition(view.frame.height - initSplitHeight, ofDividerAt: 0)
         splitViewItems[1].isCollapsed = true
+        activitySpinner.isDisplayedWhenStopped = false
     }
 
     @objc func toolchainsChanged(_ notification: Notification) {
@@ -113,7 +123,23 @@ class MainPlaygroundViewController: NSSplitViewController {
         }
         outputViewController.clearOutput()
         outputViewController.printInfo(text: "Compiling")
-        switch self.executeTask() {
+
+        activitySpinner.startAnimation(self)
+        runButton.isEnabled = false
+
+        let task = generateTask()
+        DispatchQueue.global(qos: .default).async {
+            let result = self.executeTask(task)
+            DispatchQueue.main.async {
+                self.taskFinished(result)
+            }
+        }
+    }
+
+    func taskFinished(_ result: Result<CompilerResult, PlaygroundError>) {
+        activitySpinner.stopAnimation(self)
+        runButton.isEnabled = true
+        switch result {
         case .failure(let badNews):
             outputViewController.printInfo(text: "Error")
             outputViewController.handleStdErr(text: badNews.message)
@@ -125,8 +151,7 @@ class MainPlaygroundViewController: NSSplitViewController {
         outputViewController.printInfo(text: "Done")
     }
 
-    func executeTask() -> Result<CompilerResult, PlaygroundError> {
-        let task = generateTask()
+    func executeTask(_ task: CompilerTask) -> Result<CompilerResult, PlaygroundError> {
         let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent("playground-rs", isDirectory: true)
         if FileManager.default.fileExists(atPath: tempDir.path) {
             try! FileManager.default.removeItem(at: tempDir)

@@ -733,6 +733,13 @@
                                         <action selector="build:" target="Oky-zY-oP4" id="D6r-L4-lfn"/>
                                     </connections>
                                 </toolbarItem>
+                                <toolbarItem implicitItemIdentifier="B41B4CC3-3FC8-40D7-AA69-D473074B29F3" label="" paletteLabel="Activity Indicator" tag="-1" sizingBehavior="auto" id="doR-an-fUk">
+                                    <nil key="toolTip"/>
+                                    <progressIndicator key="view" wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" id="EJY-o3-hDj">
+                                        <rect key="frame" x="40" y="14" width="16" height="16"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    </progressIndicator>
+                                </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="2834D6F6-AD4A-4BA6-93D4-CCD3A31C98FB" label="Custom View" paletteLabel="Toolchain Select" tag="13" sizingBehavior="auto" id="kXy-ES-Vk2">
                                     <nil key="toolTip"/>
                                     <popUpButton key="view" verticalHuggingPriority="750" tag="13" id="Gsv-J1-17n">
@@ -754,22 +761,11 @@
                                         <action selector="toolchainSelectAction:" target="Oky-zY-oP4" id="i4w-V8-gNQ"/>
                                     </connections>
                                 </toolbarItem>
-                                <toolbarItem implicitItemIdentifier="A75A92C7-1230-4A4B-91DC-8FCC2786112E" label="Label" paletteLabel="Run Status" sizingBehavior="auto" id="gE6-Dg-YTu">
-                                    <nil key="toolTip"/>
-                                    <textField key="view" horizontalHuggingPriority="251" verticalHuggingPriority="750" id="60t-FW-PUE">
-                                        <rect key="frame" x="29" y="14" width="8" height="17"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="BDx-Sr-qSD">
-                                            <font key="font" usesAppearanceFont="YES"/>
-                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                        </textFieldCell>
-                                    </textField>
-                                </toolbarItem>
                             </allowedToolbarItems>
                             <defaultToolbarItems>
                                 <toolbarItem reference="7QS-8p-NEL"/>
                                 <toolbarItem reference="kXy-ES-Vk2"/>
+                                <toolbarItem reference="doR-an-fUk"/>
                                 <toolbarItem reference="ayk-AU-rl3"/>
                                 <toolbarItem reference="nTn-fh-Fu5"/>
                             </defaultToolbarItems>

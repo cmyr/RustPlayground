@@ -90,6 +90,11 @@ fn toolchain_sort<T: AsRef<str>>(v: &mut Vec<T>) {
     }
 
     fn toolchain_sort_key(s: &str) -> Version {
+        use crate::toolchain::NATIVE_TOOLCHAIN;
+
+        // we want nightly-x86_etc to order before nightly-date-x86_etc
+        let s = s.trim_end_matches(NATIVE_TOOLCHAIN);
+
         if s.starts_with("stable") {
             special_version(0, s)
         } else if s.starts_with("beta") {
@@ -108,4 +113,31 @@ fn toolchain_sort<T: AsRef<str>>(v: &mut Vec<T>) {
         let b_key = toolchain_sort_key(b_str);
         a_key.cmp(&b_key)
     });
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn sort_toolchains() {
+        let mut toolchains = vec![
+            "nightly-2019-01-26-x86_64-apple-darwin",
+            "stable-x86_64-apple-darwin",
+            "nightly-x86_64-apple-darwin",
+            "1.31.0-x86_64-apple-darwin",
+        ];
+
+        toolchain_sort(&mut toolchains);
+
+        assert_eq!(
+            toolchains,
+            vec![
+                "stable-x86_64-apple-darwin",
+                "nightly-x86_64-apple-darwin",
+                "nightly-2019-01-26-x86_64-apple-darwin",
+                "1.31.0-x86_64-apple-darwin",
+            ]
+        );
+    }
 }

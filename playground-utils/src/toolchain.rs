@@ -1,7 +1,7 @@
 use crate::error::Error;
 use crate::rustup;
 
-const NATIVE_TOOLCHAIN: &str = "x86_64-apple-darwin";
+pub(crate) const NATIVE_TOOLCHAIN: &str = "x86_64-apple-darwin";
 
 #[derive(Debug, Clone, Serialize)]
 pub struct ToolchainInfo {

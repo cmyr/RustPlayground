@@ -108,23 +108,37 @@ class MainPlaygroundViewController: NSSplitViewController {
     }
 
     @IBAction func build(_ sender: Any?) {
-        let workDirectory = "/Users/rofls/dev/hacking/macos_rustplay_test"
-        let fileName = "playground_test.rs"
         if !outputViewIsVisible {
              outputViewIsVisible = true
         }
-
-        let document = AppDelegate.shared.core.getDocument()
-
-        let directory = URL(fileURLWithPath: workDirectory)
-        let fileUrl = directory.appendingPathComponent(fileName, isDirectory: false)
-
-        try! document.write(to: fileUrl, atomically: true, encoding: .utf8)
-        let scriptURL = BundleResources.buildScriptURL
         outputViewController.clearOutput()
-        let runner = Runner(scriptPath: scriptURL, fileName: fileName)
-        if runner.compile(handler: outputViewController) {
-            runner.run(handler: outputViewController)
+        outputViewController.printInfo(text: "Compiling")
+        switch self.executeTask() {
+        case .failure(let badNews):
+            outputViewController.printInfo(text: "Error")
+            outputViewController.handleStdErr(text: badNews.message)
+        case .success(let goodNews):
+            if let executablePath = goodNews.executable {
+                runCommand(atPath: executablePath, handler: outputViewController)
+            }
         }
+        outputViewController.printInfo(text: "Done")
+    }
+
+    func executeTask() -> Result<CompilerResult, PlaygroundError> {
+        let task = generateTask()
+        let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent("playground-rs", isDirectory: true)
+        if FileManager.default.fileExists(atPath: tempDir.path) {
+            try! FileManager.default.removeItem(at: tempDir)
+        }
+        return ModalInputTest.executeTask(tempDir: tempDir, task: task)
+    }
+
+    func generateTask() -> CompilerTask {
+        let activeToolchainIdx = toolchainSelectButton.indexOfSelectedItem
+        let toolchain = AppDelegate.shared.toolchains[activeToolchainIdx].name
+        let code = AppDelegate.shared.core.getDocument()
+        let taskType: CompilerTask.TaskType = .run
+        return CompilerTask(toolchain: toolchain, code: code, type: taskType, backtrace: true, release: false)
     }
 }

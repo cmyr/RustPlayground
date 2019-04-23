@@ -28,6 +28,20 @@ func listToolchains() -> Result<[Toolchain], PlaygroundError> {
     }
 }
 
+func executeTask(tempDir: URL, task: CompilerTask) -> Result<CompilerResult, PlaygroundError> {
+    let tempPath = tempDir.path
+    let taskJson = task.toJson()
+    let response = JsonResponse.from { playgroundExecuteTask(tempPath, taskJson) }
+
+    switch response {
+    case .ok(let result):
+        let data = result as! [String: AnyObject]
+        return .success(CompilerResult.fromJson(data))
+    case .error(let errorString):
+        return .failure(PlaygroundError(message: errorString))
+    }
+}
+
 struct Toolchain {
     let name: String
     let channel: String

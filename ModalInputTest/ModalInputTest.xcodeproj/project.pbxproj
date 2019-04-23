@@ -13,6 +13,7 @@
 		604C7ACE226E582C00F6B277 /* libplayground.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 604C7AC7226E56DC00F6B277 /* libplayground.a */; };
 		604C7AD0226E597700F6B277 /* Playground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 604C7ACF226E597700F6B277 /* Playground.swift */; };
 		604C7AD7226E671E00F6B277 /* libcurl.4.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 604C7AD3226E64FC00F6B277 /* libcurl.4.tbd */; };
+		604C7ADB226F60FA00F6B277 /* CompilerTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 604C7ADA226F60FA00F6B277 /* CompilerTask.swift */; };
 		606644EB223FFED7006215A0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606644EA223FFED7006215A0 /* AppDelegate.swift */; };
 		606644ED223FFED7006215A0 /* EditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606644EC223FFED7006215A0 /* EditViewController.swift */; };
 		606644EF223FFED8006215A0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 606644EE223FFED8006215A0 /* Assets.xcassets */; };
@@ -59,6 +60,7 @@
 		604C7AD1226E64EA00F6B277 /* libcurl.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcurl.tbd; path = usr/lib/libcurl.tbd; sourceTree = SDKROOT; };
 		604C7AD3226E64FC00F6B277 /* libcurl.4.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcurl.4.tbd; path = usr/lib/libcurl.4.tbd; sourceTree = SDKROOT; };
 		604C7AD5226E654400F6B277 /* libcurl.3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcurl.3.tbd; path = usr/lib/libcurl.3.tbd; sourceTree = SDKROOT; };
+		604C7ADA226F60FA00F6B277 /* CompilerTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompilerTask.swift; sourceTree = "<group>"; };
 		606644E7223FFED7006215A0 /* ModalInputTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ModalInputTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		606644EA223FFED7006215A0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		606644EC223FFED7006215A0 /* EditViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditViewController.swift; sourceTree = "<group>"; };
@@ -160,6 +162,7 @@
 				60A91D1422650D0100240CC6 /* Runner.swift */,
 				60BF2284225012DD002C0352 /* EditView.swift */,
 				608A1D3F22657604001A79EB /* MainPlaygroundViewController.swift */,
+				604C7ADA226F60FA00F6B277 /* CompilerTask.swift */,
 				60CC174E224591840075FDE5 /* XiWindow.swift */,
 				604B0F5F22405C88007038E6 /* XiCoreProxy.swift */,
 				606644EE223FFED8006215A0 /* Assets.xcassets */,
@@ -416,6 +419,7 @@
 				60D05FAF226B9B410045615B /* PreferencesViewController.swift in Sources */,
 				608A1D4022657604001A79EB /* MainPlaygroundViewController.swift in Sources */,
 				60A91D172265115E00240CC6 /* BundleResources.swift in Sources */,
+				604C7ADB226F60FA00F6B277 /* CompilerTask.swift in Sources */,
 				60CC174F224591840075FDE5 /* XiWindow.swift in Sources */,
 				60A91D1522650D0100240CC6 /* Runner.swift in Sources */,
 			);

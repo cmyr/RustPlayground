@@ -10,6 +10,8 @@ import Cocoa
 
 let OUTPUT_TOOLBAR_ITEM_TAG = 10;
 let TOOLCHAIN_SELECT_TOOLBAR_ITEM_TAG = 13;
+let RUN_TOOLBAR_ITEM_TAG = 14;
+
 let TOOLCHAIN_ITEM_TAG_OFFSET = 1000;
 
 class MainPlaygroundViewController: NSSplitViewController {
@@ -36,6 +38,13 @@ class MainPlaygroundViewController: NSSplitViewController {
         return toolbarItem!.view as! NSPopUpButton
     }()
 
+    lazy var runButton: NSButton = {
+        let toolbarItem = view.window?.toolbar?.items.first {
+            $0.tag == RUN_TOOLBAR_ITEM_TAG
+        }
+        return toolbarItem!.view as! NSButton
+    }()
+
     override func viewDidLoad() {
         super.viewDidLoad()
         NotificationCenter.default.addObserver(self,
@@ -59,6 +68,9 @@ class MainPlaygroundViewController: NSSplitViewController {
         }
 
         toolchainSelectButton.isEnabled = AppDelegate.shared.toolchains.count > 1
+        toolchainSelectButton.isHidden = AppDelegate.shared.toolchains.count == 0
+        runButton.isEnabled = AppDelegate.shared.toolchains.count > 0
+
         //TODO: show a warning if no toolchains are found
     }
 

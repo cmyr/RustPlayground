@@ -47,13 +47,21 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         // uncomment me for vim mode
 //        core.registerEventHandler(callback: dispatchEvent, action: handleRpc, timer: handleTimer, cancelTimer: cancelTimer)
+
         EditorPreferences.shared.syncAllWithCore()
         insertPlaceholderText()
         mainController?.view.window?.makeFirstResponder(mainController)
         DispatchQueue.global(qos: .default).async { [weak self] in
+
             let toolchains = listToolchains()
+
             DispatchQueue.main.async {
                 self?.gotToolchains(toolchains)
+
+                // uncomment to test UI response to single toolchain
+                
+//                let toolchainsz = [Toolchain(name: "stable-x86_etc-blah", channel: "stable", date: nil)]
+//                self?.gotToolchains(.success(toolchainsz))
             }
         }
     }

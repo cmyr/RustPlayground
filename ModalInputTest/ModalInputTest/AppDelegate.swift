@@ -36,7 +36,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     /// The available rust toolchains
     private(set) var toolchains: [Toolchain] = [] {
         didSet {
-         NotificationCenter.default.post(name: AppDelegate.toolchainsChangedNotification, object: self)
+         NotificationCenter.default.post(name: AppDelegate.toolchainsChangedNotification,
+                                         object: self)
         }
     }
 
@@ -67,6 +68,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         case .success(let greatNews):
             self.toolchains = greatNews
         case .failure(let badNews):
+            self.toolchains = []
             if let window = NSApp.mainWindow {
                 let alert = NSAlert(error: badNews)
                 alert.messageText = badNews.message

@@ -9,6 +9,8 @@
 import Cocoa
 
 let OUTPUT_TOOLBAR_ITEM_TAG = 10;
+let TOOLCHAIN_SELECT_TOOLBAR_ITEM_TAG = 13;
+let TOOLCHAIN_ITEM_TAG_OFFSET = 1000;
 
 class MainPlaygroundViewController: NSSplitViewController {
 
@@ -25,15 +27,22 @@ class MainPlaygroundViewController: NSSplitViewController {
             $0.tag == OUTPUT_TOOLBAR_ITEM_TAG
         }
         return toolbarItem!.view as! NSButton
-        }()
+    }()
+
+    lazy var toolchainSelectButton: NSPopUpButton = {
+        let toolbarItem = view.window?.toolbar?.items.first {
+            $0.tag == TOOLCHAIN_SELECT_TOOLBAR_ITEM_TAG
+        }
+        return toolbarItem!.view as! NSPopUpButton
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("init toolchains \(AppDelegate.shared.toolchains)")
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(toolchainsChanged(_:)),
                                                name: AppDelegate.toolchainsChangedNotification,
                                                object: nil)
+
     }
 
     override func viewDidAppear() {
@@ -44,7 +53,13 @@ class MainPlaygroundViewController: NSSplitViewController {
     }
 
     @objc func toolchainsChanged(_ notification: Notification) {
-        print("toolchains changed \(AppDelegate.shared.toolchains)")
+        toolchainSelectButton.removeAllItems()
+        for toolchain in AppDelegate.shared.toolchains {
+            toolchainSelectButton.addItem(withTitle: toolchain.displayName)
+        }
+
+        toolchainSelectButton.isEnabled = AppDelegate.shared.toolchains.count > 1
+        //TODO: show a warning if no toolchains are found
     }
 
     var outputViewIsVisible: Bool = false {
@@ -74,6 +89,10 @@ class MainPlaygroundViewController: NSSplitViewController {
 
     @IBAction func toggleOutputView(_ sender: NSButton?) {
         outputViewIsVisible = !outputViewIsVisible
+    }
+
+    @IBAction func toolchainSelectAction(_ sender: NSToolbarItem) {
+
     }
 
     @IBAction func build(_ sender: Any?) {

@@ -42,6 +42,15 @@ struct Toolchain {
         }
         return nil
     }
+
+    /// The name of this toolchain, suitable for display in menus etc
+    var displayName: String {
+        var base = channel.capitalized
+        if let date = self.date {
+            base = base + " (\(date))"
+        }
+        return base
+    }
 }
 
 enum JsonResponse {

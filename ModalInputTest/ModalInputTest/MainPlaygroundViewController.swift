@@ -144,6 +144,7 @@ class MainPlaygroundViewController: NSSplitViewController {
             outputViewController.printInfo(text: "Error")
             outputViewController.handleStdErr(text: badNews.message)
         case .success(let goodNews):
+            displayTaskOutput(goodNews)
             if let executablePath = goodNews.executable {
                 runCommand(atPath: executablePath, handler: outputViewController)
             }
@@ -151,11 +152,20 @@ class MainPlaygroundViewController: NSSplitViewController {
         outputViewController.printInfo(text: "Done")
     }
 
+    func displayTaskOutput(_ result: CompilerResult) {
+        if result.stdErr.count > 0 {
+            outputViewController.printHeader("Standard Error")
+            outputViewController.printText(result.stdErr)
+        }
+
+        if result.stdOut.count > 0 {
+            outputViewController.printHeader("Standard Output")
+            outputViewController.printText(result.stdOut)
+        }
+    }
+
     func executeTask(_ task: CompilerTask) -> Result<CompilerResult, PlaygroundError> {
         let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent("playground-rs", isDirectory: true)
-        if FileManager.default.fileExists(atPath: tempDir.path) {
-            try! FileManager.default.removeItem(at: tempDir)
-        }
         return ModalInputTest.executeTask(tempDir: tempDir, task: task)
     }
 

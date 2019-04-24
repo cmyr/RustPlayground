@@ -44,14 +44,22 @@ class OutputViewController: NSViewController {
         let insertedRange = NSRange(location: EOFRange.location, length: string.count)
         self.outputTextView.textStorage?.addAttributes(attributes, range: insertedRange)
     }
+
+    func printHeader(_ text: String) {
+        let text = "[ \(text) ]\n"
+        appendString(text, attributes: [.foregroundColor: NSColor.systemGray])
+    }
+
+    func printText(_ text: String) {
+        appendString(text, attributes: nil)
+    }
 }
 
 extension OutputViewController: RunnerOutputHandler {
     func printInfo(text: String) {
-        let infoString = "[ \(text) ]\n"
         // hack to give stdout time to flush before printing 'done'
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(5)) {
-            self.appendString(infoString, attributes: [.foregroundColor: NSColor.systemGray])
+            self.printHeader(text)
         }
     }
 

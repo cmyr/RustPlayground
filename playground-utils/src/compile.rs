@@ -15,7 +15,7 @@ enum Type {
 impl Type {
     fn as_str(&self) -> &str {
         match self {
-            Type::Run => "run".as_ref(),
+            Type::Run => "build".as_ref(),
             Type::Check => "build".as_ref(),
             Type::Test => "test".as_ref(),
         }
@@ -31,15 +31,18 @@ pub struct Task {
     release: bool,
 }
 
+/// The result of a rustc run.
 #[derive(Debug, Default, Clone, Serialize)]
 pub struct CompilerResult {
-    executable: Option<PathBuf>,
+    success: bool,
     stdout: String,
     stderr: String,
+    /// The path to the produced binary, if any.
+    executable: Option<PathBuf>,
 }
 
-/// Attempts to run the given task in the supplied directory. The directory
-/// should not exist.
+/// Attempts to run the given task in the supplied directory, which will
+/// be created if it does not exist.
 pub fn do_compile_task<P: AsRef<Path>>(outdir: P, task: Task) -> Result<CompilerResult, Error> {
     let outdir = outdir.as_ref();
     create_cargo_scaffold(&outdir, &task.code)?;
@@ -56,22 +59,14 @@ pub fn do_compile_task<P: AsRef<Path>>(outdir: P, task: Task) -> Result<Compiler
     }
 
     let output = command.output().map_err(|e| Error::CommandFailed(e))?;
-    if output.status.success() {
-        let executable = get_output_path(outdir, &task);
-        let stdout = String::from_utf8_lossy(&output.stdout).to_string();
-        let stderr = String::from_utf8_lossy(&output.stderr).to_string();
-        Ok(CompilerResult { executable, stdout, stderr })
-    } else {
-        Err(Error::bad_output("Cargo command failed", &output))
-    }
+    let success = output.status.success();
+    let executable = get_output_path(outdir, &task);
+    let stdout = String::from_utf8_lossy(&output.stdout).to_string();
+    let stderr = String::from_utf8_lossy(&output.stderr).to_string();
+    Ok(CompilerResult { success, executable, stdout, stderr })
 }
 
 fn create_cargo_scaffold(path: &Path, code: &str) -> Result<(), Error> {
-    if path.exists() {
-        return Err(Error::CreateOutputFailed(path.to_owned()));
-    }
-    fs::create_dir_all(path).map_err(|_| Error::CreateOutputFailed(path.to_owned()))?;
-
     let src_dir = path.join("src");
     fs::create_dir_all(&src_dir).map_err(|_| Error::CreateOutputFailed(src_dir.clone()))?;
 
@@ -110,13 +105,14 @@ fn get_output_path(path: &Path, task: &Task) -> Option<PathBuf> {
     }
 }
 
-const BIN_TARGET_NAME: &str = "mac-playground-rs-output";
+const BIN_TARGET_NAME: &str = "playground";
 
 static PLACEHOLDER_CARGO_TOML: &str = r#"
 [package]
-name = "mac-playground-rs-output"
-version = "0.1.0"
+name = "playground"
+version = "0.0.0"
 authors = ["The Intrepid User <jane.doe@example.com>"]
+edition = "2018"
 "#;
 
 #[cfg(test)]

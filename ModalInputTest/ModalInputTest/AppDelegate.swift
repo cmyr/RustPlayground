@@ -34,6 +34,26 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         return NSStoryboard.main?.instantiateController(withIdentifier: "preferences") as! PreferencesWindowController;
     }()
 
+    lazy var defaultBuildlDirectory: URL = {
+        let buildDirectory = FileManager.default.urls(
+            for: .applicationSupportDirectory,
+            in: .userDomainMask)
+            .first!
+            .appendingPathComponent("RustPlayground")
+            .appendingPathComponent("playground")
+
+        // create application support directory if needed
+        if !FileManager.default.fileExists(atPath: buildDirectory.path) {
+            do {
+                try FileManager.default.createDirectory(at: buildDirectory,
+                                                        withIntermediateDirectories: true,
+                                                        attributes: nil)
+            } catch let err  {
+                fatalError("Failed to create application support directory \(buildDirectory.path). \(err)")
+            }
+        }
+        return buildDirectory
+    }()
 
     /// The available rust toolchains
     private(set) var toolchains: [Toolchain] = [] {

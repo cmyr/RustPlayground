@@ -182,8 +182,8 @@ class MainPlaygroundViewController: NSSplitViewController {
     }
 
     func executeTask(_ task: CompilerTask) -> Result<CompilerResult, PlaygroundError> {
-        let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent("playground-rs", isDirectory: true)
-        return ModalInputTest.executeTask(tempDir: tempDir, task: task)
+        let buildDir = AppDelegate.shared.defaultBuildlDirectory
+        return ModalInputTest.executeTask(inDirectory: buildDir, task: task)
     }
 
     func generateTask() -> CompilerTask {

@@ -39,10 +39,10 @@ func listToolchains() -> Result<[Toolchain], PlaygroundError> {
     }
 }
 
-func executeTask(tempDir: URL, task: CompilerTask) -> Result<CompilerResult, PlaygroundError> {
-    let tempPath = tempDir.path
+func executeTask(inDirectory buildDir: URL, task: CompilerTask) -> Result<CompilerResult, PlaygroundError> {
+    let buildPath = buildDir.path
     let taskJson = task.toJson()
-    let response = JsonResponse.from { playgroundExecuteTask(tempPath, taskJson) }
+    let response = JsonResponse.from { playgroundExecuteTask(buildPath, taskJson) }
 
     switch response {
     case .ok(let result):

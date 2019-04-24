@@ -194,6 +194,7 @@ class EditViewController: NSViewController {
     private var dragEvent: NSEvent?
 
     override func mouseDown(with theEvent: NSEvent) {
+        view.window?.makeFirstResponder(self)
 
         let position = editView.bufferPositionFromPoint(theEvent.locationInWindow)
         lastDragPosition = position

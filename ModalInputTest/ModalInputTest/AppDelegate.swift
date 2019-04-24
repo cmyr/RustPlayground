@@ -86,9 +86,29 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func insertPlaceholderText() {
-        let placeholderProgram = "fn main() {\n    println!(\"hello 🦀!\");\n}"
-        let savedContents = UserDefaults.standard.string(forKey: AppDelegate.stashDocumentKey)
-        core.insertText(savedContents ?? placeholderProgram)
+        let placeholderProgram = """
+//! You may specify external dependencies with comment lines that begin '//~':
+//! > //~ use crate [= "1.0"] (omitting the version resolves with "*")
+
+//~ use rand
+
+fn main() {
+    println!("hello 🦀!");
+
+    let mut hits = 0;
+    while hits < 5 {
+        let randint: u8 = rand::random();
+        if randint % 8 == 0 {
+            hits += 1;
+            println!("{:>3} is divisible by 8", randint);
+        }
+    }
+}
+"""
+        let minRestoreSize = 30
+        let savedState = UserDefaults.standard.string(forKey: AppDelegate.stashDocumentKey) ?? ""
+        let toInsert = savedState.count > minRestoreSize ? savedState : placeholderProgram
+        core.insertText(toInsert)
     }
 
     @IBAction func displayPreferencePane(_: Any?) {

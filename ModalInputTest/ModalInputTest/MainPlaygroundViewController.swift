@@ -145,7 +145,7 @@ class MainPlaygroundViewController: NSSplitViewController {
             outputViewController.handleStdErr(text: badNews.message)
         case .success(let goodNews):
             displayTaskOutput(goodNews)
-            if let executablePath = goodNews.executable {
+            if goodNews.success, let executablePath = goodNews.executable {
                 runCommand(atPath: executablePath, handler: outputViewController)
             }
         }

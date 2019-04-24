@@ -31,6 +31,19 @@ impl Error {
         }
         Error::BadExit(err_string)
     }
+
+    /// An error code included in the json if this is sent to core.
+    /// This is not systematic. We just want to be able to easily identify
+    /// certain cases, such as when Rustup is not installed.
+    pub fn error_code(&self) -> u32 {
+        use Error::*;
+        match self {
+            BadExit(_) => 1,
+            MissingRustup => 10,
+            MalformedDependency(_) => 30,
+            _ => 2, // catchall; we can add these as we need them.
+        }
+    }
 }
 
 impl fmt::Display for Error {

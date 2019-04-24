@@ -10,4 +10,5 @@ mod toolchain;
 compile_error!("this library is currently macOS only.");
 
 pub use compile::{do_compile_task, Task};
+pub use error::Error;
 pub use toolchain::{list_toolchains, ToolchainInfo};

@@ -183,7 +183,7 @@ class MainPlaygroundViewController: NSSplitViewController {
 
     func executeTask(_ task: CompilerTask) -> Result<CompilerResult, PlaygroundError> {
         let buildDir = AppDelegate.shared.defaultBuildlDirectory
-        return ModalInputTest.executeTask(inDirectory: buildDir, task: task)
+        return RustPlayground.executeTask(inDirectory: buildDir, task: task)
     }
 
     func generateTask() -> CompilerTask {

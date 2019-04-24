@@ -8,7 +8,7 @@
         <!--Window Controller-->
         <scene sceneID="gFH-nN-36x">
             <objects>
-                <windowController storyboardIdentifier="preferences" id="bKo-4b-e7z" customClass="PreferencesWindowController" customModule="ModalInputTest" customModuleProvider="target" sceneMemberID="viewController">
+                <windowController storyboardIdentifier="preferences" id="bKo-4b-e7z" customClass="PreferencesWindowController" customModule="RustPlayground" customModuleProvider="target" sceneMemberID="viewController">
                     <window key="window" title="Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" titlebarAppearsTransparent="YES" id="imC-6y-W8Y">
                         <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
@@ -29,7 +29,7 @@
         <!--Preferences View Controller-->
         <scene sceneID="Yqz-QD-4c2">
             <objects>
-                <viewController id="HW3-xQ-ZLd" customClass="PreferencesViewController" customModule="ModalInputTest" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="HW3-xQ-ZLd" customClass="PreferencesViewController" customModule="RustPlayground" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="upU-wC-4XR">
                         <rect key="frame" x="0.0" y="0.0" width="480" height="200"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -234,11 +234,11 @@
                 <application id="hnw-xV-0zn" sceneMemberID="viewController">
                     <menu key="mainMenu" title="Main Menu" systemMenu="main" id="AYu-sK-qS6">
                         <items>
-                            <menuItem title="ModalInputTest" id="1Xt-HY-uBw">
+                            <menuItem title="RustPlayground" id="1Xt-HY-uBw">
                                 <modifierMask key="keyEquivalentModifierMask"/>
-                                <menu key="submenu" title="ModalInputTest" systemMenu="apple" id="uQy-DD-JDr">
+                                <menu key="submenu" title="RustPlayground" systemMenu="apple" id="uQy-DD-JDr">
                                     <items>
-                                        <menuItem title="About ModalInputTest" id="5kV-Vb-QxS">
+                                        <menuItem title="About RustPlayground" id="5kV-Vb-QxS">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="orderFrontStandardAboutPanel:" target="Ady-hI-5gd" id="Exp-CZ-Vem"/>
@@ -256,7 +256,7 @@
                                             <menu key="submenu" title="Services" systemMenu="services" id="hz9-B4-Xy5"/>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="4je-JR-u6R"/>
-                                        <menuItem title="Hide ModalInputTest" keyEquivalent="h" id="Olw-nP-bQN">
+                                        <menuItem title="Hide RustPlayground" keyEquivalent="h" id="Olw-nP-bQN">
                                             <connections>
                                                 <action selector="hide:" target="Ady-hI-5gd" id="PnN-Uc-m68"/>
                                             </connections>
@@ -274,7 +274,7 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="kCx-OE-vgT"/>
-                                        <menuItem title="Quit ModalInputTest" keyEquivalent="q" id="4sb-4s-VLi">
+                                        <menuItem title="Quit RustPlayground" keyEquivalent="q" id="4sb-4s-VLi">
                                             <connections>
                                                 <action selector="terminate:" target="Ady-hI-5gd" id="Te7-pn-YzF"/>
                                             </connections>
@@ -669,7 +669,7 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Help" systemMenu="help" id="F2S-fz-NVQ">
                                     <items>
-                                        <menuItem title="ModalInputTest Help" keyEquivalent="?" id="FKE-Sm-Kum">
+                                        <menuItem title="RustPlayground Help" keyEquivalent="?" id="FKE-Sm-Kum">
                                             <connections>
                                                 <action selector="showHelp:" target="Ady-hI-5gd" id="y7X-2Q-9no"/>
                                             </connections>
@@ -683,7 +683,7 @@
                         <outlet property="delegate" destination="Voe-Tx-rLC" id="PrD-fu-P6m"/>
                     </connections>
                 </application>
-                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="ModalInputTest" customModuleProvider="target"/>
+                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="RustPlayground" customModuleProvider="target"/>
                 <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -693,7 +693,7 @@
         <scene sceneID="R2V-B0-nI4">
             <objects>
                 <windowController id="B8D-0N-5wS" sceneMemberID="viewController">
-                    <window key="window" title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="IQv-IB-iLA" customClass="XiWindow" customModule="ModalInputTest" customModuleProvider="target">
+                    <window key="window" title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="IQv-IB-iLA" customClass="XiWindow" customModule="RustPlayground" customModuleProvider="target">
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="196" y="240" width="480" height="270"/>
@@ -785,7 +785,7 @@
         <!--Main Playground View Controller-->
         <scene sceneID="l6b-7T-BuQ">
             <objects>
-                <splitViewController id="UL3-Kl-zp9" customClass="MainPlaygroundViewController" customModule="ModalInputTest" customModuleProvider="target" sceneMemberID="viewController">
+                <splitViewController id="UL3-Kl-zp9" customClass="MainPlaygroundViewController" customModule="RustPlayground" customModuleProvider="target" sceneMemberID="viewController">
                     <splitViewItems>
                         <splitViewItem id="ML8-nQ-5hk"/>
                         <splitViewItem id="MEB-77-Wm5"/>
@@ -810,7 +810,7 @@
         <!--Edit View Controller-->
         <scene sceneID="lWk-sb-5Ed">
             <objects>
-                <viewController id="5gR-kY-uzK" customClass="EditViewController" customModule="ModalInputTest" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="5gR-kY-uzK" customClass="EditViewController" customModule="RustPlayground" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="G9l-5l-TPq">
                         <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -821,7 +821,7 @@
                                     <rect key="frame" x="1" y="1" width="448" height="298"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <customView wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xjA-QF-hok" customClass="EditView" customModule="ModalInputTest" customModuleProvider="target">
+                                        <customView wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xjA-QF-hok" customClass="EditView" customModule="RustPlayground" customModuleProvider="target">
                                             <rect key="frame" x="0.0" y="0.0" width="448" height="298"/>
                                         </customView>
                                     </subviews>
@@ -872,7 +872,7 @@
         <!--Output View Controller-->
         <scene sceneID="5My-N1-mvJ">
             <objects>
-                <viewController id="j6D-vj-7OG" customClass="OutputViewController" customModule="ModalInputTest" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="j6D-vj-7OG" customClass="OutputViewController" customModule="RustPlayground" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="yDw-Ga-GX2">
                         <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -883,7 +883,7 @@
                                     <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <textView editable="NO" importsGraphics="NO" richText="NO" horizontallyResizable="YES" verticallyResizable="YES" id="UIF-mc-bSn" customClass="OutputTextView" customModule="ModalInputTest" customModuleProvider="target">
+                                        <textView editable="NO" importsGraphics="NO" richText="NO" horizontallyResizable="YES" verticallyResizable="YES" id="UIF-mc-bSn" customClass="OutputTextView" customModule="RustPlayground" customModuleProvider="target">
                                             <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>

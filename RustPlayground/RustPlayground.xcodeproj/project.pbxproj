@@ -23,7 +23,6 @@
 		608A1D4022657604001A79EB /* MainPlaygroundViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 608A1D3F22657604001A79EB /* MainPlaygroundViewController.swift */; };
 		608A1D42226627D2001A79EB /* OutputViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 608A1D41226627D2001A79EB /* OutputViewController.swift */; };
 		609A22672240504100A3F007 /* libximodal.h in Headers */ = {isa = PBXBuildFile; fileRef = 609A22662240504100A3F007 /* libximodal.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		60A91D1322650A5B00240CC6 /* cargo_build.sh in Resources */ = {isa = PBXBuildFile; fileRef = 60A91D1222650A5B00240CC6 /* cargo_build.sh */; };
 		60A91D1522650D0100240CC6 /* Runner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60A91D1422650D0100240CC6 /* Runner.swift */; };
 		60A91D172265115E00240CC6 /* BundleResources.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60A91D162265115E00240CC6 /* BundleResources.swift */; };
 		60BF2285225012DD002C0352 /* EditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60BF2284225012DD002C0352 /* EditView.swift */; };
@@ -52,25 +51,25 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		6018ED17225FB15600B5DF38 /* Style.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Style.swift; path = ModalInputTest/Style.swift; sourceTree = SOURCE_ROOT; };
+		6018ED17225FB15600B5DF38 /* Style.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Style.swift; path = RustPlayground/Style.swift; sourceTree = SOURCE_ROOT; };
 		603608D2224EC693002CEAC6 /* xicore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = xicore.h; path = "../xi-ffi/xicore.h"; sourceTree = "<group>"; };
 		604B0F5F22405C88007038E6 /* XiCoreProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XiCoreProxy.swift; sourceTree = "<group>"; };
 		604C7AC7226E56DC00F6B277 /* libplayground.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libplayground.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		604C7ACB226E572C00F6B277 /* playground.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = playground.h; path = "../playground-utils-ffi/playground.h"; sourceTree = "<group>"; };
-		604C7ACF226E597700F6B277 /* Playground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Playground.swift; path = ModalInputTest/Playground.swift; sourceTree = "<group>"; };
+		604C7ACF226E597700F6B277 /* Playground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Playground.swift; sourceTree = "<group>"; };
 		604C7AD1226E64EA00F6B277 /* libcurl.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcurl.tbd; path = usr/lib/libcurl.tbd; sourceTree = SDKROOT; };
 		604C7AD3226E64FC00F6B277 /* libcurl.4.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcurl.4.tbd; path = usr/lib/libcurl.4.tbd; sourceTree = SDKROOT; };
 		604C7AD5226E654400F6B277 /* libcurl.3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcurl.3.tbd; path = usr/lib/libcurl.3.tbd; sourceTree = SDKROOT; };
 		604C7ADA226F60FA00F6B277 /* CompilerTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompilerTask.swift; sourceTree = "<group>"; };
-		604C7ADC22710CA600F6B277 /* MissingRustupInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MissingRustupInfoView.swift; path = ModalInputTest/MissingRustupInfoView.swift; sourceTree = "<group>"; };
-		606644E7223FFED7006215A0 /* ModalInputTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ModalInputTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		604C7ADC22710CA600F6B277 /* MissingRustupInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MissingRustupInfoView.swift; sourceTree = "<group>"; };
+		606644E7223FFED7006215A0 /* RustPlayground.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RustPlayground.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		606644EA223FFED7006215A0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		606644EC223FFED7006215A0 /* EditViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditViewController.swift; sourceTree = "<group>"; };
 		606644EE223FFED8006215A0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		606644F1223FFED8006215A0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		606644F3223FFED8006215A0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		606644F4223FFED8006215A0 /* ModalInputTest.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ModalInputTest.entitlements; sourceTree = "<group>"; };
-		606644F9223FFED9006215A0 /* ModalInputTestTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ModalInputTestTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		606644F9223FFED9006215A0 /* RustPlaygroundTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RustPlaygroundTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		606644FD223FFED9006215A0 /* ModalInputTestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModalInputTestTests.swift; sourceTree = "<group>"; };
 		606644FF223FFED9006215A0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		608A1D3F22657604001A79EB /* MainPlaygroundViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainPlaygroundViewController.swift; sourceTree = "<group>"; };
@@ -78,7 +77,6 @@
 		609A225F22404CF900A3F007 /* libximodal.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libximodal.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		609A22662240504100A3F007 /* libximodal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = libximodal.h; path = "../xi-ffi/libximodal.h"; sourceTree = "<group>"; };
 		609A2269224052B000A3F007 /* ModalInputTest-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ModalInputTest-Bridging-Header.h"; sourceTree = "<group>"; };
-		60A91D1222650A5B00240CC6 /* cargo_build.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = cargo_build.sh; path = ../../scripts/cargo_build.sh; sourceTree = "<group>"; };
 		60A91D1422650D0100240CC6 /* Runner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Runner.swift; sourceTree = "<group>"; };
 		60A91D162265115E00240CC6 /* BundleResources.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundleResources.swift; sourceTree = "<group>"; };
 		60BF2284225012DD002C0352 /* EditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditView.swift; sourceTree = "<group>"; };
@@ -129,13 +127,10 @@
 		606644DE223FFED7006215A0 = {
 			isa = PBXGroup;
 			children = (
-				604C7ADC22710CA600F6B277 /* MissingRustupInfoView.swift */,
-				60A91D1122650A4200240CC6 /* scripts */,
-				606644E9223FFED7006215A0 /* ModalInputTest */,
+				606644E9223FFED7006215A0 /* RustPlayground */,
 				606644FC223FFED9006215A0 /* ModalInputTestTests */,
 				606644E8223FFED7006215A0 /* Products */,
 				609A2269224052B000A3F007 /* ModalInputTest-Bridging-Header.h */,
-				604C7ACF226E597700F6B277 /* Playground.swift */,
 				604C7ACB226E572C00F6B277 /* playground.h */,
 				609A22662240504100A3F007 /* libximodal.h */,
 				603608D2224EC693002CEAC6 /* xicore.h */,
@@ -146,17 +141,19 @@
 		606644E8223FFED7006215A0 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				606644E7223FFED7006215A0 /* ModalInputTest.app */,
-				606644F9223FFED9006215A0 /* ModalInputTestTests.xctest */,
+				606644E7223FFED7006215A0 /* RustPlayground.app */,
+				606644F9223FFED9006215A0 /* RustPlaygroundTests.xctest */,
 				609A225F22404CF900A3F007 /* libximodal.a */,
 				604C7AC7226E56DC00F6B277 /* libplayground.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		606644E9223FFED7006215A0 /* ModalInputTest */ = {
+		606644E9223FFED7006215A0 /* RustPlayground */ = {
 			isa = PBXGroup;
 			children = (
+				60EB1B60227129300006FB81 /* Assets */,
+				604C7ADC22710CA600F6B277 /* MissingRustupInfoView.swift */,
 				606644EA223FFED7006215A0 /* AppDelegate.swift */,
 				60D05FAE226B9B410045615B /* PreferencesViewController.swift */,
 				606644EC223FFED7006215A0 /* EditViewController.swift */,
@@ -168,15 +165,12 @@
 				604C7ADA226F60FA00F6B277 /* CompilerTask.swift */,
 				60CC174E224591840075FDE5 /* XiWindow.swift */,
 				604B0F5F22405C88007038E6 /* XiCoreProxy.swift */,
-				606644EE223FFED8006215A0 /* Assets.xcassets */,
-				606644F0223FFED8006215A0 /* Main.storyboard */,
+				604C7ACF226E597700F6B277 /* Playground.swift */,
 				60D05FAC226A7ED10045615B /* PreferencesWindowController.swift */,
 				608A1D41226627D2001A79EB /* OutputViewController.swift */,
 				6018ED17225FB15600B5DF38 /* Style.swift */,
-				606644F3223FFED8006215A0 /* Info.plist */,
-				606644F4223FFED8006215A0 /* ModalInputTest.entitlements */,
 			);
-			path = ModalInputTest;
+			path = RustPlayground;
 			sourceTree = "<group>";
 		};
 		606644FC223FFED9006215A0 /* ModalInputTestTests */ = {
@@ -188,12 +182,15 @@
 			path = ModalInputTestTests;
 			sourceTree = "<group>";
 		};
-		60A91D1122650A4200240CC6 /* scripts */ = {
+		60EB1B60227129300006FB81 /* Assets */ = {
 			isa = PBXGroup;
 			children = (
-				60A91D1222650A5B00240CC6 /* cargo_build.sh */,
+				606644EE223FFED8006215A0 /* Assets.xcassets */,
+				606644F0223FFED8006215A0 /* Main.storyboard */,
+				606644F3223FFED8006215A0 /* Info.plist */,
+				606644F4223FFED8006215A0 /* ModalInputTest.entitlements */,
 			);
-			path = scripts;
+			path = Assets;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -236,9 +233,9 @@
 			productReference = 604C7AC7226E56DC00F6B277 /* libplayground.a */;
 			productType = "com.apple.product-type.library.static";
 		};
-		606644E6223FFED7006215A0 /* ModalInputTest */ = {
+		606644E6223FFED7006215A0 /* RustPlayground */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 60664502223FFED9006215A0 /* Build configuration list for PBXNativeTarget "ModalInputTest" */;
+			buildConfigurationList = 60664502223FFED9006215A0 /* Build configuration list for PBXNativeTarget "RustPlayground" */;
 			buildPhases = (
 				606644E3223FFED7006215A0 /* Sources */,
 				606644E4223FFED7006215A0 /* Frameworks */,
@@ -249,14 +246,14 @@
 			dependencies = (
 				609A226522404D5D00A3F007 /* PBXTargetDependency */,
 			);
-			name = ModalInputTest;
+			name = RustPlayground;
 			productName = ModalInputTest;
-			productReference = 606644E7223FFED7006215A0 /* ModalInputTest.app */;
+			productReference = 606644E7223FFED7006215A0 /* RustPlayground.app */;
 			productType = "com.apple.product-type.application";
 		};
-		606644F8223FFED9006215A0 /* ModalInputTestTests */ = {
+		606644F8223FFED9006215A0 /* RustPlaygroundTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 60664505223FFED9006215A0 /* Build configuration list for PBXNativeTarget "ModalInputTestTests" */;
+			buildConfigurationList = 60664505223FFED9006215A0 /* Build configuration list for PBXNativeTarget "RustPlaygroundTests" */;
 			buildPhases = (
 				606644F5223FFED9006215A0 /* Sources */,
 				606644F6223FFED9006215A0 /* Frameworks */,
@@ -267,9 +264,9 @@
 			dependencies = (
 				606644FB223FFED9006215A0 /* PBXTargetDependency */,
 			);
-			name = ModalInputTestTests;
+			name = RustPlaygroundTests;
 			productName = ModalInputTestTests;
-			productReference = 606644F9223FFED9006215A0 /* ModalInputTestTests.xctest */;
+			productReference = 606644F9223FFED9006215A0 /* RustPlaygroundTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		609A225E22404CF900A3F007 /* ximodal */ = {
@@ -320,7 +317,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 606644E2223FFED7006215A0 /* Build configuration list for PBXProject "ModalInputTest" */;
+			buildConfigurationList = 606644E2223FFED7006215A0 /* Build configuration list for PBXProject "RustPlayground" */;
 			compatibilityVersion = "Xcode 10.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -333,8 +330,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				606644E6223FFED7006215A0 /* ModalInputTest */,
-				606644F8223FFED9006215A0 /* ModalInputTestTests */,
+				606644E6223FFED7006215A0 /* RustPlayground */,
+				606644F8223FFED9006215A0 /* RustPlaygroundTests */,
 				609A225E22404CF900A3F007 /* ximodal */,
 				604C7AC6226E56DC00F6B277 /* playground */,
 			);
@@ -348,7 +345,6 @@
 			files = (
 				606644EF223FFED8006215A0 /* Assets.xcassets in Resources */,
 				606644F2223FFED8006215A0 /* Main.storyboard in Resources */,
-				60A91D1322650A5B00240CC6 /* cargo_build.sh in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -442,7 +438,7 @@
 /* Begin PBXTargetDependency section */
 		606644FB223FFED9006215A0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 606644E6223FFED7006215A0 /* ModalInputTest */;
+			target = 606644E6223FFED7006215A0 /* RustPlayground */;
 			targetProxy = 606644FA223FFED9006215A0 /* PBXContainerItemProxy */;
 		};
 		609A226522404D5D00A3F007 /* PBXTargetDependency */ = {
@@ -606,7 +602,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				INFOPLIST_FILE = ModalInputTest/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/RustPlayground/Assets/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -630,7 +626,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				INFOPLIST_FILE = ModalInputTest/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/RustPlayground/Assets/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -662,7 +658,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = net.cmyr.ModalInputTestTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ModalInputTest.app/Contents/MacOS/ModalInputTest";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RustPlayground.app/Contents/MacOS/RustPlayground";
 			};
 			name = Debug;
 		};
@@ -682,7 +678,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = net.cmyr.ModalInputTestTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ModalInputTest.app/Contents/MacOS/ModalInputTest";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RustPlayground.app/Contents/MacOS/RustPlayground";
 			};
 			name = Release;
 		};
@@ -718,7 +714,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		606644E2223FFED7006215A0 /* Build configuration list for PBXProject "ModalInputTest" */ = {
+		606644E2223FFED7006215A0 /* Build configuration list for PBXProject "RustPlayground" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				60664500223FFED9006215A0 /* Debug */,
@@ -727,7 +723,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		60664502223FFED9006215A0 /* Build configuration list for PBXNativeTarget "ModalInputTest" */ = {
+		60664502223FFED9006215A0 /* Build configuration list for PBXNativeTarget "RustPlayground" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				60664503223FFED9006215A0 /* Debug */,
@@ -736,7 +732,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		60664505223FFED9006215A0 /* Build configuration list for PBXNativeTarget "ModalInputTestTests" */ = {
+		60664505223FFED9006215A0 /* Build configuration list for PBXNativeTarget "RustPlaygroundTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				60664506223FFED9006215A0 /* Debug */,

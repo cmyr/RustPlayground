@@ -7,7 +7,7 @@
 //
 
 import XCTest
-@testable import ModalInputTest
+@testable import RustPlayground
 
 class ModalInputTestTests: XCTestCase {
 

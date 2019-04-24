@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "606644E6223FFED7006215A0"
-               BuildableName = "ModalInputTest.app"
-               BlueprintName = "ModalInputTest"
-               ReferencedContainer = "container:ModalInputTest.xcodeproj">
+               BuildableName = "RustPlayground.app"
+               BlueprintName = "RustPlayground"
+               ReferencedContainer = "container:RustPlayground.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "606644F8223FFED9006215A0"
-               BuildableName = "ModalInputTestTests.xctest"
-               BlueprintName = "ModalInputTestTests"
-               ReferencedContainer = "container:ModalInputTest.xcodeproj">
+               BuildableName = "RustPlaygroundTests.xctest"
+               BlueprintName = "RustPlaygroundTests"
+               ReferencedContainer = "container:RustPlayground.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -43,9 +43,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "606644E6223FFED7006215A0"
-            BuildableName = "ModalInputTest.app"
-            BlueprintName = "ModalInputTest"
-            ReferencedContainer = "container:ModalInputTest.xcodeproj">
+            BuildableName = "RustPlayground.app"
+            BlueprintName = "RustPlayground"
+            ReferencedContainer = "container:RustPlayground.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -66,9 +66,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "606644E6223FFED7006215A0"
-            BuildableName = "ModalInputTest.app"
-            BlueprintName = "ModalInputTest"
-            ReferencedContainer = "container:ModalInputTest.xcodeproj">
+            BuildableName = "RustPlayground.app"
+            BlueprintName = "RustPlayground"
+            ReferencedContainer = "container:RustPlayground.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <EnvironmentVariables>
@@ -102,9 +102,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "606644E6223FFED7006215A0"
-            BuildableName = "ModalInputTest.app"
-            BlueprintName = "ModalInputTest"
-            ReferencedContainer = "container:ModalInputTest.xcodeproj">
+            BuildableName = "RustPlayground.app"
+            BlueprintName = "RustPlayground"
+            ReferencedContainer = "container:RustPlayground.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

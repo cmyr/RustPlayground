@@ -10,7 +10,7 @@ playground-utils/target
 playground-utils-ffi/Cargo.lock
 playground-utils-ffi/target
 
-ModalInputTest/*.a
+RustPlayground/*.a
 
 ### macOS ###
 # General
@@ -74,17 +74,17 @@ DerivedData/
 xcuserdata/
 
 ## Basic
-ModalInputTest/*.xcodeproj/*
-!ModalInputTest/*.xcodeproj/project.pbxproj
-!ModalInputTest/*.xcodeproj/xcshareddata/
-!ModalInputTest/*.xcworkspace/contents.xcworkspacedata
+RustPlayground/*.xcodeproj/*
+!RustPlayground/*.xcodeproj/project.pbxproj
+!RustPlayground/*.xcodeproj/xcshareddata/
+!RustPlayground/*.xcworkspace/contents.xcworkspacedata
 /*.gcno
 **/xcshareddata/WorkspaceSettings.xcsettings
 
 ## Other
-ModalInputTest/*.moved-aside
-ModalInputTest/*.xccheckout
-ModalInputTest/*.xcscmblueprint
+RustPlayground/*.moved-aside
+RustPlayground/*.xccheckout
+RustPlayground/*.xcscmblueprint
 !**/xcshareddata/IDETemplateMacros.plist
 
 ### Project Specific ###

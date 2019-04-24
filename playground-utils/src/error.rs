@@ -10,6 +10,7 @@ pub enum Error {
     ReadingToolchainsDir,
     CreateOutputFailed(PathBuf),
     CommandFailed(io::Error),
+    MalformedDependency(String),
     BadExit(String),
 }
 
@@ -44,6 +45,12 @@ impl fmt::Display for Error {
             }
             CommandFailed(s) => write!(f, "Failed to execute command '{}'.", s),
             BadExit(msg) => write!(f, "{}", msg),
+            MalformedDependency(s) => write!(
+                f,
+                "Malformed dependency '{}'. Inline dependencies must \n\
+                 be in the form, 'use crate_name [= x[.y.z]]'.",
+                s
+            ),
         }
     }
 }

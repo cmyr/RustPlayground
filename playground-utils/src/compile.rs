@@ -74,10 +74,60 @@ fn create_cargo_scaffold(path: &Path, code: &str) -> Result<(), Error> {
     fs::write(&main_rs, code.as_bytes()).map_err(|_| Error::CreateOutputFailed(main_rs.clone()))?;
 
     let cargo_toml = path.join("Cargo.toml");
-    fs::write(&cargo_toml, PLACEHOLDER_CARGO_TOML.as_bytes())
+    let extra_deps = parse_dep_comments(code)?;
+
+    let mut manifest = PLACEHOLDER_CARGO_TOML.to_string();
+    for line in extra_deps {
+        manifest.push_str(&line);
+        manifest.push('\n');
+    }
+
+    fs::write(&cargo_toml, manifest.as_bytes())
         .map_err(|_| Error::CreateOutputFailed(cargo_toml))?;
 
     Ok(())
+}
+
+/// Hacky. We allow dependencies to be specified as comments with the form,
+/// '//~ serde = "1.0"'. This finds those strings and returns them formatted
+/// suitable for appending to the toml text.
+fn parse_dep_comments(code: &str) -> Result<Vec<String>, Error> {
+    code.lines().filter(|l| l.trim().starts_with("//~")).map(dep_for_comment_line).collect()
+}
+
+fn dep_for_comment_line(line: &str) -> Result<String, Error> {
+    // we trim twice to get whitespace between thee comment markere and the first token
+    let line = line.trim().trim_start_matches("//~").trim();
+    let tokens = line.split_whitespace().collect::<Vec<_>>();
+    match tokens.as_slice() {
+        &["use", name] => {
+            if name.chars().all(legal_in_crate_name) {
+                Ok(format!("{} = \"*\"", name))
+            } else {
+                Err(Error::MalformedDependency(line.to_owned()))
+            }
+        }
+        &["use", name, "=", version] => {
+            let version = version.trim_matches('"');
+            if name.chars().all(legal_in_crate_name) && version.chars().all(legal_in_version) {
+                Ok(format!("{} = \"{}\"", name, version))
+            } else {
+                Err(Error::MalformedDependency(line.into()))
+            }
+        }
+        _other => Err(Error::MalformedDependency(line.into())),
+    }
+}
+
+fn legal_in_crate_name(c: char) -> bool {
+    c.is_ascii_alphanumeric() || c == '_' || c == '-'
+}
+
+fn legal_in_version(c: char) -> bool {
+    match c {
+        '0'..='9' | '.' => true,
+        _ => false,
+    }
 }
 
 fn activate_toolchain(path: &Path, toolchain: &str) -> Result<(), Error> {
@@ -113,6 +163,8 @@ name = "playground"
 version = "0.0.0"
 authors = ["The Intrepid User <jane.doe@example.com>"]
 edition = "2018"
+
+[dependencies]
 "#;
 
 #[cfg(test)]
@@ -136,5 +188,24 @@ mod tests {
         let result = do_compile_task(&outdir, task).expect("compile task failed");
 
         assert_eq!(result.executable, Some(exp_exec_path));
+    }
+
+    #[test]
+    fn hacky_dependencies() {
+        assert_eq!(dep_for_comment_line("//~ use serde = 1.0").unwrap(), ("serde = \"1.0\""));
+        assert_eq!(dep_for_comment_line("  //~ use ast").unwrap(), ("ast = \"*\""));
+        // allow missing first space
+        assert_eq!(dep_for_comment_line("//~use ast").unwrap(), ("ast = \"*\""));
+        // ignore quotes
+        assert_eq!(dep_for_comment_line("//~ use ast = \"5\"").unwrap(), ("ast = \"5\""));
+
+        assert_eq!(dep_for_comment_line("//~ use ast = \"5.0.1\"").unwrap(), ("ast = \"5.0.1\""));
+
+        // versions are numeric values
+        assert!(dep_for_comment_line("//~ use ast = \"5a\"").is_err());
+
+        // identifiers are alphanums
+        assert!(dep_for_comment_line("//~ use jsoñ = \"5\"").is_err());
+        assert!(dep_for_comment_line("//~ use jso.n = \"5\"").is_err());
     }
 }

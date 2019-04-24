@@ -14,6 +14,7 @@
 		604C7AD0226E597700F6B277 /* Playground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 604C7ACF226E597700F6B277 /* Playground.swift */; };
 		604C7AD7226E671E00F6B277 /* libcurl.4.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 604C7AD3226E64FC00F6B277 /* libcurl.4.tbd */; };
 		604C7ADB226F60FA00F6B277 /* CompilerTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 604C7ADA226F60FA00F6B277 /* CompilerTask.swift */; };
+		604C7ADD22710CA600F6B277 /* MissingRustupInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 604C7ADC22710CA600F6B277 /* MissingRustupInfoView.swift */; };
 		606644EB223FFED7006215A0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606644EA223FFED7006215A0 /* AppDelegate.swift */; };
 		606644ED223FFED7006215A0 /* EditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606644EC223FFED7006215A0 /* EditViewController.swift */; };
 		606644EF223FFED8006215A0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 606644EE223FFED8006215A0 /* Assets.xcassets */; };
@@ -61,6 +62,7 @@
 		604C7AD3226E64FC00F6B277 /* libcurl.4.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcurl.4.tbd; path = usr/lib/libcurl.4.tbd; sourceTree = SDKROOT; };
 		604C7AD5226E654400F6B277 /* libcurl.3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcurl.3.tbd; path = usr/lib/libcurl.3.tbd; sourceTree = SDKROOT; };
 		604C7ADA226F60FA00F6B277 /* CompilerTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompilerTask.swift; sourceTree = "<group>"; };
+		604C7ADC22710CA600F6B277 /* MissingRustupInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MissingRustupInfoView.swift; path = ModalInputTest/MissingRustupInfoView.swift; sourceTree = "<group>"; };
 		606644E7223FFED7006215A0 /* ModalInputTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ModalInputTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		606644EA223FFED7006215A0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		606644EC223FFED7006215A0 /* EditViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditViewController.swift; sourceTree = "<group>"; };
@@ -127,6 +129,7 @@
 		606644DE223FFED7006215A0 = {
 			isa = PBXGroup;
 			children = (
+				604C7ADC22710CA600F6B277 /* MissingRustupInfoView.swift */,
 				60A91D1122650A4200240CC6 /* scripts */,
 				606644E9223FFED7006215A0 /* ModalInputTest */,
 				606644FC223FFED9006215A0 /* ModalInputTestTests */,
@@ -417,6 +420,7 @@
 				60D05FAD226A7ED10045615B /* PreferencesWindowController.swift in Sources */,
 				608A1D42226627D2001A79EB /* OutputViewController.swift in Sources */,
 				60D05FAF226B9B410045615B /* PreferencesViewController.swift in Sources */,
+				604C7ADD22710CA600F6B277 /* MissingRustupInfoView.swift in Sources */,
 				608A1D4022657604001A79EB /* MainPlaygroundViewController.swift in Sources */,
 				60A91D172265115E00240CC6 /* BundleResources.swift in Sources */,
 				604C7ADB226F60FA00F6B277 /* CompilerTask.swift in Sources */,

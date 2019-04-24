@@ -77,11 +77,28 @@ class MainPlaygroundViewController: NSSplitViewController {
             toolchainSelectButton.addItem(withTitle: toolchain.displayName)
         }
 
+        if AppDelegate.shared.toolchains.count == 0 {
+            //TODO: only show this if rustup is actually missing?
+            showMissingRustupView()
+        }
         toolchainSelectButton.isEnabled = AppDelegate.shared.toolchains.count > 1
         toolchainSelectButton.isHidden = AppDelegate.shared.toolchains.count == 0
         runButton.isEnabled = AppDelegate.shared.toolchains.count > 0
 
         //TODO: show a warning if no toolchains are found
+    }
+
+    func showMissingRustupView() {
+        let rustupView = MissingRustupInfoView(frame: self.view.bounds)
+        rustupView.translatesAutoresizingMaskIntoConstraints = false
+        self.view.addSubview(rustupView)
+        self.view.addConstraints([
+            NSLayoutConstraint(item: self.view, attribute: .leading, relatedBy: .equal, toItem: rustupView, attribute: .leading, multiplier: 1.0, constant: 0),
+            NSLayoutConstraint(item: self.view, attribute: .trailing, relatedBy: .equal, toItem: rustupView, attribute: .trailing, multiplier: 1.0, constant: 0),
+            NSLayoutConstraint(item: self.view, attribute: .top, relatedBy: .equal, toItem: rustupView, attribute: .top, multiplier: 1.0, constant: 0),
+            NSLayoutConstraint(item: self.view, attribute: .bottom, relatedBy: .equal, toItem: rustupView, attribute: .bottom, multiplier: 1.0, constant: 0),
+            ])
+        self.view.needsLayout = true
     }
 
     var outputViewIsVisible: Bool = false {

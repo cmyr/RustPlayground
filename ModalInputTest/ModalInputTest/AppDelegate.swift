@@ -8,6 +8,8 @@
 
 import Cocoa
 
+let MISSING_RUSTUP_ERROR_CODE = 10
+
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
     static let stashDocumentKey = "net.cmyr.rust-playground.allDocumentContents"
@@ -50,20 +52,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         EditorPreferences.shared.syncAllWithCore()
         insertPlaceholderText()
+        checkRustup()
         mainController?.view.window?.makeFirstResponder(mainController)
-        DispatchQueue.global(qos: .default).async { [weak self] in
-
-            let toolchains = listToolchains()
-
-            DispatchQueue.main.async {
-                self?.gotToolchains(toolchains)
-
-                // uncomment to test UI response to single toolchain
-                
-//                let toolchainsz = [Toolchain(name: "stable-x86_etc-blah", channel: "stable", date: nil)]
-//                self?.gotToolchains(.success(toolchainsz))
-            }
-        }
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
@@ -71,13 +61,29 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         UserDefaults.standard.set(bufferContents, forKey: AppDelegate.stashDocumentKey)
     }
 
+    func checkRustup() {
+        DispatchQueue.global(qos: .default).async { [weak self] in
+            let toolchains = listToolchains()
+            DispatchQueue.main.async {
+                self?.gotToolchains(toolchains)
+                // uncomment to test UI response to single toolchain
+                // let toolchainsz = [Toolchain(name: "stable-x86_etc-blah", channel: "stable", date: nil)]
+                // self?.gotToolchains(.success(toolchainsz))
+            }
+        }
+    }
+
     func gotToolchains(_ toolchainResult: Result<[Toolchain], PlaygroundError>) {
+
         switch toolchainResult {
         case .success(let greatNews):
             self.toolchains = greatNews
         case .failure(let badNews):
             self.toolchains = []
-            if let window = NSApp.mainWindow {
+            if badNews.code == MISSING_RUSTUP_ERROR_CODE {
+                //TODO: show error
+
+            } else if let window = NSApp.mainWindow {
                 let alert = NSAlert(error: badNews)
                 alert.messageText = badNews.message
                 alert.beginSheetModal(for: window, completionHandler: nil)
@@ -87,7 +93,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func insertPlaceholderText() {
         let placeholderProgram = """
-//! You may specify external dependencies with comment lines that begin '//~':
+//! You may specify external dependencies with comment lines that begin '//~'
+//! For example:
+//!
 //! > //~ use crate [= "1.0"] (omitting the version resolves with "*")
 
 //~ use rand
@@ -194,6 +202,7 @@ fn main() {
     }
 }
 
+// TODO: move these to their own file
 func dispatchEvent(eventPtr: OpaquePointer?, toTheTrash: Bool) {
     if let ptr = UnsafeRawPointer(eventPtr) {
         let event: NSEvent = Unmanaged<NSEvent>.fromOpaque(ptr).takeRetainedValue();

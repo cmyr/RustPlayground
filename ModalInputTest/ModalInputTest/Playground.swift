@@ -12,6 +12,17 @@ import Foundation
 
 struct PlaygroundError {
     let message: String
+    let code: Int
+
+    init?(json: [String: AnyObject]) {
+        if let message = json["message"] as? String,
+            let code = json["code"] as? Int {
+            self.message = message
+            self.code = code
+        } else {
+            return nil
+        }
+    }
 }
 
 extension PlaygroundError: Error {}
@@ -23,8 +34,8 @@ func listToolchains() -> Result<[Toolchain], PlaygroundError> {
         let data = (result as! [AnyObject])
         let toolchains = data.map { Toolchain.fromJson(json: $0)! }
         return .success(toolchains)
-    case .error(let errorString):
-        return .failure(PlaygroundError(message: errorString))
+    case .error(let error):
+        return .failure(error)
     }
 }
 
@@ -37,8 +48,8 @@ func executeTask(tempDir: URL, task: CompilerTask) -> Result<CompilerResult, Pla
     case .ok(let result):
         let data = result as! [String: AnyObject]
         return .success(CompilerResult.fromJson(data))
-    case .error(let errorString):
-        return .failure(PlaygroundError(message: errorString))
+    case .error(let err):
+        return .failure(err)
     }
 }
 
@@ -66,9 +77,9 @@ struct Toolchain {
         return base
     }
 }
-
+// TODO: this can probably just be a Result<T, E>
 enum JsonResponse {
-    case error(String)
+    case error(PlaygroundError)
     case ok(Any)
 
     /// Wrapper around an external function that returns json. Handles basic
@@ -85,7 +96,8 @@ enum JsonResponse {
         if let result = message["result"] {
             return .ok(result)
         } else if let error = message["error"] {
-            return .error(error as! String)
+            let error = error as! [String: AnyObject]
+            return .error(PlaygroundError(json: error)!)
         } else {
             fatalError("invalid json response: \(message)")
         }

@@ -119,7 +119,7 @@
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ggS-Ro-BzO">
-                                <rect key="frame" x="116.5" y="19" width="145" height="23"/>
+                                <rect key="frame" x="117" y="19" width="145" height="23"/>
                                 <buttonCell key="cell" type="roundTextured" title="Input Sans 14.0" bezelStyle="texturedRounded" image="NSFontPanel" imagePosition="trailing" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="dlh-QW-rjM">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -137,7 +137,7 @@
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="rEQ-jW-2Hf">
-                                <rect key="frame" x="116.5" y="47" width="145" height="23"/>
+                                <rect key="frame" x="117" y="47" width="145" height="23"/>
                                 <buttonCell key="cell" type="roundTextured" title="Input Sans 14.0" bezelStyle="texturedRounded" image="NSFontPanel" imagePosition="right" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="TJH-wR-Owz">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -591,6 +591,13 @@
                                         <menuItem title="Decrease Font" keyEquivalent="-" id="GeR-NY-dDe">
                                             <connections>
                                                 <action selector="decreaseFontSize:" target="Ady-hI-5gd" id="KJe-oJ-97C"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="xXv-BZ-ths"/>
+                                        <menuItem title="Debug Env" id="jZe-wa-bbq">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="debugPrintEnvironment" target="Ady-hI-5gd" id="QeT-3d-4cz"/>
                                             </connections>
                                         </menuItem>
                                     </items>

@@ -70,6 +70,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // uncomment me for vim mode
 //        core.registerEventHandler(callback: dispatchEvent, action: handleRpc, timer: handleTimer, cancelTimer: cancelTimer)
 
+        //        HACK: need to figure out how to get app to inherit environment correctly
+        let homeDir = FileManager.default.homeDirectoryForCurrentUser
+        setenv("PATH", "\(homeDir)/.cargo/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin", 1)
+
         EditorPreferences.shared.syncAllWithCore()
         insertPlaceholderText()
         checkRustup()

@@ -58,7 +58,7 @@ pub fn do_compile_task<P: AsRef<Path>>(outdir: P, task: Task) -> Result<Compiler
         command.arg("--release");
     }
 
-    let output = command.output().map_err(|e| Error::CommandFailed(e))?;
+    let output = command.output().map_err(|e| Error::CompileFailed(e))?;
     let success = output.status.success();
     let executable = get_output_path(outdir, &task);
     let stdout = String::from_utf8_lossy(&output.stdout).to_string();
@@ -135,7 +135,7 @@ fn activate_toolchain(path: &Path, toolchain: &str) -> Result<(), Error> {
         .current_dir(path)
         .args(&["override", "set", toolchain])
         .output()
-        .map_err(|e| Error::CommandFailed(e))?;
+        .map_err(|e| Error::ToolchainSelectFailed(e))?;
 
     if result.status.success() {
         Ok(())

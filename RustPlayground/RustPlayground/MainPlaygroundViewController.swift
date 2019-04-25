@@ -88,6 +88,21 @@ class MainPlaygroundViewController: NSSplitViewController {
         //TODO: show a warning if no toolchains are found
     }
 
+    @IBAction func debugPrintEnvironment(_ sender: Any?) {
+        let env = ProcessInfo.processInfo.environment
+        if !outputViewIsVisible {
+            outputViewIsVisible = true
+        }
+
+        outputViewController.clearOutput()
+        outputViewController.printHeader("ENV")
+
+        for (key, value) in env {
+            outputViewController.printText(("\(key):\n\t\(value)\n"))
+        }
+        outputViewController.printHeader("Done")
+    }
+
     func showMissingRustupView() {
         let rustupView = MissingRustupInfoView(frame: self.view.bounds)
         rustupView.translatesAutoresizingMaskIntoConstraints = false

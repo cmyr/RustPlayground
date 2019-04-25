@@ -8,8 +8,9 @@ pub enum Error {
     ToolchainParseError(String),
     MissingRustup,
     ReadingToolchainsDir,
+    CompileFailed(io::Error),
+    ToolchainSelectFailed(io::Error),
     CreateOutputFailed(PathBuf),
-    CommandFailed(io::Error),
     MalformedDependency(String),
     BadExit(String),
 }
@@ -56,7 +57,8 @@ impl fmt::Display for Error {
             CreateOutputFailed(p) => {
                 write!(f, "Failed to create output path at '{}'.", p.to_string_lossy())
             }
-            CommandFailed(s) => write!(f, "Failed to execute command '{}'.", s),
+            CompileFailed(s) => write!(f, "Compiler command failed: '{}'.", s),
+            ToolchainSelectFailed(s) => write!(f, "Toolchain select failed: '{}'.", s),
             BadExit(msg) => write!(f, "{}", msg),
             MalformedDependency(s) => write!(
                 f,

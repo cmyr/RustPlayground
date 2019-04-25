@@ -8,11 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		6018ED18225FB15600B5DF38 /* Style.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6018ED17225FB15600B5DF38 /* Style.swift */; };
+		603B05992272068F00FBD7FC /* libximodal.a in CopyFiles */ = {isa = PBXBuildFile; fileRef = 603B05982272068F00FBD7FC /* libximodal.a */; };
+		603B059B227206C200FBD7FC /* libplayground.a in CopyFiles */ = {isa = PBXBuildFile; fileRef = 603B059A227206C200FBD7FC /* libplayground.a */; };
 		604B0F6022405C88007038E6 /* XiCoreProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 604B0F5F22405C88007038E6 /* XiCoreProxy.swift */; };
 		604C7ACC226E572C00F6B277 /* playground.h in Headers */ = {isa = PBXBuildFile; fileRef = 604C7ACB226E572C00F6B277 /* playground.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		604C7ACE226E582C00F6B277 /* libplayground.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 604C7AC7226E56DC00F6B277 /* libplayground.a */; };
 		604C7AD0226E597700F6B277 /* Playground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 604C7ACF226E597700F6B277 /* Playground.swift */; };
-		604C7AD7226E671E00F6B277 /* libcurl.4.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 604C7AD3226E64FC00F6B277 /* libcurl.4.tbd */; };
 		604C7ADB226F60FA00F6B277 /* CompilerTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 604C7ADA226F60FA00F6B277 /* CompilerTask.swift */; };
 		604C7ADD22710CA600F6B277 /* MissingRustupInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 604C7ADC22710CA600F6B277 /* MissingRustupInfoView.swift */; };
 		606644EB223FFED7006215A0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606644EA223FFED7006215A0 /* AppDelegate.swift */; };
@@ -34,6 +35,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		603B05902271FF5600FBD7FC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 606644DF223FFED7006215A0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 604C7AC6226E56DC00F6B277;
+			remoteInfo = playground;
+		};
 		606644FA223FFED9006215A0 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 606644DF223FFED7006215A0 /* Project object */;
@@ -50,9 +58,34 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		603B0594227204B300FBD7FC /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 16;
+			files = (
+				603B05992272068F00FBD7FC /* libximodal.a in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		603B05972272063700FBD7FC /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 16;
+			files = (
+				603B059B227206C200FBD7FC /* libplayground.a in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		6018ED17225FB15600B5DF38 /* Style.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Style.swift; path = RustPlayground/Style.swift; sourceTree = SOURCE_ROOT; };
 		603608D2224EC693002CEAC6 /* xicore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = xicore.h; path = "../xi-ffi/xicore.h"; sourceTree = "<group>"; };
+		603B05982272068F00FBD7FC /* libximodal.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libximodal.a; path = "../xi-ffi/target/libximodal.a"; sourceTree = "<group>"; };
+		603B059A227206C200FBD7FC /* libplayground.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libplayground.a; path = "../playground-utils-ffi/target/libplayground.a"; sourceTree = "<group>"; };
 		604B0F5F22405C88007038E6 /* XiCoreProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XiCoreProxy.swift; sourceTree = "<group>"; };
 		604C7AC7226E56DC00F6B277 /* libplayground.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libplayground.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		604C7ACB226E572C00F6B277 /* playground.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = playground.h; path = "../playground-utils-ffi/playground.h"; sourceTree = "<group>"; };
@@ -87,20 +120,12 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		604C7AC5226E56DC00F6B277 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				604C7AD7226E671E00F6B277 /* libcurl.4.tbd in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		606644E4223FFED7006215A0 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				604C7ACE226E582C00F6B277 /* libplayground.a in Frameworks */,
 				60BF2286225511BD002C0352 /* libximodal.a in Frameworks */,
+				604C7ACE226E582C00F6B277 /* libplayground.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -130,6 +155,8 @@
 				606644E9223FFED7006215A0 /* RustPlayground */,
 				606644FC223FFED9006215A0 /* ModalInputTestTests */,
 				606644E8223FFED7006215A0 /* Products */,
+				603B05982272068F00FBD7FC /* libximodal.a */,
+				603B059A227206C200FBD7FC /* libplayground.a */,
 				609A2269224052B000A3F007 /* ModalInputTest-Bridging-Header.h */,
 				604C7ACB226E572C00F6B277 /* playground.h */,
 				609A22662240504100A3F007 /* libximodal.h */,
@@ -220,9 +247,8 @@
 			buildConfigurationList = 604C7ACA226E56DC00F6B277 /* Build configuration list for PBXNativeTarget "playground" */;
 			buildPhases = (
 				604C7AC3226E56DC00F6B277 /* Headers */,
-				604C7AC4226E56DC00F6B277 /* Sources */,
-				604C7AC5226E56DC00F6B277 /* Frameworks */,
 				604C7ACD226E573A00F6B277 /* ShellScript */,
+				603B05972272063700FBD7FC /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -244,6 +270,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				603B05912271FF5600FBD7FC /* PBXTargetDependency */,
 				609A226522404D5D00A3F007 /* PBXTargetDependency */,
 			);
 			name = RustPlayground;
@@ -275,6 +302,7 @@
 			buildPhases = (
 				609A225B22404CF900A3F007 /* Headers */,
 				609A226322404D0D00A3F007 /* ShellScript */,
+				603B0594227204B300FBD7FC /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -373,7 +401,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# When building from Xcode we want to ensure that `cargo` is in PATH.\n# as a convenience, add the default cargo install location\nexport PATH=\"$PATH:${HOME}/.cargo/bin\"\n\nset -e\n\nif [[ $CONFIGURATION = \"Debug\" ]]; then\nRUST_CONFIGURATION=\"debug\"\nRUST_CONFIGURATION_FLAG=\"\"\nelse\nRUST_CONFIGURATION=\"release\"\nRUST_CONFIGURATION_FLAG=\"--release\"\nfi\n\nCRATE_ROOT=\"${SRCROOT}/../playground-utils-ffi\"\nOUTDIR=\"$CRATE_ROOT/target/${RUST_CONFIGURATION}\"\nPRODUCT_NAME=\"libplayground.a\"\n\ncd \"${CRATE_ROOT}\"\n\necho \"building ${CRATE_ROOT}, conf ${RUST_CONFIGURATION}, action ${ACTION}\"\n\nif [[ ${ACTION:-build} = \"build\" ]]; then\ncargo build $RUST_CONFIGURATION_FLAG\necho \"cargo built, copying to ${BUILT_PRODUCTS_DIR}\"\ncp \"${OUTDIR}/${PRODUCT_NAME}\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}\"\nelif [[ $ACTION = \"clean\" ]]; then\necho \"cleaing\"\ncargo clean\nfi\n\nset +e\n";
+			shellScript = "# When building from Xcode we want to ensure that `cargo` is in PATH.\n# as a convenience, add the default cargo install location\nexport PATH=\"$PATH:${HOME}/.cargo/bin\"\n\nset -e\n\nif [[ $CONFIGURATION = \"Debug\" ]]; then\nRUST_CONFIGURATION=\"debug\"\nRUST_CONFIGURATION_FLAG=\"\"\nelse\nRUST_CONFIGURATION=\"release\"\nRUST_CONFIGURATION_FLAG=\"--release\"\nfi\n\nCRATE_ROOT=\"${SRCROOT}/../playground-utils-ffi\"\nOUTDIR=\"$CRATE_ROOT/target/\"\nPRODUCT_NAME=\"libplayground.a\"\n\ncd \"${CRATE_ROOT}\"\n\necho \"building ${CRATE_ROOT}, conf ${RUST_CONFIGURATION}, action ${ACTION}\"\n\nif [[ ${ACTION:-build} = \"build\" ]]; then\ncargo build $RUST_CONFIGURATION_FLAG\necho \"cargo built, copying to ${BUILT_PRODUCTS_DIR}\"\ncp \"${OUTDIR}/${RUST_CONFIGURATION}/${PRODUCT_NAME}\" \"${OUTDIR}/${PRODUCT_NAME}\"\nelif [[ $ACTION = \"clean\" ]]; then\necho \"cleaing\"\ncargo clean\nfi\n\nset +e\n";
 		};
 		609A226322404D0D00A3F007 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -390,18 +418,11 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# When building from Xcode we want to ensure that `cargo` is in PATH.\n# as a convenience, add the default cargo install location\nexport PATH=\"$PATH:${HOME}/.cargo/bin\"\n\nset -e\n\nif [[ $CONFIGURATION = \"Debug\" ]]; then\n    RUST_CONFIGURATION=\"debug\"\n    RUST_CONFIGURATION_FLAG=\"\"\nelse\n    RUST_CONFIGURATION=\"release\"\n    RUST_CONFIGURATION_FLAG=\"--release\"\nfi\n\ncd \"${SRCROOT}/../xi-ffi\"\n\necho \"rust config ${RUST_CONFIGURATION}, action ${ACTION}\"\n\nif [[ ${ACTION:-build} = \"build\" ]]; then\n    cargo build $RUST_CONFIGURATION_FLAG\n    echo \"cargo built, copying to ${BUILT_PRODUCTS_DIR}\"\n    cp \"${SRCROOT}/../xi-ffi/target/${RUST_CONFIGURATION}/libximodal.a\" \"${BUILT_PRODUCTS_DIR}/libximodal.a\"\nelif [[ $ACTION = \"clean\" ]]; then\n    echo \"cleaing\"\n    cargo clean\nfi\n\nset +e\n";
+			shellScript = "# When building from Xcode we want to ensure that `cargo` is in PATH.\n# as a convenience, add the default cargo install location\nexport PATH=\"$PATH:${HOME}/.cargo/bin\"\n\nset -e\n\nif [[ $CONFIGURATION = \"Debug\" ]]; then\n    RUST_CONFIGURATION=\"debug\"\n    RUST_CONFIGURATION_FLAG=\"\"\nelse\n    RUST_CONFIGURATION=\"release\"\n    RUST_CONFIGURATION_FLAG=\"--release\"\nfi\n\ncd \"${SRCROOT}/../xi-ffi\"\n\necho \"rust config ${RUST_CONFIGURATION}, action ${ACTION}\"\n\nif [[ ${ACTION:-build} = \"build\" ]]; then\n    cargo build $RUST_CONFIGURATION_FLAG\n#echo \"cargo built, copying to ${BUILT_PRODUCTS_DIR}\"\n    cp \"${SRCROOT}/../xi-ffi/target/${RUST_CONFIGURATION}/libximodal.a\" \"${SRCROOT}/../xi-ffi/target/libximodal.a\"\nelif [[ $ACTION = \"clean\" ]]; then\n    echo \"cleaing\"\n    cargo clean\nfi\n\nset +e\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		604C7AC4226E56DC00F6B277 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		606644E3223FFED7006215A0 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -436,6 +457,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		603B05912271FF5600FBD7FC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 604C7AC6226E56DC00F6B277 /* playground */;
+			targetProxy = 603B05902271FF5600FBD7FC /* PBXContainerItemProxy */;
+		};
 		606644FB223FFED9006215A0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 606644E6223FFED7006215A0 /* RustPlayground */;
@@ -609,7 +635,7 @@
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)",
+					"${BUILT_PRODUCTS_DIR}",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = net.cmyr.ModalInputTest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -633,7 +659,7 @@
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)",
+					"${BUILT_PRODUCTS_DIR}",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = net.cmyr.ModalInputTest;
 				PRODUCT_NAME = "$(TARGET_NAME)";

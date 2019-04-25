@@ -129,6 +129,11 @@ class MainPlaygroundViewController: NSSplitViewController {
                 let newState: NSControl.StateValue = isVisible ? .on : .off
                 self.toggleOutputToolbarButton.highlight(false)
                 self.toggleOutputToolbarButton.state = newState
+                if newState == .on {
+                    AppDelegate.shared.toggleConsoleMenu.title = "Hide Console"
+                } else {
+                    AppDelegate.shared.toggleConsoleMenu.title = "Show Console"
+                }
             })
         }
     }
@@ -147,6 +152,10 @@ class MainPlaygroundViewController: NSSplitViewController {
 
     @IBAction func toolchainSelectAction(_ sender: NSToolbarItem) {
 
+    }
+
+    @IBAction func toggleConsoleAction(_ sender: NSMenuItem) {
+        outputViewIsVisible = !outputViewIsVisible
     }
 
     @IBAction func build(_ sender: Any?) {

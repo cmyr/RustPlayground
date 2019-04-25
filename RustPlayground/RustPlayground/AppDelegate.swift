@@ -24,6 +24,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     let styleMap = StyleMap()
 
+    @IBOutlet weak var toggleConsoleMenu: NSMenuItem!
+
     var mainController: EditViewController? {
         didSet {
             mainController?.core = core
@@ -117,10 +119,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func insertPlaceholderText() {
         let placeholderProgram = """
-//! You may specify external dependencies with comment lines that begin '//~'
-//! For example:
+//! Welcome to Rust Playground!
 //!
-//! > //~ use crate [= "1.0"] (omitting the version resolves with "*")
+//! To use external crates, start a line with:
+//! '//~' + 'use crate = "1.0".
+//! (The version is optional; we default to the latest)
+
 
 //~ use rand
 

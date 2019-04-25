@@ -119,13 +119,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func insertPlaceholderText() {
         let placeholderProgram = """
-//! Welcome to Rust Playground!
+//! Welcome to the Rust Playground!
 //!
 //! To use external crates, start a line with:
-//! '//~' + 'use crate = "1.0".
-//! (The version is optional; we default to the latest)
+//! '//~ use crate [= "1.0"]'
 
-
+// Equivalent to `rand = "*"` in Cargo.toml:
+//
 //~ use rand
 
 fn main() {

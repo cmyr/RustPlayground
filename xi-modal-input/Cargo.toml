@@ -18,10 +18,13 @@ version = "0.2.17"
 default-features = false
 
 [dependencies.xi-core-lib]
-path = "/Users/rofls/dev/projects/xi-mac/xi-editor/rust/core-lib"
+git = "https://github.com/cmyr/xi-editor.git"
+branch = "xi-modal"
 
 [dependencies.xi-rope]
-path = "/Users/rofls/dev/projects/xi-mac/xi-editor/rust/rope"
+git = "https://github.com/cmyr/xi-editor.git"
+branch = "xi-modal"
 
 [dependencies.xi-unicode]
-path = "/Users/rofls/dev/projects/xi-mac/xi-editor/rust/unicode"
+git = "https://github.com/cmyr/xi-editor.git"
+branch = "xi-modal"

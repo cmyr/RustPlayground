@@ -609,7 +609,12 @@
                                     <items>
                                         <menuItem title="Build" keyEquivalent="b" id="RZB-au-jE5">
                                             <connections>
-                                                <action selector="build:" target="Ady-hI-5gd" id="ASx-ga-uix"/>
+                                                <action selector="buildAction:" target="Ady-hI-5gd" id="j3n-YU-Nma"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Run" keyEquivalent="r" id="Hzc-sb-8gm">
+                                            <connections>
+                                                <action selector="runAction:" target="Ady-hI-5gd" id="znL-ac-QKe"/>
                                             </connections>
                                         </menuItem>
                                     </items>
@@ -735,12 +740,12 @@
                                         <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="PlayIcon" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="wzt-1I-Kk6">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
-                                            <string key="keyEquivalent">b</string>
+                                            <string key="keyEquivalent">r</string>
                                             <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                                         </buttonCell>
                                     </button>
                                     <connections>
-                                        <action selector="build:" target="Oky-zY-oP4" id="D6r-L4-lfn"/>
+                                        <action selector="runAction:" target="Oky-zY-oP4" id="Rsn-Va-VmZ"/>
                                     </connections>
                                 </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="B41B4CC3-3FC8-40D7-AA69-D473074B29F3" label="" paletteLabel="Activity Indicator" tag="-1" sizingBehavior="auto" id="doR-an-fUk">

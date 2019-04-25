@@ -158,9 +158,17 @@ class MainPlaygroundViewController: NSSplitViewController {
         outputViewIsVisible = !outputViewIsVisible
     }
 
-    @IBAction func build(_ sender: Any?) {
+    @IBAction func buildAction(_ sender: Any?) {
+        build(andRun: false)
+    }
+
+    @IBAction func runAction(_ sender: Any?) {
+        build(andRun: true)
+    }
+
+    func build(andRun run: Bool) {
         if !outputViewIsVisible {
-             outputViewIsVisible = true
+            outputViewIsVisible = true
         }
         outputViewController.clearOutput()
         outputViewController.printInfo(text: "Compiling")
@@ -172,12 +180,13 @@ class MainPlaygroundViewController: NSSplitViewController {
         DispatchQueue.global(qos: .default).async {
             let result = self.executeTask(task)
             DispatchQueue.main.async {
-                self.taskFinished(result)
+                self.taskFinished(result, run: run)
             }
         }
+
     }
 
-    func taskFinished(_ result: Result<CompilerResult, PlaygroundError>) {
+    func taskFinished(_ result: Result<CompilerResult, PlaygroundError>, run: Bool) {
         activitySpinner.stopAnimation(self)
         runButton.isEnabled = true
         switch result {
@@ -186,7 +195,7 @@ class MainPlaygroundViewController: NSSplitViewController {
             outputViewController.handleStdErr(text: badNews.message)
         case .success(let goodNews):
             displayTaskOutput(goodNews)
-            if goodNews.success, let executablePath = goodNews.executable {
+            if goodNews.success && run, let executablePath = goodNews.executable {
                 runCommand(atPath: executablePath, handler: outputViewController)
             }
         }

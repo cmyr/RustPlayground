@@ -8,9 +8,6 @@
 
 import Cocoa
 
-// it's around here somewhere
-let CURSOR_BLINK_INTERVAL: TimeInterval = 0.6
-
 class EditViewController: NSViewController {
 
     @IBOutlet weak var editView: EditView!
@@ -60,11 +57,7 @@ class EditViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        blinkTimer?.invalidate()
-        blinkTimer = Timer.scheduledTimer(withTimeInterval: CURSOR_BLINK_INTERVAL,
-                                          repeats: true,
-                                          block: { [weak self] _ in self?.blinkCursors() })
-
+        resetBlinkTimer()
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(frameDidChangeNotification),
                                                name: NSView.frameDidChangeNotification,
@@ -153,11 +146,13 @@ class EditViewController: NSViewController {
     }
 
     override func doCommand(by selector: Selector) {
+        resetBlinkTimer()
         let selString = NSStringFromSelector(selector)
         core.doCommand(selString)
     }
 
     override func insertText(_ insertString: Any) {
+        resetBlinkTimer()
         core.insertText(insertString as! String)
     }
 
@@ -204,6 +199,7 @@ class EditViewController: NSViewController {
 
     override func mouseDown(with theEvent: NSEvent) {
         view.window?.makeFirstResponder(self)
+        resetBlinkTimer()
 
         let position = editView.bufferPositionFromPoint(theEvent.locationInWindow)
         lastDragPosition = position
@@ -273,6 +269,16 @@ class EditViewController: NSViewController {
 
     @objc func toggleComment(_ sender: Any?) {
         core.doCommand("toggle_comment")
+    }
+
+    func resetBlinkTimer() {
+        // it's around here somewhere
+        let CURSOR_BLINK_INTERVAL: TimeInterval = 0.6
+        editView?.drawsCursors = true
+        blinkTimer?.invalidate()
+        blinkTimer = Timer.scheduledTimer(withTimeInterval: CURSOR_BLINK_INTERVAL,
+                                          repeats: true,
+                                          block: { [weak self] _ in self?.blinkCursors() })
     }
 
     @objc func blinkCursors() {

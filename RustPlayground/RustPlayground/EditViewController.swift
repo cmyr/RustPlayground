@@ -8,6 +8,9 @@
 
 import Cocoa
 
+// it's around here somewhere
+let CURSOR_BLINK_INTERVAL: TimeInterval = 0.6
+
 class EditViewController: NSViewController {
 
     @IBOutlet weak var editView: EditView!
@@ -18,6 +21,7 @@ class EditViewController: NSViewController {
     let minimumPadding: CGFloat = 2
 
     var core: XiCoreProxy!
+    var blinkTimer: Timer?
 
     enum Mode: String {
         case command, insert, visual
@@ -56,6 +60,11 @@ class EditViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        blinkTimer?.invalidate()
+        blinkTimer = Timer.scheduledTimer(withTimeInterval: CURSOR_BLINK_INTERVAL,
+                                          repeats: true,
+                                          block: { [weak self] _ in self?.blinkCursors() })
+
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(frameDidChangeNotification),
                                                name: NSView.frameDidChangeNotification,
@@ -264,6 +273,13 @@ class EditViewController: NSViewController {
 
     @objc func toggleComment(_ sender: Any?) {
         core.doCommand("toggle_comment")
+    }
+
+    @objc func blinkCursors() {
+        if !(editView?.cursorRect.isEmpty ?? true) {
+            editView.drawsCursors = !editView.drawsCursors
+            editView!.setNeedsDisplay(editView.cursorRect)
+        }
     }
 }
 

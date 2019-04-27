@@ -38,6 +38,11 @@ class EditView: NSView {
         }
     }
 
+    var drawsCursors = true
+
+    /// The smallest rect that includes all visible cursors. Uses for invalidation.
+    private(set) var cursorRect = CGRect.zero
+
     override var intrinsicContentSize: NSSize {
         let charSpace = EditorPreferences.shared.editorFont.characterWidth() * 2
         let lineHeight = EditorPreferences.shared.editorFont.linespace
@@ -52,10 +57,11 @@ class EditView: NSView {
 
         let font = EditorPreferences.shared.editorFont
         let linespace = font.linespace
-        let charWidth = font.characterWidth()
 
         let first = min(Int((dirtyRect.minY / linespace).rounded(.down)), lines.totalLines)
         let last = min(Int((dirtyRect.maxY / linespace).rounded(.up)), lines.totalLines)
+
+        cursorRect = CGRect.zero
 
         for lineNumber in first..<last {
             let line = lines.getLine(line: UInt32(lineNumber)) ?? RawLine.placeholder()
@@ -81,23 +87,33 @@ class EditView: NSView {
             }
             if let cursor = line.cursor {
                 let cursorPos = getVisualOffset(attrString, cursor)
+                cursorRect = cursorRect.union(CGRect(x: X_OFFSET + cursorPos, y: selY, width: 2, height: linespace))
 
-                let rect: NSRect
-                if lines.mode?.drawBox ?? false {
-                    let selWidth: CGFloat;
-                    if font.isFixedPitch || cursorPos == 0 {
-                        selWidth = charWidth
-                    } else {
-                        selWidth = cursorPos - getVisualOffset(attrString, cursor - 1)
-                    }
-                    rect = NSRect(x: X_OFFSET + max(cursorPos - selWidth, 0), y: selY, width: selWidth, height: linespace).integral
-                    NSColor.lightGray.setFill()
-                } else {
-                    rect = NSRect(x: X_OFFSET + cursorPos, y: selY + (linespace - 1), width: charWidth, height: font.underlineThickness).integral
-                    NSColor.black.setFill()
+                if drawsCursors {
+                    let path = NSBezierPath()
+                    path.move(to: NSPoint(x: X_OFFSET + cursorPos, y: selY))
+                    path.line(to: NSPoint(x: X_OFFSET + cursorPos, y: selY + linespace))
+                    NSColor.black.setStroke()
+                    path.stroke()
                 }
 
-                rect.fill()
+//                        let charWidth = font.characterWidth()
+//                let rect: NSRect
+//                if lines.mode?.drawBox ?? false {
+//                    let selWidth: CGFloat;
+//                    if font.isFixedPitch || cursorPos == 0 {
+//                        selWidth = charWidth
+//                    } else {
+//                        selWidth = cursorPos - getVisualOffset(attrString, cursor - 1)
+//                    }
+//                    rect = NSRect(x: X_OFFSET + max(cursorPos - selWidth, 0), y: selY, width: selWidth, height: linespace).integral
+//                    NSColor.lightGray.setFill()
+//                } else {
+//                    rect = NSRect(x: X_OFFSET + cursorPos, y: selY + (linespace - 1), width: charWidth, height: font.underlineThickness).integral
+//                    NSColor.black.setFill()
+//                }
+//
+//                rect.fill()
             }
             let yPos = linespace * CGFloat(lineNumber)
 

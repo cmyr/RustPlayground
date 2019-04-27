@@ -38,7 +38,7 @@ Document state is handled in rust; the swift frontend interfaces with the rust c
 ### Known issues
 
 - Performance is not great; it is expected that documents are only ever a few hundred lines.
-- Drawing is hacky. We don't blink the cursor, and we only draw the cursor as an underbar. This will change at some point.
+- Drawing is hacky. We may draw ghost selections.
 
 
 ### TODO

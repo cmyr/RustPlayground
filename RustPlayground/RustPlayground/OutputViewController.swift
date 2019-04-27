@@ -40,7 +40,7 @@ class OutputViewController: NSViewController {
             self.outputTextView.font = self.outputFont
         }
 
-        let attributes = attributes ?? [.foregroundColor: NSColor.black]
+        let attributes = attributes ?? [.foregroundColor: NSColor.textColor]
         let insertedRange = NSRange(location: EOFRange.location, length: string.count)
         self.outputTextView.textStorage?.addAttributes(attributes, range: insertedRange)
     }

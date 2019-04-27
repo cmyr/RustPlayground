@@ -76,6 +76,8 @@ class EditViewController: NSViewController {
         } else {
             mode = nil
         }
+        scrollView.drawsBackground = true
+        scrollView.backgroundColor = NSColor.textBackgroundColor
     }
 
     override func viewWillAppear() {

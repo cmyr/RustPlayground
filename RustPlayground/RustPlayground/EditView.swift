@@ -52,8 +52,6 @@ class EditView: NSView {
 
     override func draw(_ dirtyRect: NSRect) {
         guard let lines = lineSource, lines.totalLines > 0 else { return }
-        NSColor.white.setFill()
-        dirtyRect.fill()
 
         let font = EditorPreferences.shared.editorFont
         let linespace = font.linespace
@@ -65,7 +63,7 @@ class EditView: NSView {
 
         for lineNumber in first..<last {
             let line = lines.getLine(line: UInt32(lineNumber)) ?? RawLine.placeholder()
-            let attrString = NSMutableAttributedString(string: line.text, attributes: [.font: font, .foregroundColor: NSColor.black])
+            let attrString = NSMutableAttributedString(string: line.text, attributes: [.font: font, .foregroundColor: NSColor.textColor])
 
             for styleSpan in line.styles {
                 let range = NSRange(location: styleSpan.start, length: styleSpan.len)
@@ -93,7 +91,7 @@ class EditView: NSView {
                     let path = NSBezierPath()
                     path.move(to: NSPoint(x: X_OFFSET + cursorPos, y: selY))
                     path.line(to: NSPoint(x: X_OFFSET + cursorPos, y: selY + linespace))
-                    NSColor.black.setStroke()
+                    NSColor.textColor.setStroke()
                     path.stroke()
                 }
 
@@ -229,7 +227,8 @@ extension NSMutableAttributedString {
 
         var attrs = [NSAttributedString.Key : Any]()
         if style.foreground.alphaComponent != 0 {
-            attrs[.foregroundColor] = style.foreground
+            let color = style.foreground.isTextColor ? NSColor.textColor : style.foreground
+            attrs[.foregroundColor] = color
         }
 
         //FIXME: background color is always set, plus is paints over cursors.
@@ -250,5 +249,12 @@ extension NSMutableAttributedString {
             attrs[.font] = EditorPreferences.shared.editorFont.bold()
         }
         self.addAttributes(attrs, range: utf16Range)
+    }
+}
+
+extension NSColor {
+    var isTextColor: Bool {
+        let themeTextGray: CGFloat = 0.19607843137254902
+        return self.blueComponent == themeTextGray && self.greenComponent == themeTextGray && self.redComponent == themeTextGray
     }
 }

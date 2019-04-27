@@ -67,12 +67,12 @@ class EditView: NSView {
                 attrString.addAttributesForStyle(range, style: style)
             }
 
-            let selY = font.topPadding + linespace * CGFloat(lineNumber)
+            let selY = linespace * CGFloat(lineNumber)
 
             if let selection = line.selection {
 
-                let selStart = font.isFixedPitch ? CGFloat(selection.startIndex) * charWidth : getVisualOffset(attrString, selection.startIndex)
-                let selEnd = font.isFixedPitch ?  CGFloat(selection.endIndex) * charWidth : getVisualOffset(attrString, selection.endIndex)
+                let selStart = getVisualOffset(attrString, selection.startIndex)
+                let selEnd = getVisualOffset(attrString, selection.endIndex)
 
 
                 let rect = CGRect(x: X_OFFSET + selStart, y: selY, width: selEnd - selStart, height: linespace).integral
@@ -101,7 +101,22 @@ class EditView: NSView {
             }
             let yPos = linespace * CGFloat(lineNumber)
 
-            attrString.draw(at: NSPoint(x: X_OFFSET, y: yPos))
+            let context = NSGraphicsContext.current!.cgContext
+            let ctLine = CTLineCreateWithAttributedString(attrString)
+            // this is funky by default, and will draw text mirrored.
+            context.textMatrix = CGAffineTransform(a: 1, b: 0, c: 0, d: -1, tx: 0, ty: 0)
+
+            /* we use Core Text to draw (Instead of NSAttributedString) because it doesn't
+             * do things like add paragraph spacing.
+             *
+             * However, it does do some funny stuff: it treats the bottom left as the origin,
+             * and it draws from the baseline, at the context's current text position.
+             * Because we're otherwise treating the top left as the origin, we need to
+             * adjust the yPos by one line height + the descender (which is a negative value)
+            */
+            let textY = yPos + linespace + font.descender
+            context.textPosition = CGPoint(x: X_OFFSET, y: textY)
+            CTLineDraw(ctLine, context)
         }
     }
 

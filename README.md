@@ -8,15 +8,19 @@ The Rust Playground for MacOS is a standalone native mac application that allows
 
 ## installation
 
+You can download a disk image of a recent build on [the releases page](https://github.com/cmyr/RustPlayground/releases).
+
 ### requirements
 
 The playground [requires rustup](https://rustup.rs), and allows code to be run with any installed toolchain.
 **note**: Rustup must currently be in the default directory, `$HOME/.rustup`.
 
-### install
-Either,
-1. checkout this repository and build the included Xcode projoect
-2. download a compiled binary from the [releases page](https://github.com/cmyr/RustPlayground/releases).
+### install from source (requires Xcode)
+
+- clone this repository
+- cd in to the `RustPlayground` directory
+- run `xcodebuild` from the command line
+- copy `build/Release/Rust Playground.app` to your `Applications` directory
 
 ## About
 

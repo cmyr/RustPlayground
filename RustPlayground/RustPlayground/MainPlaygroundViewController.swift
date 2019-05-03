@@ -215,8 +215,12 @@ class MainPlaygroundViewController: NSSplitViewController {
     }
 
     func executeTask(_ task: CompilerTask) -> Result<CompilerResult, PlaygroundError> {
-        let buildDir = AppDelegate.shared.defaultBuildlDirectory
-        return RustPlayground.executeTask(inDirectory: buildDir, task: task)
+        let buildDir = AppDelegate.shared.defaultBuildDirectory
+        return RustPlayground.executeTask(inDirectory: buildDir, task: task, stderr: { [weak self] (line) in
+            DispatchQueue.main.async {
+                self?.outputViewController.handleRawStdErrLine(line)
+            }
+        })
     }
 
     func generateTask() -> CompilerTask {

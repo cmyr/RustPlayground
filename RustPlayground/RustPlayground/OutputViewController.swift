@@ -53,8 +53,21 @@ class OutputViewController: NSViewController {
     func printText(_ text: String) {
         appendString(text, attributes: nil)
     }
+
+    // we want to clean up and do som formating of the line before appending it.
+    func handleRawStdErrLine(_ line: String) {
+        var attrs = [NSAttributedString.Key.foregroundColor: NSColor.textColor]
+        if line.starts(with: "error") {
+            attrs[.foregroundColor] = NSColor.systemRed
+        } else if line.starts(with: "warning") {
+            attrs[.foregroundColor] = NSColor.systemYellow
+        }
+        appendString(line, attributes: attrs)
+    }
 }
 
+// TODO: we used to use this pattern for all output,
+// but now we sort of mix and match; this could be cleaned up.
 extension OutputViewController: RunnerOutputHandler {
     func printInfo(text: String) {
         // hack to give stdout time to flush before printing 'done'

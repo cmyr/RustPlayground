@@ -119,7 +119,7 @@
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ggS-Ro-BzO">
-                                <rect key="frame" x="116.5" y="19" width="145" height="23"/>
+                                <rect key="frame" x="117" y="19" width="145" height="23"/>
                                 <buttonCell key="cell" type="roundTextured" title="Input Sans 14.0" bezelStyle="texturedRounded" image="NSFontPanel" imagePosition="trailing" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="dlh-QW-rjM">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -137,7 +137,7 @@
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="rEQ-jW-2Hf">
-                                <rect key="frame" x="116.5" y="47" width="145" height="23"/>
+                                <rect key="frame" x="117" y="47" width="145" height="23"/>
                                 <buttonCell key="cell" type="roundTextured" title="Input Sans 14.0" bezelStyle="texturedRounded" image="NSFontPanel" imagePosition="right" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="TJH-wR-Owz">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -719,7 +719,7 @@
                                 <toolbarItem implicitItemIdentifier="B31474D0-1922-4D2E-8099-332D211BF426" label="Custom View" paletteLabel="Show Bottom View" tag="10" image="ToggleConsoleIcon" sizingBehavior="auto" id="nTn-fh-Fu5">
                                     <nil key="toolTip"/>
                                     <button key="view" verticalHuggingPriority="750" tag="10" id="Eca-GE-Ny7">
-                                        <rect key="frame" x="41" y="14" width="25" height="24"/>
+                                        <rect key="frame" x="41" y="14" width="24" height="24"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="ToggleConsoleIcon" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="eLZ-mn-lHm">
                                             <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -735,7 +735,7 @@
                                 <toolbarItem implicitItemIdentifier="5A07218F-600A-452C-8157-452A1CE9D23D" label="" paletteLabel="Run" tag="14" image="PlayIcon" sizingBehavior="auto" id="7QS-8p-NEL">
                                     <nil key="toolTip"/>
                                     <button key="view" verticalHuggingPriority="750" tag="14" id="4A9-hC-f7B">
-                                        <rect key="frame" x="2" y="14" width="25" height="24"/>
+                                        <rect key="frame" x="2" y="14" width="24" height="24"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="PlayIcon" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="wzt-1I-Kk6">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>

@@ -39,10 +39,11 @@ func listToolchains() -> Result<[Toolchain], PlaygroundError> {
     }
 }
 
-func executeTask(inDirectory buildDir: URL, task: CompilerTask) -> Result<CompilerResult, PlaygroundError> {
+func executeTask(inDirectory buildDir: URL, task: CompilerTask, stderr: @escaping ((String) -> ())) -> Result<CompilerResult, PlaygroundError> {
+    GlobalTaskContext.stderrCallback = stderr
     let buildPath = buildDir.path
     let taskJson = task.toJson()
-    let response = JsonResponse.from { playgroundExecuteTask(buildPath, taskJson) }
+    let response = JsonResponse.from { playgroundExecuteTask(buildPath, taskJson, stderrCallback) }
 
     switch response {
     case .ok(let result):
@@ -50,6 +51,24 @@ func executeTask(inDirectory buildDir: URL, task: CompilerTask) -> Result<Compil
         return .success(CompilerResult.fromJson(data))
     case .error(let err):
         return .failure(err)
+    }
+}
+
+/// The least bad way I could think of to pipe callbacks from rust back
+/// to whoever cares about them for this action
+fileprivate class GlobalTaskContext {
+    static var stderrCallback: ((String) -> ())? = nil
+}
+
+/// Called over the FFI boundry with lines from stderr
+func stderrCallback(linePtr: UnsafePointer<Int8>?) {
+    if let ptr = linePtr {
+        let line = String(cString: ptr)
+        if let callback = GlobalTaskContext.stderrCallback {
+            callback(line)
+        } else {
+            print("NO STDERR callback for line: '\(line)'")
+        }
     }
 }
 

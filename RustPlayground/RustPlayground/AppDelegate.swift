@@ -36,7 +36,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         return NSStoryboard.main?.instantiateController(withIdentifier: "preferences") as! PreferencesWindowController;
     }()
 
-    lazy var defaultBuildlDirectory: URL = {
+    lazy var defaultBuildDirectory: URL = {
         let buildDirectory = FileManager.default.urls(
             for: .applicationSupportDirectory,
             in: .userDomainMask)

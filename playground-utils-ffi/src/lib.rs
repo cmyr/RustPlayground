@@ -24,13 +24,19 @@ pub extern "C" fn playgroundGetToolchains() -> *const c_char {
 pub extern "C" fn playgroundExecuteTask(
     path: *const c_char,
     cmd_json: *const c_char,
+    std_err_callback: extern "C" fn(*const c_char),
 ) -> *const c_char {
+    eprintln!("playground execute task");
     let path = unsafe { CStr::from_ptr(path) };
     let json = unsafe { CStr::from_ptr(cmd_json) };
     let path = Path::new(OsStr::from_bytes(path.to_bytes()));
     let json = json.to_str().expect("json must be valid utf8");
     let task: Task = serde_json::from_str(json).expect("malformed task json");
-    let response = match do_compile_task(path, task) {
+    let response = match do_compile_task(path, task, |stderr| {
+        let cstring =
+            CString::new(stderr).unwrap_or_else(|_| CString::new("null byte in stderr").unwrap());
+        std_err_callback(cstring.as_ptr());
+    }) {
         Ok(result) => json!({ "result": result }),
         Err(e) => to_json_error(e),
     };

@@ -1,6 +1,7 @@
 use std::fs;
+use std::io::{BufRead, BufReader};
 use std::path::{Path, PathBuf};
-use std::process::Command;
+use std::process::{Command, Stdio};
 
 use crate::error::Error;
 
@@ -43,7 +44,15 @@ pub struct CompilerResult {
 
 /// Attempts to run the given task in the supplied directory, which will
 /// be created if it does not exist.
-pub fn do_compile_task<P: AsRef<Path>>(outdir: P, task: Task) -> Result<CompilerResult, Error> {
+pub fn do_compile_task<P, F>(
+    outdir: P,
+    task: Task,
+    mut std_err_callback: F,
+) -> Result<CompilerResult, Error>
+where
+    P: AsRef<Path>,
+    F: FnMut(&str),
+{
     let outdir = outdir.as_ref();
     create_cargo_scaffold(&outdir, &task.code)?;
     activate_toolchain(outdir, &task.toolchain)?;
@@ -58,7 +67,31 @@ pub fn do_compile_task<P: AsRef<Path>>(outdir: P, task: Task) -> Result<Compiler
         command.arg("--release");
     }
 
-    let output = command.output().map_err(|e| Error::CompileFailed(e))?;
+    command.stderr(Stdio::piped());
+    command.stdout(Stdio::piped());
+
+    let mut child = command.spawn().map_err(|e| Error::CompileFailed(e))?;
+    let stderr = child.stderr.take().expect("piped stderr must exist");
+    let mut linereader = BufReader::new(stderr);
+
+    let mut line_buf = String::new();
+    // we send stderr lines as they arrive, so the client
+    // is more responsive & informative
+    loop {
+        match linereader.read_line(&mut line_buf) {
+            Ok(0) => {
+                println!("read len 0");
+                break;
+            }
+            Ok(_) => {
+                std_err_callback(&line_buf);
+                line_buf.clear();
+            }
+            Err(e) => return Err(Error::CompileFailed(e)),
+        }
+    }
+
+    let output = child.wait_with_output().map_err(|e| Error::CompileFailed(e))?;
     let success = output.status.success();
     let executable = get_output_path(outdir, &task);
     let stdout = String::from_utf8_lossy(&output.stdout).to_string();
@@ -185,7 +218,7 @@ mod tests {
         };
 
         let exp_exec_path = outdir.join("target").join("debug").join(BIN_TARGET_NAME);
-        let result = do_compile_task(&outdir, task).expect("compile task failed");
+        let result = do_compile_task(&outdir, task, |_| {}).expect("compile task failed");
 
         assert_eq!(result.executable, Some(exp_exec_path));
     }

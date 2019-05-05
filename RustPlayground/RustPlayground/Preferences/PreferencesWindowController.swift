@@ -12,8 +12,11 @@ class PreferencesWindowController: NSWindowController {
 
     override func windowDidLoad() {
         super.windowDidLoad()
-    
-        // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
-    }
 
+        //HACK: we have to set this to resizeable for the tabview to size correctly
+        // (or at least I couldn't figure out another way, and don't want to spend two more hours on it)
+        var mask = window!.styleMask
+        mask.remove(.resizable)
+        window?.styleMask = mask
+    }
 }

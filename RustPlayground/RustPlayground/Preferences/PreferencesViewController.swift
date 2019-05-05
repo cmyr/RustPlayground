@@ -27,6 +27,7 @@ class EditorPreferences {
         case editorFontSize = "font_size"
         case consoleFontFace = "console_font_face"
         case consoleFontSize = "console_font_size"
+        case githubToken = "githubToken"
     }
 
     enum IndentType {
@@ -48,6 +49,7 @@ class EditorPreferences {
             Keys.editorFontSize.rawValue: defaultFontSize,
             Keys.consoleFontFace.rawValue: defaultFont.fontName,
             Keys.consoleFontSize.rawValue: defaultFontSize,
+            Keys.githubToken.rawValue: "",
         ])
     }
 
@@ -69,6 +71,7 @@ class EditorPreferences {
 
         self.editorFont = NSFont(name: editorFont, size: editorFontSize) ?? NSFont.systemFont(ofSize: editorFontSize)
         self.consoleFont = NSFont(name: consoleFont, size: consoleFontSize) ?? NSFont.systemFont(ofSize: consoleFontSize)
+        self.githubToken = defaults.string(forKey: Keys.githubToken.rawValue) ?? ""
     }
 
     func syncAllWithCore() {
@@ -131,6 +134,12 @@ class EditorPreferences {
 
             NotificationCenter.default.post(name: EditorPreferences.consoleFontChangedNotification, object: nil)
             // NOTE: core doesn't know about the console
+        }
+    }
+
+    internal var githubToken: String {
+        didSet {
+            UserDefaults.standard.set(githubToken, forKey: Keys.githubToken.rawValue)
         }
     }
 

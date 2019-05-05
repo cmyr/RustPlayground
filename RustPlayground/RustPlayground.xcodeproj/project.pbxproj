@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		60096082227F81E4001BE755 /* SharePreferencesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60096081227F81E4001BE755 /* SharePreferencesViewController.swift */; };
 		6018ED18225FB15600B5DF38 /* Style.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6018ED17225FB15600B5DF38 /* Style.swift */; };
 		603B05992272068F00FBD7FC /* libximodal.a in CopyFiles */ = {isa = PBXBuildFile; fileRef = 603B05982272068F00FBD7FC /* libximodal.a */; };
 		603B059B227206C200FBD7FC /* libplayground.a in CopyFiles */ = {isa = PBXBuildFile; fileRef = 603B059A227206C200FBD7FC /* libplayground.a */; };
@@ -82,6 +83,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		60096081227F81E4001BE755 /* SharePreferencesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharePreferencesViewController.swift; sourceTree = "<group>"; };
 		6018ED17225FB15600B5DF38 /* Style.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Style.swift; path = RustPlayground/Style.swift; sourceTree = SOURCE_ROOT; };
 		603608D2224EC693002CEAC6 /* xicore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = xicore.h; path = "../xi-ffi/xicore.h"; sourceTree = "<group>"; };
 		603B05982272068F00FBD7FC /* libximodal.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libximodal.a; path = "../xi-ffi/target/libximodal.a"; sourceTree = "<group>"; };
@@ -139,6 +141,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		60096083227FA8D7001BE755 /* Preferences */ = {
+			isa = PBXGroup;
+			children = (
+				60D05FAC226A7ED10045615B /* PreferencesWindowController.swift */,
+				60D05FAE226B9B410045615B /* PreferencesViewController.swift */,
+				60096081227F81E4001BE755 /* SharePreferencesViewController.swift */,
+			);
+			path = Preferences;
+			sourceTree = "<group>";
+		};
 		600D761222405AC400CC9D90 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -179,10 +191,10 @@
 		606644E9223FFED7006215A0 /* RustPlayground */ = {
 			isa = PBXGroup;
 			children = (
+				60096083227FA8D7001BE755 /* Preferences */,
 				60EB1B60227129300006FB81 /* Assets */,
 				604C7ADC22710CA600F6B277 /* MissingRustupInfoView.swift */,
 				606644EA223FFED7006215A0 /* AppDelegate.swift */,
-				60D05FAE226B9B410045615B /* PreferencesViewController.swift */,
 				606644EC223FFED7006215A0 /* EditViewController.swift */,
 				60D8C745226A4D2800440860 /* OutputTextView.swift */,
 				60A91D162265115E00240CC6 /* BundleResources.swift */,
@@ -193,7 +205,6 @@
 				60CC174E224591840075FDE5 /* XiWindow.swift */,
 				604B0F5F22405C88007038E6 /* XiCoreProxy.swift */,
 				604C7ACF226E597700F6B277 /* Playground.swift */,
-				60D05FAC226A7ED10045615B /* PreferencesWindowController.swift */,
 				608A1D41226627D2001A79EB /* OutputViewController.swift */,
 				6018ED17225FB15600B5DF38 /* Style.swift */,
 			);
@@ -434,6 +445,7 @@
 				604C7AD0226E597700F6B277 /* Playground.swift in Sources */,
 				606644ED223FFED7006215A0 /* EditViewController.swift in Sources */,
 				606644EB223FFED7006215A0 /* AppDelegate.swift in Sources */,
+				60096082227F81E4001BE755 /* SharePreferencesViewController.swift in Sources */,
 				60D05FAD226A7ED10045615B /* PreferencesWindowController.swift in Sources */,
 				608A1D42226627D2001A79EB /* OutputViewController.swift in Sources */,
 				60D05FAF226B9B410045615B /* PreferencesViewController.swift in Sources */,

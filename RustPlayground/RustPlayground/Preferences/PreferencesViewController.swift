@@ -18,6 +18,8 @@ class EditorPreferences {
 
     static let consoleFontChangedNotification = Notification.Name(rawValue: "net.cmyr.rust-playground.consoleFontChanged")
 
+    static let githubTokenChangedNotification = Notification.Name(rawValue: "net.cmyr.rust-playground.githubTokenChanged")
+
     enum Keys: String {
         case translateTabsToSpaces = "translate_tabs_to_spaces"
         case tabWidth = "tab_size"
@@ -140,6 +142,7 @@ class EditorPreferences {
     internal var githubToken: String {
         didSet {
             UserDefaults.standard.set(githubToken, forKey: Keys.githubToken.rawValue)
+            NotificationCenter.default.post(name: EditorPreferences.githubTokenChangedNotification, object: nil)
         }
     }
 

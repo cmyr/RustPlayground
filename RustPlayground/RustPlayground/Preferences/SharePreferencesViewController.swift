@@ -71,7 +71,7 @@ class SharePreferencesViewController: NSViewController {
     /// If there is a valid looking token, ping github and see if it works
     /// and has the necessary authorizations.
     private func validateCredentialsIfPossible(_ token: String) {
-        GithubConnection(username: "", token: token).validate {
+        GithubConnection(token: token).validate {
             [weak self] (error) in
             if let error = error {
                 self?.validationFailed(withError: error)

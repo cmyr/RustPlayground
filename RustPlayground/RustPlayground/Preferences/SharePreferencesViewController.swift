@@ -13,12 +13,13 @@ let GITHUB_TOKEN_PATH = "https://github.com/settings/tokens"
 class SharePreferencesViewController: NSViewController {
 
     @IBOutlet weak var githubTokenTextField: NSTextField!
+    @IBOutlet weak var bottomHelperButton: NSButton!
 
     override func viewDidLoad() {
         super.viewDidLoad()
         githubTokenTextField.formatter = nil
         githubTokenTextField.delegate = self
-        githubTokenTextField.stringValue = EditorPreferences.shared.githubToken
+        setupInitialState()
     }
 
     override func viewDidAppear() {
@@ -29,12 +30,34 @@ class SharePreferencesViewController: NSViewController {
         }
     }
 
+    func setupInitialState() {
+        let token = EditorPreferences.shared.githubToken
+        githubTokenTextField.stringValue = token
+        githubTokenTextField.isEnabled = token == ""
+        bottomHelperButton.target = self
+
+        if token.isEmpty {
+            bottomHelperButton.title = "Generate a token"
+            bottomHelperButton.contentTintColor = NSColor.linkColor
+            bottomHelperButton.action = #selector(generateLinkAction(_:))
+        } else {
+            bottomHelperButton.title = "Clear token"
+            bottomHelperButton.contentTintColor = NSColor.systemRed
+            bottomHelperButton.action = #selector(clearTokenAction(_:))
+        }
+    }
+
     @IBAction func generateLinkAction(_ sender: NSButton) {
         guard let url = URL(string: GITHUB_TOKEN_PATH) else {
             print("conversion to url failed?")
             return
         }
         NSWorkspace.shared.open(url)
+    }
+
+    @objc func clearTokenAction(_ sender: NSButton) {
+        EditorPreferences.shared.githubToken = ""
+        setupInitialState()
     }
 
     private func validateTokenTextField() {
@@ -61,14 +84,17 @@ class SharePreferencesViewController: NSViewController {
     private func validationFailed(withError error: GithubError) {
         // not sure we should be doing much else here
         guard let window = view.window else { return }
+
         let alert = NSAlert(error: error)
         alert.messageText = error.localizedDescription
-        alert.beginSheetModal(for: window, completionHandler: nil)
+        alert.beginSheetModal(for: window) { [weak self] (response) in
+            window.makeFirstResponder(self?.githubTokenTextField)
+        }
     }
 
     private func validationSucceeded(withToken token: String) {
         EditorPreferences.shared.githubToken = token
-        print("validation succeeded!")
+        setupInitialState()
     }
 }
 

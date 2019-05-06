@@ -70,19 +70,19 @@
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textField verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RBI-n4-WJ2">
-                                            <rect key="frame" x="20" y="86" width="360" height="29"/>
+                                            <rect key="frame" x="20" y="88" width="360" height="25"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="200" id="zyg-1X-aKH"/>
                                             </constraints>
-                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Your Token Here" drawsBackground="YES" id="erI-Bw-kN6">
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Github Access Token" drawsBackground="YES" id="erI-Bw-kN6">
                                                 <numberFormatter key="formatter" formatterBehavior="default10_4" numberStyle="decimal" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" maximumFractionDigits="3" id="k8o-xe-a6p"/>
-                                                <font key="font" size="16" name="Menlo-Regular"/>
+                                                <font key="font" size="14" name="Menlo-Regular"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
                                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="uM1-np-7HF">
-                                            <rect key="frame" x="18" y="135" width="364" height="34"/>
+                                            <rect key="frame" x="18" y="133" width="364" height="34"/>
                                             <textFieldCell key="cell" selectable="YES" title="Provide a GitHub token in order to create gists and permalinks. This token only needs the 'gists' permission." id="Llj-5q-Mis">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -90,7 +90,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qkH-Yw-cRO">
-                                            <rect key="frame" x="20" y="61" width="101" height="16"/>
+                                            <rect key="frame" x="20" y="63" width="101" height="16"/>
                                             <buttonCell key="cell" type="roundRect" title="Generate a token" bezelStyle="roundedRect" alignment="center" inset="2" id="WUC-kv-LlN">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="cellTitle"/>
@@ -126,6 +126,7 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="bottomHelperButton" destination="qkH-Yw-cRO" id="jMp-DA-che"/>
                         <outlet property="githubTokenTextField" destination="RBI-n4-WJ2" id="Mnr-YX-Pzy"/>
                     </connections>
                 </viewController>

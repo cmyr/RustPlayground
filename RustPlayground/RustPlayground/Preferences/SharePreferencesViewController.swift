@@ -18,19 +18,15 @@ class SharePreferencesViewController: NSViewController {
         super.viewDidLoad()
         githubTokenTextField.formatter = nil
         githubTokenTextField.delegate = self
-        let token = EditorPreferences.shared.githubToken
-        if token != "" {
-            githubTokenTextField.stringValue = token
-        }
+        githubTokenTextField.stringValue = EditorPreferences.shared.githubToken
     }
 
     override func viewDidAppear() {
         super.viewDidAppear()
-        validateTokenTextField()
-    }
-
-    override func resignFirstResponder() -> Bool {
-        return super.resignFirstResponder()
+        if !githubTokenTextField.stringValue.isEmpty {
+            // if we have a valid token, don't make text field the first responder
+            view.window?.makeFirstResponder(self)
+        }
     }
 
     @IBAction func generateLinkAction(_ sender: NSButton) {
@@ -42,22 +38,47 @@ class SharePreferencesViewController: NSViewController {
     }
 
     private func validateTokenTextField() {
-        if textLooksLikeToken(githubTokenTextField.stringValue) {
-            // deselect the text view
-            self.view.window?.makeFirstResponder(self)
-            githubTokenTextField.textColor = NSColor.systemGreen
-
-            //FIXME: we should be using keychain for this, really
-            EditorPreferences.shared.githubToken = githubTokenTextField.stringValue
-        } else {
-            githubTokenTextField.textColor = NSColor.textColor
+        let maybeToken = githubTokenTextField.stringValue
+        if textLooksLikeToken(maybeToken) {
+            view.window?.makeFirstResponder(self)
+            validateCredentialsIfPossible(maybeToken)
         }
+    }
+
+    /// If there is a valid looking token, ping github and see if it works
+    /// and has the necessary authorizations.
+    private func validateCredentialsIfPossible(_ token: String) {
+        GithubConnection(username: "", token: token).validate {
+            [weak self] (error) in
+            if let error = error {
+                self?.validationFailed(withError: error)
+            } else {
+                self?.validationSucceeded(withToken: token)
+            }
+        }
+    }
+
+    private func validationFailed(withError error: GithubError) {
+        // not sure we should be doing much else here
+        guard let window = view.window else { return }
+        let alert = NSAlert(error: error)
+        alert.messageText = error.localizedDescription
+        alert.beginSheetModal(for: window, completionHandler: nil)
+    }
+
+    private func validationSucceeded(withToken token: String) {
+        EditorPreferences.shared.githubToken = token
+        print("validation succeeded!")
     }
 }
 
 extension SharePreferencesViewController: NSTextFieldDelegate {
     func controlTextDidChange(_ obj: Notification) {
-        validateTokenTextField()
+        guard let textField = obj.object as? NSTextField else { return }
+
+        if textField == githubTokenTextField {
+            validateTokenTextField()
+        }
     }
 }
 

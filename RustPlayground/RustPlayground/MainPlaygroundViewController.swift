@@ -12,8 +12,15 @@ let OUTPUT_TOOLBAR_ITEM_TAG = 10;
 let TOOLCHAIN_SELECT_TOOLBAR_ITEM_TAG = 13;
 let RUN_TOOLBAR_ITEM_TAG = 14;
 let ACTIVITY_SPINNER_TOOLBAR_ITEM_TAG = -1;
+let SHARE_DISABLED_TOOLBAR_ITEM_TAG = 15;
+let SHARE_TOOLBAR_ITEM_TAG = 16;
+
+let SHARE_TOOLBAR_IDENTIFIER = NSToolbarItem.Identifier(rawValue: "share")
+let SHARE_DISABLED_TOOLBAR_IDENTIFIER = NSToolbarItem.Identifier(rawValue: "shareDisabled")
 
 let TOOLCHAIN_ITEM_TAG_OFFSET = 1000;
+
+let SHARE_PREFERENCES_TAB_VIEW_INDEX = 1;
 
 class MainPlaygroundViewController: NSSplitViewController {
 
@@ -60,7 +67,10 @@ class MainPlaygroundViewController: NSSplitViewController {
                                                name: AppDelegate.toolchainsChangedNotification,
                                                object: nil)
 
-
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(githubTokenChanged(_:)),
+                                               name: EditorPreferences.githubTokenChangedNotification,
+                                               object: nil)
     }
 
     override func viewDidAppear() {
@@ -69,6 +79,20 @@ class MainPlaygroundViewController: NSSplitViewController {
         splitView.setPosition(view.frame.height - initSplitHeight, ofDividerAt: 0)
         splitViewItems[1].isCollapsed = true
         activitySpinner.isDisplayedWhenStopped = false
+        configureShareToolbarItem()
+    }
+
+    func configureShareToolbarItem() {
+        guard let toolbar = view.window?.toolbar else { return }
+        if let toRemove = toolbar.items.firstIndex(where: {
+            $0.tag == SHARE_TOOLBAR_ITEM_TAG
+            || $0.tag == SHARE_DISABLED_TOOLBAR_ITEM_TAG
+        }) {
+            toolbar.removeItem(at: toRemove)
+        }
+        let shareDisabled = EditorPreferences.shared.githubToken.isEmpty
+        let identifier = shareDisabled ? SHARE_DISABLED_TOOLBAR_IDENTIFIER : SHARE_TOOLBAR_IDENTIFIER
+        toolbar.insertItem(withItemIdentifier: identifier, at: toolbar.items.count)
     }
 
     @objc func toolchainsChanged(_ notification: Notification) {
@@ -86,6 +110,10 @@ class MainPlaygroundViewController: NSSplitViewController {
         runButton.isEnabled = AppDelegate.shared.toolchains.count > 0
 
         //TODO: show a warning if no toolchains are found
+    }
+
+    @objc func githubTokenChanged(_ notification: Notification) {
+        configureShareToolbarItem()
     }
 
     @IBAction func debugPrintEnvironment(_ sender: Any?) {
@@ -156,6 +184,43 @@ class MainPlaygroundViewController: NSSplitViewController {
 
     @IBAction func toggleConsoleAction(_ sender: NSMenuItem) {
         outputViewIsVisible = !outputViewIsVisible
+    }
+
+    @IBAction func shareDisabledAction(_ sender: NSToolbarItem) {
+        let prefController = AppDelegate.shared.preferencesWindowController
+        guard let tabController = prefController.contentViewController as? NSTabViewController else { return }
+        tabController.selectedTabViewItemIndex = SHARE_PREFERENCES_TAB_VIEW_INDEX;
+        prefController.showWindow(nil)
+    }
+
+    @IBAction func createGist(_ sender: Any?) {
+        createGistAndReportErrors() { NSWorkspace.shared.open($0.toGistUrl()) }
+    }
+
+    @IBAction func sendToWebPlayground(_ sender: Any?) {
+        createGistAndReportErrors() { NSWorkspace.shared.open($0.toPlaygroundUrl()) }
+    }
+
+    func createGistAndReportErrors(completion: @escaping (GistIdentifier) -> ()) {
+        let text = AppDelegate.shared.core.getDocument()
+        GithubConnection(token: EditorPreferences.shared.githubToken) .createGist(withContent: text) { [weak self] (result) in
+            DispatchQueue.main.async {
+                switch result {
+                case .failure(let err):
+                    self?.showGithubError(err)
+                case .success(let gistId):
+                    completion(gistId)
+                }
+            }
+        }
+    }
+
+    func showGithubError(_ error: GithubError) {
+        guard let window = view.window else { return }
+
+        let alert = NSAlert(error: error)
+        alert.messageText = error.localizedDescription
+        alert.beginSheetModal(for: window)
     }
 
     @IBAction func buildAction(_ sender: Any?) {

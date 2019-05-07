@@ -3,6 +3,8 @@ use std::io;
 use std::path::PathBuf;
 use std::process::Output;
 
+use ffi_support::{ExternError, ErrorCode};
+
 #[derive(Debug)]
 pub enum Error {
     ToolchainParseError(String),
@@ -36,7 +38,7 @@ impl Error {
     /// An error code included in the json if this is sent to core.
     /// This is not systematic. We just want to be able to easily identify
     /// certain cases, such as when Rustup is not installed.
-    pub fn error_code(&self) -> u32 {
+    pub fn error_code(&self) -> i32 {
         use Error::*;
         match self {
             BadExit(_) => 1,
@@ -71,3 +73,10 @@ impl fmt::Display for Error {
 }
 
 impl std::error::Error for Error {}
+
+impl From<Error> for ExternError {
+    fn from(e: Error) -> ExternError {
+        let code = ErrorCode::new(e.error_code());
+        ExternError::new_error(code, e.to_string())
+    }
+}

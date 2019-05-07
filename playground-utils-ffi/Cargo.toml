@@ -5,6 +5,7 @@ authors = ["Colin Rofls <colin@cmyr.net>"]
 edition = "2018"
 
 [dependencies]
+ffi-support = "0.3.4"
 serde_json = "1.0"
 
 [dependencies.playground-utils]

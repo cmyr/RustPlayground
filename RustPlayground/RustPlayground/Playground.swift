@@ -12,46 +12,25 @@ import Foundation
 
 struct PlaygroundError {
     let message: String
-    let code: Int
-
-    init?(json: [String: AnyObject]) {
-        if let message = json["message"] as? String,
-            let code = json["code"] as? Int {
-            self.message = message
-            self.code = code
-        } else {
-            return nil
-        }
-    }
+    let code: Int32
 }
 
 extension PlaygroundError: Error {}
 
 func listToolchains() -> Result<[Toolchain], PlaygroundError> {
-    let response = JsonResponse.from(externFn: playgroundGetToolchains)
-    switch response {
-    case .ok(let result):
-        let data = (result as! [AnyObject])
-        let toolchains = data.map { Toolchain.fromJson(json: $0)! }
-        return .success(toolchains)
-    case .error(let error):
-        return .failure(error)
-    }
+    let response = PlaygroundResult.from { err in playgroundGetToolchains(err) }
+    return response.map({ (toolchains) -> [Toolchain] in
+        let data = toolchains as! [AnyObject]
+        return data.map { Toolchain.fromJson(json: $0)! }
+    })
 }
 
 func executeTask(inDirectory buildDir: URL, task: CompilerTask, stderr: @escaping ((String) -> ())) -> Result<CompilerResult, PlaygroundError> {
     GlobalTaskContext.stderrCallback = stderr
     let buildPath = buildDir.path
     let taskJson = task.toJson()
-    let response = JsonResponse.from { playgroundExecuteTask(buildPath, taskJson, stderrCallback) }
-
-    switch response {
-    case .ok(let result):
-        let data = result as! [String: AnyObject]
-        return .success(CompilerResult.fromJson(data))
-    case .error(let err):
-        return .failure(err)
-    }
+    let response = PlaygroundResult.from { err in playgroundExecuteTask(buildPath, taskJson, stderrCallback, err) }
+    return response.map { CompilerResult.fromJson($0 as! [String: AnyObject]) }
 }
 
 /// The least bad way I could think of to pipe callbacks from rust back
@@ -96,30 +75,26 @@ struct Toolchain {
         return base
     }
 }
-// TODO: this can probably just be a Result<T, E>
-enum JsonResponse {
-    case error(PlaygroundError)
-    case ok(Any)
 
-    /// Wrapper around an external function that returns json. Handles basic
-    /// parsing and freeing memory.
-    ///
-    /// we control all the messages we send and receive, so we assume all
-    /// messages are well-formed.
-    static func from(externFn: () -> UnsafePointer<Int8>?) -> JsonResponse {
-        let cString = externFn()!
+typealias PlaygroundResult = Result<Any, PlaygroundError>
+
+extension PlaygroundResult {
+    /// Call an external function, doing error handling and json parsing.
+    static func from(externFn: (UnsafeMutablePointer<ExternError>) -> UnsafePointer<Int8>?) -> PlaygroundResult {
+        var error = ExternError()
+        let cString = externFn(&error)!
         defer { playgroundStringFree(cString) }
 
-        let string = String(cString: cString, encoding: .utf8)!
-        let message = try! JSONSerialization.jsonObject(with: string.data(using: .utf8)!) as! [String: AnyObject]
-        if let result = message["result"] {
-            return .ok(result)
-        } else if let error = message["error"] {
-            let error = error as! [String: AnyObject]
-            return .error(PlaygroundError(json: error)!)
-        } else {
-            fatalError("invalid json response: \(message)")
+        if error.code != 0 {
+            let message = String(cString: error.message, encoding: .utf8)!
+            let error = PlaygroundError(message: message, code: error.code)
+            playgroundStringFree(error.message)
+            return .failure(error)
         }
-    }
-}
 
+        let string = String(cString: cString, encoding: .utf8)!
+        let message = try! JSONSerialization.jsonObject(with: string.data(using: .utf8)!)
+        return .success(message)
+    }
+
+}

@@ -1,0 +1,7 @@
+[workspace]
+members = [
+    "xi-modal-input",
+    "xi-ffi",
+    "playground-utils",
+    "playground-utils-ffi",
+]

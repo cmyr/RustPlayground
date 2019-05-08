@@ -6,7 +6,7 @@
 
 The Rust Playground for MacOS is a standalone native mac application that allows quickly editing and testing rust snippets.
 
-![Rust Playground Screenshot](https://raw.githubusercontent.com/cmyr/RustPlayground/screenshots/screenshot-1.png)
+![Rust Playground Screenshot](https://raw.githubusercontent.com/cmyr/RustPlayground/screenshots/playground-0.2.png)
 
 ## installation
 

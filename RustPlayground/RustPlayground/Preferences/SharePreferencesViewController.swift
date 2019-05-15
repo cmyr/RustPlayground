@@ -38,11 +38,15 @@ class SharePreferencesViewController: NSViewController {
 
         if token.isEmpty {
             bottomHelperButton.title = "Generate a token"
-            bottomHelperButton.contentTintColor = NSColor.linkColor
+            if #available(OSX 10.14, *) {
+                bottomHelperButton.contentTintColor = NSColor.linkColor
+            }
             bottomHelperButton.action = #selector(generateLinkAction(_:))
         } else {
             bottomHelperButton.title = "Clear token"
-            bottomHelperButton.contentTintColor = NSColor.systemRed
+            if #available(OSX 10.14, *) {
+                bottomHelperButton.contentTintColor = NSColor.systemRed
+            }
             bottomHelperButton.action = #selector(clearTokenAction(_:))
         }
     }

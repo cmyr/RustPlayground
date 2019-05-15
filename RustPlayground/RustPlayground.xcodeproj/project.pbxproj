@@ -94,9 +94,6 @@
 		604C7AC7226E56DC00F6B277 /* libplayground.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libplayground.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		604C7ACB226E572C00F6B277 /* playground.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = playground.h; path = "../playground-utils-ffi/playground.h"; sourceTree = "<group>"; };
 		604C7ACF226E597700F6B277 /* Playground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Playground.swift; sourceTree = "<group>"; };
-		604C7AD1226E64EA00F6B277 /* libcurl.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcurl.tbd; path = usr/lib/libcurl.tbd; sourceTree = SDKROOT; };
-		604C7AD3226E64FC00F6B277 /* libcurl.4.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcurl.4.tbd; path = usr/lib/libcurl.4.tbd; sourceTree = SDKROOT; };
-		604C7AD5226E654400F6B277 /* libcurl.3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcurl.3.tbd; path = usr/lib/libcurl.3.tbd; sourceTree = SDKROOT; };
 		604C7ADA226F60FA00F6B277 /* CompilerTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompilerTask.swift; sourceTree = "<group>"; };
 		604C7ADC22710CA600F6B277 /* MissingRustupInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MissingRustupInfoView.swift; sourceTree = "<group>"; };
 		606644E7223FFED7006215A0 /* Rust Playground.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Rust Playground.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -153,21 +150,9 @@
 			path = Preferences;
 			sourceTree = "<group>";
 		};
-		600D761222405AC400CC9D90 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				604C7AD5226E654400F6B277 /* libcurl.3.tbd */,
-				604C7AD3226E64FC00F6B277 /* libcurl.4.tbd */,
-				604C7AD1226E64EA00F6B277 /* libcurl.tbd */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		606644DE223FFED7006215A0 = {
 			isa = PBXGroup;
 			children = (
-				6009608B22837CF3001BE755 /* libximodal.a */,
-				6009608922837CD9001BE755 /* libplayground.a */,
 				606644E9223FFED7006215A0 /* RustPlayground */,
 				606644FC223FFED9006215A0 /* ModalInputTestTests */,
 				606644E8223FFED7006215A0 /* Products */,
@@ -175,7 +160,8 @@
 				604C7ACB226E572C00F6B277 /* playground.h */,
 				609A22662240504100A3F007 /* libximodal.h */,
 				603608D2224EC693002CEAC6 /* xicore.h */,
-				600D761222405AC400CC9D90 /* Frameworks */,
+				6009608B22837CF3001BE755 /* libximodal.a */,
+				6009608922837CD9001BE755 /* libplayground.a */,
 			);
 			sourceTree = "<group>";
 		};
@@ -507,6 +493,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				EXECUTABLE_PREFIX = lib;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 			};
@@ -517,6 +504,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				EXECUTABLE_PREFIX = lib;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 			};
@@ -655,6 +643,7 @@
 					"$(inherited)",
 					"${BUILT_PRODUCTS_DIR}",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				PRODUCT_BUNDLE_IDENTIFIER = net.cmyr.RustPlayground;
 				PRODUCT_MODULE_NAME = RustPlayground;
 				PRODUCT_NAME = "Rust Playground";
@@ -681,6 +670,7 @@
 					"$(inherited)",
 					"${BUILT_PRODUCTS_DIR}",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				PRODUCT_BUNDLE_IDENTIFIER = net.cmyr.RustPlayground;
 				PRODUCT_MODULE_NAME = RustPlayground;
 				PRODUCT_NAME = "Rust Playground";
@@ -735,6 +725,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				EXECUTABLE_PREFIX = lib;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 			};
@@ -745,6 +736,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				EXECUTABLE_PREFIX = lib;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 			};

@@ -82,15 +82,18 @@ extension PlaygroundResult {
     /// Call an external function, doing error handling and json parsing.
     static func from(externFn: (UnsafeMutablePointer<ExternError>) -> UnsafePointer<Int8>?) -> PlaygroundResult {
         var error = ExternError()
-        let cString = externFn(&error)!
-        defer { playgroundStringFree(cString) }
+        let result = externFn(&error);
 
         if error.code != 0 {
             let message = String(cString: error.message, encoding: .utf8)!
             let error = PlaygroundError(message: message, code: error.code)
-            playgroundStringFree(error.message)
             return .failure(error)
         }
+        guard let cString = result else {
+            fatalError("ffi returned no error and null string");
+        }
+
+        defer { playgroundStringFree(cString)}
 
         let string = String(cString: cString, encoding: .utf8)!
         let message = try! JSONSerialization.jsonObject(with: string.data(using: .utf8)!)

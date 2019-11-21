@@ -176,7 +176,7 @@
                                                     </textFieldCell>
                                                 </textField>
                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RzW-pz-aeR">
-                                                    <rect key="frame" x="204" y="143" width="47" height="17"/>
+                                                    <rect key="frame" x="204" y="144" width="47" height="16"/>
                                                     <textFieldCell key="cell" lineBreakMode="clipping" title="spaces" id="IWC-uu-vcQ">
                                                         <font key="font" metaFont="system"/>
                                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -750,6 +750,12 @@
                                         <menuItem title="Run" keyEquivalent="r" id="Hzc-sb-8gm">
                                             <connections>
                                                 <action selector="runAction:" target="Ady-hI-5gd" id="znL-ac-QKe"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Release" id="6hh-yH-yWU">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="toggleReleaseBuild:" target="Ady-hI-5gd" id="rtJ-SR-ynv"/>
                                             </connections>
                                         </menuItem>
                                     </items>

@@ -60,6 +60,8 @@ class MainPlaygroundViewController: NSSplitViewController {
         return toolbarItem!.view as! NSProgressIndicator
     }()
 
+    var buildForRelease = false;
+
     override func viewDidLoad() {
         super.viewDidLoad()
         NotificationCenter.default.addObserver(self,
@@ -129,6 +131,15 @@ class MainPlaygroundViewController: NSSplitViewController {
             outputViewController.printText(("\(key):\n\t\(value)\n"))
         }
         outputViewController.printHeader("Done")
+    }
+
+    @IBAction func toggleReleaseBuild(_ sender: NSMenuItem?) {
+        if sender?.state == .on {
+            sender?.state = .off;
+        } else {
+            sender?.state = .on;
+        }
+        buildForRelease = sender?.state == .on
     }
 
     func showMissingRustupView() {
@@ -293,6 +304,6 @@ class MainPlaygroundViewController: NSSplitViewController {
         let toolchain = AppDelegate.shared.toolchains[activeToolchainIdx].name
         let code = AppDelegate.shared.core.getDocument()
         let taskType: CompilerTask.TaskType = .run
-        return CompilerTask(toolchain: toolchain, code: code, type: taskType, backtrace: true, release: false)
+        return CompilerTask(toolchain: toolchain, code: code, type: taskType, backtrace: true, release: buildForRelease)
     }
 }

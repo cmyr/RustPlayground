@@ -242,8 +242,9 @@ class MainPlaygroundViewController: NSSplitViewController {
         runButton.isEnabled = false
 
         let task = generateTask()
+        let buildDir = AppDelegate.shared.defaultBuildDirectory
         DispatchQueue.global(qos: .default).async {
-            let result = self.executeTask(task)
+            let result = self.executeTask(task, inDirectory: buildDir)
             DispatchQueue.main.async {
                 self.taskFinished(result, run: run)
             }
@@ -279,9 +280,8 @@ class MainPlaygroundViewController: NSSplitViewController {
         }
     }
 
-    func executeTask(_ task: CompilerTask) -> Result<CompilerResult, PlaygroundError> {
-        let buildDir = AppDelegate.shared.defaultBuildDirectory
-        return RustPlayground.executeTask(inDirectory: buildDir, task: task, stderr: { [weak self] (line) in
+    func executeTask(_ task: CompilerTask, inDirectory directory: URL) -> Result<CompilerResult, PlaygroundError> {
+        return RustPlayground.executeTask(inDirectory: directory, task: task, stderr: { [weak self] (line) in
             DispatchQueue.main.async {
                 self?.outputViewController.handleRawStdErrLine(line)
             }

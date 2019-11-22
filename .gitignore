@@ -1,5 +1,6 @@
 Cargo.lock
 target
+releases
 
 xi-modal-input/Cargo.lock
 xi-modal-input/target

@@ -634,6 +634,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 4;
 				INFOPLIST_FILE = RustPlayground/Assets/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -644,6 +645,7 @@
 					"${BUILT_PRODUCTS_DIR}",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MARKETING_VERSION = 0.2.1;
 				PRODUCT_BUNDLE_IDENTIFIER = net.cmyr.RustPlayground;
 				PRODUCT_MODULE_NAME = RustPlayground;
 				PRODUCT_NAME = "Rust Playground";
@@ -661,6 +663,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 4;
 				INFOPLIST_FILE = RustPlayground/Assets/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -671,6 +674,7 @@
 					"${BUILT_PRODUCTS_DIR}",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MARKETING_VERSION = 0.2.1;
 				PRODUCT_BUNDLE_IDENTIFIER = net.cmyr.RustPlayground;
 				PRODUCT_MODULE_NAME = RustPlayground;
 				PRODUCT_NAME = "Rust Playground";

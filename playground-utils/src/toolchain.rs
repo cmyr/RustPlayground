@@ -31,7 +31,7 @@ pub fn list_toolchains() -> Result<Vec<ToolchainInfo>, Error> {
     let toolchains = toolchains
         .into_iter()
         .filter(|t| t.ends_with(NATIVE_TOOLCHAIN))
-        .map(|t| ToolchainInfo::from_name(t))
+        .map(ToolchainInfo::from_name)
         .collect::<Result<Vec<_>, _>>()?;
     Ok(toolchains)
 }

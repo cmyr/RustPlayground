@@ -16,9 +16,9 @@ enum Type {
 impl Type {
     fn as_str(&self) -> &str {
         match self {
-            Type::Run => "build".as_ref(),
-            Type::Check => "build".as_ref(),
-            Type::Test => "test".as_ref(),
+            Type::Run => "build",
+            Type::Check => "build",
+            Type::Test => "test",
         }
     }
 }
@@ -70,7 +70,7 @@ where
     command.stderr(Stdio::piped());
     command.stdout(Stdio::piped());
 
-    let mut child = command.spawn().map_err(|e| Error::CompileFailed(e))?;
+    let mut child = command.spawn().map_err(Error::CompileFailed)?;
     let stderr = child.stderr.take().expect("piped stderr must exist");
     let mut linereader = BufReader::new(stderr);
 
@@ -91,12 +91,12 @@ where
         }
     }
 
-    let output = child.wait_with_output().map_err(|e| Error::CompileFailed(e))?;
+    let output = child.wait_with_output().map_err(Error::CompileFailed)?;
     let success = output.status.success();
     let executable = get_output_path(outdir, &task);
     let stdout = String::from_utf8_lossy(&output.stdout).to_string();
     let stderr = String::from_utf8_lossy(&output.stderr).to_string();
-    Ok(CompilerResult { success, executable, stdout, stderr })
+    Ok(CompilerResult { success, stdout, stderr, executable })
 }
 
 fn create_cargo_scaffold(path: &Path, code: &str) -> Result<(), Error> {
@@ -157,10 +157,7 @@ fn legal_in_crate_name(c: char) -> bool {
 }
 
 fn legal_in_version(c: char) -> bool {
-    match c {
-        '0'..='9' | '.' => true,
-        _ => false,
-    }
+    matches!(c, '0'..='9' | '.')
 }
 
 fn activate_toolchain(path: &Path, toolchain: &str) -> Result<(), Error> {
@@ -168,7 +165,7 @@ fn activate_toolchain(path: &Path, toolchain: &str) -> Result<(), Error> {
         .current_dir(path)
         .args(&["override", "set", toolchain])
         .output()
-        .map_err(|e| Error::ToolchainSelectFailed(e))?;
+        .map_err(Error::ToolchainSelectFailed)?;
 
     if result.status.success() {
         Ok(())

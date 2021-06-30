@@ -1,4 +1,4 @@
-use libc::{c_char, uint32_t};
+use libc::c_char;
 use std::ffi::CString;
 
 use xi_core_lib::edit_types::EventDomain;
@@ -14,7 +14,7 @@ type Milliseconds = u32;
 pub enum EventPayload {}
 
 pub struct KeyEvent {
-    pub modifiers: uint32_t,
+    pub modifiers: u32,
     pub characters: &'static str,
     pub payload: *const EventPayload,
 }
@@ -22,16 +22,16 @@ pub struct KeyEvent {
 pub struct Plumber {
     event_callback: extern "C" fn(*const EventPayload, bool),
     action_callback: extern "C" fn(*const c_char),
-    timer_callback: extern "C" fn(*const EventPayload, uint32_t) -> uint32_t,
-    cancel_timer_callback: extern "C" fn(uint32_t),
+    timer_callback: extern "C" fn(*const EventPayload, u32) -> u32,
+    cancel_timer_callback: extern "C" fn(u32),
 }
 
 impl Plumber {
     pub fn new(
         event_callback: extern "C" fn(*const EventPayload, bool),
         action_callback: extern "C" fn(*const c_char),
-        timer_callback: extern "C" fn(*const EventPayload, uint32_t) -> uint32_t,
-        cancel_timer_callback: extern "C" fn(uint32_t),
+        timer_callback: extern "C" fn(*const EventPayload, u32) -> u32,
+        cancel_timer_callback: extern "C" fn(u32),
     ) -> Plumber {
         Plumber { event_callback, action_callback, timer_callback, cancel_timer_callback }
     }
@@ -66,7 +66,7 @@ impl<'a> EventCtx<'a> {
     where
         V: Into<Option<serde_json::Value>>,
     {
-        let params = params.into().unwrap_or(serde_json::Map::new().into());
+        let params = params.into().unwrap_or_else(|| serde_json::Map::new().into());
         let json = json!({
             "method": method,
             "params": params,

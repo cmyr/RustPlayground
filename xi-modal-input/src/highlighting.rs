@@ -71,7 +71,7 @@ impl Internal {
         let mut total_offset = 0;
 
         while total_offset < text.len() {
-            let next_break = cursor.next::<LinesMetric>().unwrap_or(text.len());
+            let next_break = cursor.next::<LinesMetric>().unwrap_or_else(|| text.len());
             let line = text.slice_to_cow(total_offset..next_break);
             let mut last_pos = 0;
             let ops = parse_state.parse_line(line.trim_end_matches('\n'), syntax_set);
@@ -123,7 +123,7 @@ impl Internal {
 //TODO: rewrite using std::iter::from_fn?
 /// Returns the set of line ranges that include a selection. (Lines that include
 /// multiple selections are only included once.)
-pub(crate) fn lines_for_selection(text: &Rope, sel: &Selection) -> Vec<(Range<usize>)> {
+pub(crate) fn lines_for_selection(text: &Rope, sel: &Selection) -> Vec<Range<usize>> {
     let mut prev_range: Option<Range<usize>> = None;
     let mut line_ranges = Vec::new();
     // we send selection state to syntect in the form of a vec of line ranges,

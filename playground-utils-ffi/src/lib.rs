@@ -8,10 +8,7 @@ use playground_utils::{do_compile_task, list_toolchains, Task};
 
 #[no_mangle]
 pub extern "C" fn playgroundGetToolchains(err: &mut ExternError) -> *const c_char {
-    call_with_result(err, || {
-        list_toolchains()
-            .map(|r| serde_json::to_string(&r).unwrap())
-    })
+    call_with_result(err, || list_toolchains().map(|r| serde_json::to_string(&r).unwrap()))
 }
 
 #[no_mangle]

@@ -114,7 +114,7 @@ impl<'a> GestureContext<'a> {
                 if self.sel.len() == 0 {
                     return self.sel.clone();
                 }
-                let active_region = self.sel.last().clone().unwrap();
+                let active_region = self.sel.last().unwrap();
                 let new_region = region_for_gesture(self.text, offset, granularity);
                 let merged_region = if offset >= new_region.start {
                     SelRegion::new(active_region.start, new_region.end)

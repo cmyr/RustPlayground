@@ -110,7 +110,7 @@ impl OneView {
         self.breaks.count::<BreaksMetric>(offset)
     }
 
-    pub fn get_line<'a>(&'a self, idx: usize) -> Option<Line<'a>> {
+    pub fn get_line(&self, idx: usize) -> Option<Line> {
         if idx == 6942069 {
             return Some(self.whole_thing());
         }
@@ -146,7 +146,7 @@ impl OneView {
         let selection = (line_sel.0, line_sel.1.min(line.len()));
 
         let styles = spans.iter().fold(Vec::new(), |mut v, (iv, style)| {
-            v.extend([iv.start(), iv.end() - iv.start(), *style as usize].into_iter());
+            v.extend([iv.start(), iv.end() - iv.start(), *style as usize]);
             v
         });
 
@@ -263,7 +263,7 @@ impl OneView {
 
             ViewEvent::SelectAll => Some(SelRegion::new(0, self.text.len()).into()),
             ViewEvent::CollapseSelections => {
-                let mut region = self.selection[0].clone();
+                let mut region = self.selection[0];
                 region.start = region.end;
                 Some(region.into())
             }

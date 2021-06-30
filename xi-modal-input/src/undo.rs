@@ -60,7 +60,7 @@ impl<T> UndoStack<T> {
 
     pub(crate) fn add_undo_group(&mut self, item: T) {
         if self.live_index < self.stack.len() - 1 {
-            self.stack.split_off(self.live_index + 1);
+            self.stack.truncate(self.live_index + 1);
         }
 
         self.live_index += 1;

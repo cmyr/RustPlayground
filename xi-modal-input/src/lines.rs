@@ -38,8 +38,9 @@ where
     let mut builder = BreakBuilder::new();
     let mut last_break = interval.start;
 
-    let mut breaks_iter = BreaksIter::new(text, interval.start, width_cache, view_width);
-    while let Some(Break { offset, width, hard }) = breaks_iter.next() {
+    let breaks_iter = BreaksIter::new(text, interval.start, width_cache, view_width);
+    for Break { offset, width, hard } in breaks_iter {
+        //while let Some(Break { offset, width, hard }) = breaks_iter.next() {
         if offset == interval.end && !hard {
             builder.add_no_break(offset - last_break, width);
             break;

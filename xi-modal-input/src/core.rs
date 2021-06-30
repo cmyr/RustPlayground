@@ -59,7 +59,7 @@ impl XiCore {
                     line: u64,
                     col: u64,
                     ty: GestureType,
-                };
+                }
                 let Params { line, col, ty } = msg.get_params();
                 E::Gesture { line, col, ty }
             }

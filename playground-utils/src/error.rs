@@ -3,7 +3,7 @@ use std::io;
 use std::path::PathBuf;
 use std::process::Output;
 
-use ffi_support::{ExternError, ErrorCode};
+use ffi_support::{ErrorCode, ExternError};
 
 #[derive(Debug)]
 pub enum Error {

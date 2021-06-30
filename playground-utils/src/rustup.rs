@@ -65,7 +65,7 @@ fn get_rustup_home() -> Result<PathBuf, Error> {
         if let Some(home) = env::var_os("RUSTUP_HOME") {
             return Ok(home.into());
         }
-        dirs::home_dir().map(|p| p.join(".rustup")).ok_or_else(|| Error::MissingRustup)
+        dirs::home_dir().map(|p| p.join(".rustup")).ok_or(Error::MissingRustup)
     }
 
     let rustup_home = get_rustup_home_path()?;

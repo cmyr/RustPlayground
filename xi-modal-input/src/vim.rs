@@ -88,14 +88,20 @@ impl Handler for Machine {
     }
 }
 
-impl Machine {
-    pub fn new() -> Self {
+impl Default for Machine {
+    fn default() -> Self {
         Machine {
             mode: Mode::Insert,
             state: CommandState::Ready,
             raw: String::new(),
             timeout_token: None,
         }
+    }
+}
+
+impl Machine {
+    pub fn new() -> Self {
+        Machine::default()
     }
 
     fn handle_insert(&mut self, event: KeyEvent, ctx: &EventCtx) {

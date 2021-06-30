@@ -1,13 +1,13 @@
 use std::ffi::{CStr, CString};
 
-use libc::{c_char, int32_t, size_t, uint32_t};
+use libc::{c_char, size_t};
 extern crate xi_modal_input;
 use xi_modal_input::{EventCtx, EventPayload, KeyEvent, Line, OneView, Plumber, Size, Vim, XiCore};
 
 #[repr(C)]
 pub struct XiLine {
     text: *const c_char,
-    cursor: int32_t,
+    cursor: i32,
     selection: [size_t; 2],
     styles: *const [size_t],
     styles_len: size_t,
@@ -33,8 +33,8 @@ pub extern "C" fn xiCoreRegisterEventHandler(
     ptr: *mut XiCore,
     event_cb: extern "C" fn(*const EventPayload, bool),
     action_cb: extern "C" fn(*const c_char),
-    timer_cb: extern "C" fn(*const EventPayload, uint32_t) -> uint32_t,
-    cancel_timer_cb: extern "C" fn(uint32_t),
+    timer_cb: extern "C" fn(*const EventPayload, u32) -> u32,
+    cancel_timer_cb: extern "C" fn(u32),
 ) {
     let core = unsafe {
         assert!(!ptr.is_null(), "null pointer in xiCoreRegisterEventHandler");
@@ -50,7 +50,7 @@ pub extern "C" fn xiCoreRegisterEventHandler(
 #[no_mangle]
 pub extern "C" fn xiCoreHandleInput(
     ptr: *mut XiCore,
-    modifiers: uint32_t,
+    modifiers: u32,
     characters: *const c_char,
     payload: *const EventPayload,
 ) {
@@ -72,7 +72,7 @@ pub extern "C" fn xiCoreHandleInput(
         }
     };
 
-    let event = KeyEvent { characters, modifiers, payload };
+    let event = KeyEvent { modifiers, characters, payload };
 
     let ctx = EventCtx { plumber: core.plumber.as_ref().unwrap(), state: &mut core.state };
     if let Some(update) = core.handler.as_mut().unwrap().handle_event(event, ctx) {
@@ -81,7 +81,7 @@ pub extern "C" fn xiCoreHandleInput(
 }
 
 #[no_mangle]
-pub extern "C" fn xiCoreClearPending(ptr: *mut XiCore, token: uint32_t) {
+pub extern "C" fn xiCoreClearPending(ptr: *mut XiCore, token: u32) {
     let core = unsafe {
         assert!(!ptr.is_null());
         &mut *ptr
@@ -91,11 +91,13 @@ pub extern "C" fn xiCoreClearPending(ptr: *mut XiCore, token: uint32_t) {
         eprintln!("unexpected None in xiCoreClearPending");
     }
 
-    core.handler.as_mut().map(|h| h.clear_pending(token));
+    if let Some(h) = core.handler.as_mut() {
+        h.clear_pending(token)
+    };
 }
 
 #[no_mangle]
-pub extern "C" fn xiCoreGetLine(ptr: *mut XiCore, idx: uint32_t) -> *const XiLine {
+pub extern "C" fn xiCoreGetLine(ptr: *mut XiCore, idx: u32) -> *const XiLine {
     let core = unsafe {
         assert!(!ptr.is_null(), "null pointer in xiCoreGetLine");
         &mut *ptr

@@ -11,6 +11,7 @@ enum Type {
     Run,
     Check,
     Test,
+    Clean,
 }
 
 impl Type {
@@ -19,6 +20,7 @@ impl Type {
             Type::Run => "build",
             Type::Check => "build",
             Type::Test => "test",
+            Type::Clean => "clean",
         }
     }
 }

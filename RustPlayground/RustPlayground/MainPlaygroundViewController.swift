@@ -242,6 +242,17 @@ class MainPlaygroundViewController: NSSplitViewController {
         build(andRun: true)
     }
 
+    @IBAction func cleanAction(_ sender: Any?) {
+        let task = generateTask(type: .clean)
+        let buildDir = AppDelegate.shared.defaultBuildDirectory
+        DispatchQueue.global(qos: .default).async {
+            let result = self.executeTask(task, inDirectory: buildDir)
+            DispatchQueue.main.async {
+                self.taskFinished(result, run: false)
+            }
+        }
+    }
+
     func build(andRun run: Bool) {
         if !outputViewIsVisible {
             outputViewIsVisible = true
@@ -299,11 +310,11 @@ class MainPlaygroundViewController: NSSplitViewController {
         })
     }
 
-    func generateTask() -> CompilerTask {
+    func generateTask(type: CompilerTask.TaskType? = nil) -> CompilerTask {
         let activeToolchainIdx = toolchainSelectButton.indexOfSelectedItem
         let toolchain = AppDelegate.shared.toolchains[activeToolchainIdx].name
         let code = AppDelegate.shared.core.getDocument()
-        let taskType: CompilerTask.TaskType = .run
+        let taskType: CompilerTask.TaskType = type ?? .run
         return CompilerTask(toolchain: toolchain, code: code, type: taskType, backtrace: true, release: buildForRelease)
     }
 }

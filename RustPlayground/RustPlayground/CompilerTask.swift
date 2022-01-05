@@ -12,7 +12,7 @@ import Foundation
 struct CompilerTask {
 
     enum TaskType: String {
-        case run, check, test
+        case run, check, test, clean
     }
 
     let toolchain: String

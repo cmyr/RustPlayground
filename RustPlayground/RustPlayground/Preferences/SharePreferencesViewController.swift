@@ -113,5 +113,5 @@ extension SharePreferencesViewController: NSTextFieldDelegate {
 }
 
 fileprivate func textLooksLikeToken(_ maybeToken: String) -> Bool {
-    return maybeToken.count == 40 && maybeToken.allSatisfy({ $0.isHexDigit })
+    return maybeToken.count == 40
 }

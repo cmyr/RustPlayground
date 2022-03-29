@@ -53,7 +53,7 @@ extension GithubError: Error {
         case .InvalidResponse:
             return "Authorization failed, invalid response."
         case .NotAuthorized:
-            return "Authorization failed, invalid token."
+            return "Authorization failed, invalid token. You can update it in the application preferences."
         case .MissingGistAuthorization:
             return "Authorization failed. The provided token does not have the 'gists' permission."
         case .MissingExpectedHeader:
@@ -90,7 +90,7 @@ class GithubConnection {
                     return completionHandler(.NotAuthorized)
                 }
 
-                guard let authorizedScopes = response.allHeaderFields[HTTP_HEADER_GITHUB_SCOPES] as? String else {
+                guard let authorizedScopes = response.value(forHTTPHeaderField: HTTP_HEADER_GITHUB_SCOPES) else {
                     return completionHandler(.MissingExpectedHeader)
                 }
 
